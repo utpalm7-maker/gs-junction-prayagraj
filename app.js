@@ -1,9 +1,11 @@
 /* =========================================================
    GS JUNCTION PRAYAGRAJ
    MASTER APP.JS
+   UPDATED + SAFE VERSION
    ========================================================= */
 
 "use strict";
+
 
 /* =========================================================
    GLOBAL VARIABLES
@@ -25,6 +27,8 @@ let selectedAnswers = [];
 let currentExam = "";
 let currentCategory = "";
 let currentSubject = "";
+
+let appInitialized = false;
 
 const SECONDS_PER_QUESTION = 45;
 
@@ -59,22 +63,25 @@ function showPage(id) {
             page.classList.remove("active");
         });
 
-    const page = document.getElementById(id);
+    const page =
+        document.getElementById(id);
 
     if (page) {
         page.classList.add("active");
     }
 
-    const nav = document.getElementById("nav");
+    const nav =
+        document.getElementById("nav");
 
     if (nav) {
         nav.classList.remove("open");
     }
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+    /*
+     * Smooth scrolling हटाया गया
+     * ताकि page freeze न हो
+     */
+    window.scrollTo(0, 0);
 }
 
 
@@ -84,7 +91,8 @@ function showPage(id) {
 
 function toggleNav() {
 
-    const nav = document.getElementById("nav");
+    const nav =
+        document.getElementById("nav");
 
     if (nav) {
         nav.classList.toggle("open");
@@ -103,7 +111,12 @@ function loginStudent() {
         "student"
     );
 
-    if (!localStorage.getItem("studentName")) {
+    if (
+        !localStorage.getItem(
+            "studentName"
+        )
+    ) {
+
         localStorage.setItem(
             "studentName",
             "Student"
@@ -122,9 +135,10 @@ function loginStudent() {
 
 function loginAdmin() {
 
-    const password = prompt(
-        "Admin Password दर्ज करें:"
-    );
+    const password =
+        prompt(
+            "Admin Password दर्ज करें:"
+        );
 
     if (password === "admin123") {
 
@@ -150,14 +164,23 @@ function loginAdmin() {
 
 function logout() {
 
-    localStorage.removeItem(
-        "userType"
-    );
-
     stopTimer();
 
     currentTest = null;
+
     selectedAnswers = [];
+
+    currentQuestion = 0;
+
+    score = 0;
+
+    correctAnswers = 0;
+
+    attempted = 0;
+
+    localStorage.removeItem(
+        "userType"
+    );
 
     showPage("loginPage");
 }
@@ -171,7 +194,8 @@ function youtube() {
 
     window.open(
         "https://www.youtube.com/@LiveStudyAllahabad",
-        "_blank"
+        "_blank",
+        "noopener,noreferrer"
     );
 }
 
@@ -197,19 +221,26 @@ function openExam(exam) {
     currentExam = exam;
 
     const title =
-        document.getElementById("examTitle");
+        document.getElementById(
+            "examTitle"
+        );
 
     const description =
-        document.getElementById("examDescription");
+        document.getElementById(
+            "examDescription"
+        );
 
     if (title) {
+
         title.textContent =
             exam + " — Test Series";
     }
 
     if (description) {
+
         description.textContent =
-            exam + " के लिए उपलब्ध सभी Tests";
+            exam +
+            " के लिए उपलब्ध सभी Tests";
     }
 
     renderExamTests(exam);
@@ -225,7 +256,9 @@ function openExam(exam) {
 function renderExamTests(exam) {
 
     const container =
-        document.getElementById("examTests");
+        document.getElementById(
+            "examTests"
+        );
 
     if (!container) return;
 
@@ -238,59 +271,76 @@ function renderExamTests(exam) {
 
         container.innerHTML = `
             <div class="empty-state">
+
                 <span>📝</span>
-                <h3>अभी कोई Test उपलब्ध नहीं है</h3>
+
+                <h3>
+                    अभी कोई Test उपलब्ध नहीं है
+                </h3>
+
                 <p>
                     इस परीक्षा के लिए Test जल्द उपलब्ध कराया जाएगा।
                 </p>
+
             </div>
         `;
 
         return;
     }
 
-    filtered.forEach((test, index) => {
+    filtered.forEach(
+        (test, index) => {
 
-        const button =
-            document.createElement("button");
+            const button =
+                document.createElement(
+                    "button"
+                );
 
-        button.className =
-            "dashboard-card";
+            button.className =
+                "dashboard-card";
 
-        button.type = "button";
+            button.type =
+                "button";
 
-        const questionCount =
-            Number(
-                test.questions?.length || 0
+            const questionCount =
+                Array.isArray(
+                    test.questions
+                )
+                    ? test.questions.length
+                    : 0;
+
+            const totalSeconds =
+                questionCount *
+                SECONDS_PER_QUESTION;
+
+            button.innerHTML = `
+                <span>📝</span>
+
+                <strong>
+                    ${escapeHTML(
+                        test.title ||
+                        `Test - ${index + 1}`
+                    )}
+                </strong>
+
+                <small>
+                    ${questionCount} प्रश्न
+                    •
+                    ${formatTime(totalSeconds)}
+                </small>
+            `;
+
+            button.onclick =
+                function () {
+
+                    startTestDirect(test);
+                };
+
+            container.appendChild(
+                button
             );
-
-        const totalSeconds =
-            questionCount *
-            SECONDS_PER_QUESTION;
-
-        button.innerHTML = `
-            <span>📝</span>
-
-            <strong>
-                ${escapeHTML(
-                    test.title ||
-                    `Test - ${index + 1}`
-                )}
-            </strong>
-
-            <small>
-                ${questionCount} प्रश्न
-                •
-                ${formatTime(totalSeconds)}
-            </small>
-        `;
-
-        button.onclick = function () {
-            startTestDirect(test);
-        };
-
-        container.appendChild(button);
-    });
+        }
+    );
 }
 
 
@@ -302,7 +352,9 @@ function startTestDirect(test) {
 
     if (
         !test ||
-        !Array.isArray(test.questions) ||
+        !Array.isArray(
+            test.questions
+        ) ||
         !test.questions.length
     ) {
 
@@ -319,8 +371,11 @@ function startTestDirect(test) {
         normalizeTest(test);
 
     currentQuestion = 0;
+
     score = 0;
+
     correctAnswers = 0;
+
     attempted = 0;
 
     selectedAnswers =
@@ -334,7 +389,11 @@ function startTestDirect(test) {
         );
 
     if (resultArea) {
-        resultArea.classList.add("hidden");
+
+        resultArea.classList.add(
+            "hidden"
+        );
+
         resultArea.innerHTML = "";
     }
 
@@ -355,24 +414,33 @@ function initializeTestSelectors() {
     populateExamSelector();
 
     const count =
-        document.getElementById("count");
+        document.getElementById(
+            "count"
+        );
 
     if (count) {
 
         count.innerHTML = "";
 
-        [10, 20, 30, 50, 100].forEach(num => {
+        [10, 20, 30, 50, 100].forEach(
+            num => {
 
-            const option =
-                document.createElement("option");
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
-            option.value = num;
+                option.value =
+                    String(num);
 
-            option.textContent =
-                `${num} Questions`;
+                option.textContent =
+                    `${num} Questions`;
 
-            count.appendChild(option);
-        });
+                count.appendChild(
+                    option
+                );
+            }
+        );
     }
 }
 
@@ -384,7 +452,9 @@ function initializeTestSelectors() {
 function populateExamSelector() {
 
     const select =
-        document.getElementById("examSelect");
+        document.getElementById(
+            "examSelect"
+        );
 
     if (!select) return;
 
@@ -393,8 +463,9 @@ function populateExamSelector() {
 
     const exams =
         getUniqueValues(
-            testData.map(test =>
-                test.exam
+            testData.map(
+                test =>
+                    test.exam
             )
         );
 
@@ -403,16 +474,25 @@ function populateExamSelector() {
             ? exams
             : DEFAULT_EXAMS;
 
-    finalExams.forEach(exam => {
+    finalExams.forEach(
+        exam => {
 
-        const option =
-            document.createElement("option");
+            const option =
+                document.createElement(
+                    "option"
+                );
 
-        option.value = exam;
-        option.textContent = exam;
+            option.value =
+                exam;
 
-        select.appendChild(option);
-    });
+            option.textContent =
+                exam;
+
+            select.appendChild(
+                option
+            );
+        }
+    );
 }
 
 
@@ -439,35 +519,50 @@ function updateCategorySelector() {
     select.innerHTML =
         `<option value="">सभी Categories</option>`;
 
-    let tests = testData;
+    let tests =
+        testData;
 
     if (exam) {
 
         tests =
             tests.filter(
                 test =>
-                    normalizeText(test.exam) ===
-                    normalizeText(exam)
+                    normalizeText(
+                        test.exam
+                    ) ===
+                    normalizeText(
+                        exam
+                    )
             );
     }
 
     const categories =
         getUniqueValues(
-            tests.map(test =>
-                test.category
+            tests.map(
+                test =>
+                    test.category
             )
         );
 
-    categories.forEach(category => {
+    categories.forEach(
+        category => {
 
-        const option =
-            document.createElement("option");
+            const option =
+                document.createElement(
+                    "option"
+                );
 
-        option.value = category;
-        option.textContent = category;
+            option.value =
+                category;
 
-        select.appendChild(option);
-    });
+            option.textContent =
+                category;
+
+            select.appendChild(
+                option
+            );
+        }
+    );
 
     updateSubjectSelector();
 }
@@ -489,8 +584,11 @@ function updateSubjectSelector() {
             "categorySelect"
         )?.value || "";
 
-    currentExam = exam;
-    currentCategory = category;
+    currentExam =
+        exam;
+
+    currentCategory =
+        category;
 
     const select =
         document.getElementById(
@@ -502,15 +600,20 @@ function updateSubjectSelector() {
     select.innerHTML =
         `<option value="">सभी Subjects</option>`;
 
-    let tests = testData;
+    let tests =
+        testData;
 
     if (exam) {
 
         tests =
             tests.filter(
                 test =>
-                    normalizeText(test.exam) ===
-                    normalizeText(exam)
+                    normalizeText(
+                        test.exam
+                    ) ===
+                    normalizeText(
+                        exam
+                    )
             );
     }
 
@@ -519,28 +622,42 @@ function updateSubjectSelector() {
         tests =
             tests.filter(
                 test =>
-                    normalizeText(test.category) ===
-                    normalizeText(category)
+                    normalizeText(
+                        test.category
+                    ) ===
+                    normalizeText(
+                        category
+                    )
             );
     }
 
     const subjects =
         getUniqueValues(
-            tests.map(test =>
-                test.subject
+            tests.map(
+                test =>
+                    test.subject
             )
         );
 
-    subjects.forEach(subject => {
+    subjects.forEach(
+        subject => {
 
-        const option =
-            document.createElement("option");
+            const option =
+                document.createElement(
+                    "option"
+                );
 
-        option.value = subject;
-        option.textContent = subject;
+            option.value =
+                subject;
 
-        select.appendChild(option);
-    });
+            option.textContent =
+                subject;
+
+            select.appendChild(
+                option
+            );
+        }
+    );
 
     updateTestSelector();
 }
@@ -567,9 +684,14 @@ function updateTestSelector() {
             "subjectSelect"
         )?.value || "";
 
-    currentExam = exam;
-    currentCategory = category;
-    currentSubject = subject;
+    currentExam =
+        exam;
+
+    currentCategory =
+        category;
+
+    currentSubject =
+        subject;
 
     const select =
         document.getElementById(
@@ -581,15 +703,20 @@ function updateTestSelector() {
     select.innerHTML =
         `<option value="">Test चुनें</option>`;
 
-    let tests = testData;
+    let tests =
+        testData;
 
     if (exam) {
 
         tests =
             tests.filter(
                 test =>
-                    normalizeText(test.exam) ===
-                    normalizeText(exam)
+                    normalizeText(
+                        test.exam
+                    ) ===
+                    normalizeText(
+                        exam
+                    )
             );
     }
 
@@ -598,8 +725,12 @@ function updateTestSelector() {
         tests =
             tests.filter(
                 test =>
-                    normalizeText(test.category) ===
-                    normalizeText(category)
+                    normalizeText(
+                        test.category
+                    ) ===
+                    normalizeText(
+                        category
+                    )
             );
     }
 
@@ -608,27 +739,39 @@ function updateTestSelector() {
         tests =
             tests.filter(
                 test =>
-                    normalizeText(test.subject) ===
-                    normalizeText(subject)
+                    normalizeText(
+                        test.subject
+                    ) ===
+                    normalizeText(
+                        subject
+                    )
             );
     }
 
-    tests.forEach((test, index) => {
+    tests.forEach(
+        (test, index) => {
 
-        const option =
-            document.createElement("option");
+            const option =
+                document.createElement(
+                    "option"
+                );
 
-        option.value =
-            String(
-                testData.indexOf(test)
+            option.value =
+                String(
+                    testData.indexOf(
+                        test
+                    )
+                );
+
+            option.textContent =
+                test.title ||
+                `Test ${index + 1}`;
+
+            select.appendChild(
+                option
             );
-
-        option.textContent =
-            test.title ||
-            `Test ${index + 1}`;
-
-        select.appendChild(option);
-    });
+        }
+    );
 
     showSelectedTestInfo();
 }
@@ -670,7 +813,11 @@ function showSelectedTestInfo() {
         testData[index];
 
     const total =
-        test.questions?.length || 0;
+        Array.isArray(
+            test.questions
+        )
+            ? test.questions.length
+            : 0;
 
     const totalTime =
         total *
@@ -687,17 +834,23 @@ function showSelectedTestInfo() {
         <br>
 
         Exam:
-        ${escapeHTML(test.exam || "-")}
+        ${escapeHTML(
+            test.exam || "-"
+        )}
 
         <br>
 
         Category:
-        ${escapeHTML(test.category || "-")}
+        ${escapeHTML(
+            test.category || "-"
+        )}
 
         <br>
 
         Subject:
-        ${escapeHTML(test.subject || "-")}
+        ${escapeHTML(
+            test.subject || "-"
+        )}
 
         <br>
 
@@ -756,7 +909,9 @@ function startTest() {
     }
 
     const countSelect =
-        document.getElementById("count");
+        document.getElementById(
+            "count"
+        );
 
     let questionCount =
         Number(
@@ -764,14 +919,19 @@ function startTest() {
         );
 
     const total =
-        test.questions?.length || 0;
+        Array.isArray(
+            test.questions
+        )
+            ? test.questions.length
+            : 0;
 
     if (
         !questionCount ||
         questionCount > total
     ) {
 
-        questionCount = total;
+        questionCount =
+            total;
     }
 
     const clonedTest =
@@ -785,7 +945,9 @@ function startTest() {
             questionCount
         );
 
-    startTestDirect(clonedTest);
+    startTestDirect(
+        clonedTest
+    );
 }
 
 
@@ -800,9 +962,16 @@ function renderTestArea() {
             "testArea"
         );
 
-    if (!area || !currentTest) return;
+    if (
+        !area ||
+        !currentTest
+    ) {
+        return;
+    }
 
-    area.classList.remove("hidden");
+    area.classList.remove(
+        "hidden"
+    );
 
     const q =
         currentTest.questions[
@@ -833,8 +1002,10 @@ function renderTestArea() {
                 </strong>
 
                 <small>
-                    प्रश्न ${currentQuestion + 1}
-                    / ${total}
+                    प्रश्न
+                    ${currentQuestion + 1}
+                    /
+                    ${total}
                 </small>
 
             </div>
@@ -843,7 +1014,9 @@ function renderTestArea() {
                 id="timer"
                 class="test-timer">
 
-                ${formatTime(timeLeft)}
+                ${formatTime(
+                    timeLeft
+                )}
 
             </div>
 
@@ -853,7 +1026,8 @@ function renderTestArea() {
         <div class="question-card">
 
             <div class="question-number">
-                प्रश्न ${currentQuestion + 1}
+                प्रश्न
+                ${currentQuestion + 1}
             </div>
 
             <h3 class="question-text">
@@ -933,7 +1107,9 @@ function renderTestArea() {
 function renderOptions(question) {
 
     const options =
-        getQuestionOptions(question);
+        getQuestionOptions(
+            question
+        );
 
     if (!options.length) {
 
@@ -944,41 +1120,43 @@ function renderOptions(question) {
         `;
     }
 
-    return options.map(
-        (option, index) => {
+    return options
+        .map(
+            (option, index) => {
 
-            const letter =
-                String.fromCharCode(
-                    65 + index
-                );
+                const letter =
+                    String.fromCharCode(
+                        65 + index
+                    );
 
-            return `
+                return `
 
-                <label class="option">
+                    <label class="option">
 
-                    <input
-                        type="radio"
-                        name="answer"
-                        value="${letter}"
-                        onchange="selectAnswer('${letter}')">
+                        <input
+                            type="radio"
+                            name="answer"
+                            value="${letter}"
+                            onchange="selectAnswer('${letter}')">
 
-                    <span>
+                        <span>
 
-                        <strong>
-                            (${letter})
-                        </strong>
+                            <strong>
+                                (${letter})
+                            </strong>
 
-                        ${escapeHTML(
-                            String(option)
-                        )}
+                            ${escapeHTML(
+                                String(option)
+                            )}
 
-                    </span>
+                        </span>
 
-                </label>
+                    </label>
 
-            `;
-        }
-    ).join("");
+                `;
+            }
+        )
+        .join("");
 }
 
 
@@ -988,9 +1166,18 @@ function renderOptions(question) {
 
 function selectAnswer(answer) {
 
+    if (
+        !currentTest ||
+        !selectedAnswers
+    ) {
+        return;
+    }
+
     selectedAnswers[
         currentQuestion
-    ] = answer;
+    ] = normalizeAnswer(
+        answer
+    );
 }
 
 
@@ -1005,7 +1192,9 @@ function restoreSelectedAnswer() {
             currentQuestion
         ];
 
-    if (!answer) return;
+    if (!answer) {
+        return;
+    }
 
     const input =
         document.querySelector(
@@ -1013,7 +1202,9 @@ function restoreSelectedAnswer() {
         );
 
     if (input) {
-        input.checked = true;
+
+        input.checked =
+            true;
     }
 }
 
@@ -1024,7 +1215,9 @@ function restoreSelectedAnswer() {
 
 function nextQuestion() {
 
-    if (!currentTest) return;
+    if (!currentTest) {
+        return;
+    }
 
     saveCurrentAnswer();
 
@@ -1052,7 +1245,9 @@ function nextQuestion() {
 
 function previousQuestion() {
 
-    if (!currentTest) return;
+    if (!currentTest) {
+        return;
+    }
 
     saveCurrentAnswer();
 
@@ -1073,7 +1268,9 @@ function previousQuestion() {
 
 function saveCurrentAnswer() {
 
-    if (!currentTest) return;
+    if (!currentTest) {
+        return;
+    }
 
     const selected =
         document.querySelector(
@@ -1084,7 +1281,10 @@ function saveCurrentAnswer() {
 
         selectedAnswers[
             currentQuestion
-        ] = selected.value;
+        ] =
+            normalizeAnswer(
+                selected.value
+            );
     }
 }
 
@@ -1104,20 +1304,25 @@ function startQuestionTimer() {
     updateTimerDisplay();
 
     timerId =
-        setInterval(() => {
+        setInterval(
+            function () {
 
-            timeLeft--;
+                timeLeft--;
 
-            updateTimerDisplay();
+                updateTimerDisplay();
 
-            if (timeLeft <= 0) {
+                if (
+                    timeLeft <= 0
+                ) {
 
-                stopTimer();
+                    stopTimer();
 
-                autoNextQuestion();
-            }
+                    autoNextQuestion();
+                }
 
-        }, 1000);
+            },
+            1000
+        );
 }
 
 
@@ -1144,9 +1349,13 @@ function resetQuestionTimer() {
 
 function stopTimer() {
 
-    if (timerId !== null) {
+    if (
+        timerId !== null
+    ) {
 
-        clearInterval(timerId);
+        clearInterval(
+            timerId
+        );
 
         timerId = null;
     }
@@ -1164,23 +1373,31 @@ function updateTimerDisplay() {
             "timer"
         );
 
-    if (!timer) return;
+    if (!timer) {
+        return;
+    }
 
     timer.textContent =
-        formatTime(timeLeft);
+        formatTime(
+            timeLeft
+        );
 
     timer.classList.remove(
         "warning",
         "danger"
     );
 
-    if (timeLeft <= 10) {
+    if (
+        timeLeft <= 10
+    ) {
 
         timer.classList.add(
             "danger"
         );
 
-    } else if (timeLeft <= 20) {
+    } else if (
+        timeLeft <= 20
+    ) {
 
         timer.classList.add(
             "warning"
@@ -1195,7 +1412,9 @@ function updateTimerDisplay() {
 
 function autoNextQuestion() {
 
-    if (!currentTest) return;
+    if (!currentTest) {
+        return;
+    }
 
     saveCurrentAnswer();
 
@@ -1230,12 +1449,15 @@ function finishTest() {
 
     saveCurrentAnswer();
 
-    if (!currentTest) return;
+    if (!currentTest) {
+        return;
+    }
 
     const questions =
         currentTest.questions || [];
 
     let correct = 0;
+
     let attemptedCount = 0;
 
     questions.forEach(
@@ -1254,13 +1476,19 @@ function finishTest() {
             }
 
             const correctAnswer =
-                getCorrectAnswer(question);
+                getCorrectAnswer(
+                    question
+                );
 
             if (
                 userAnswer &&
                 correctAnswer &&
-                normalizeText(userAnswer) ===
-                normalizeText(correctAnswer)
+                normalizeText(
+                    userAnswer
+                ) ===
+                normalizeText(
+                    correctAnswer
+                )
             ) {
 
                 correct++;
@@ -1295,7 +1523,10 @@ function finishTest() {
     const percentage =
         total > 0
             ? Math.round(
-                (correct / total) * 100
+                (
+                    correct /
+                    total
+                ) * 100
             )
             : 0;
 
@@ -1336,10 +1567,15 @@ function finishTest() {
     showResult({
 
         total,
+
         correct,
+
         wrong,
+
         unanswered,
+
         attempted,
+
         percentage
     });
 }
@@ -1360,7 +1596,9 @@ function showResult(result) {
 
     if (area) {
 
-        area.classList.add("hidden");
+        area.classList.add(
+            "hidden"
+        );
     }
 
     const resultArea =
@@ -1368,7 +1606,9 @@ function showResult(result) {
             "#tests #resultArea"
         );
 
-    if (!resultArea) return;
+    if (!resultArea) {
+        return;
+    }
 
     resultArea.classList.remove(
         "hidden"
@@ -1393,6 +1633,7 @@ function showResult(result) {
             <div class="result-stats">
 
                 <div>
+
                     <strong>
                         ${result.total}
                     </strong>
@@ -1400,10 +1641,12 @@ function showResult(result) {
                     <span>
                         कुल प्रश्न
                     </span>
+
                 </div>
 
 
                 <div>
+
                     <strong>
                         ${result.correct}
                     </strong>
@@ -1411,10 +1654,12 @@ function showResult(result) {
                     <span>
                         सही
                     </span>
+
                 </div>
 
 
                 <div>
+
                     <strong>
                         ${result.wrong}
                     </strong>
@@ -1422,10 +1667,12 @@ function showResult(result) {
                     <span>
                         गलत
                     </span>
+
                 </div>
 
 
                 <div>
+
                     <strong>
                         ${result.unanswered}
                     </strong>
@@ -1433,10 +1680,12 @@ function showResult(result) {
                     <span>
                         अनुत्तरित
                     </span>
+
                 </div>
 
 
                 <div>
+
                     <strong>
                         ${result.percentage}%
                     </strong>
@@ -1444,6 +1693,7 @@ function showResult(result) {
                     <span>
                         प्रतिशत
                     </span>
+
                 </div>
 
             </div>
@@ -1489,10 +1739,29 @@ function saveResult(result) {
 
     results.push(result);
 
-    localStorage.setItem(
-        "testResults",
-        JSON.stringify(results)
-    );
+    /*
+     * केवल बहुत पुराने results हटाएँ
+     * ताकि localStorage अनावश्यक रूप से बड़ा न हो
+     */
+    const limitedResults =
+        results.slice(-500);
+
+    try {
+
+        localStorage.setItem(
+            "testResults",
+            JSON.stringify(
+                limitedResults
+            )
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Result save नहीं हुआ:",
+            error
+        );
+    }
 }
 
 
@@ -1533,7 +1802,9 @@ function showResults() {
             "#results #resultArea"
         );
 
-    if (!area) return;
+    if (!area) {
+        return;
+    }
 
     const results =
         getResults();
@@ -1541,6 +1812,7 @@ function showResults() {
     if (!results.length) {
 
         area.innerHTML = `
+
             <div class="empty-state">
 
                 <span>🏆</span>
@@ -1554,6 +1826,7 @@ function showResults() {
                 </p>
 
             </div>
+
         `;
 
         showPage("results");
@@ -1589,11 +1862,11 @@ function showResults() {
 
                             ${
                                 result.subject
-                                ? " • " +
-                                  escapeHTML(
-                                      result.subject
-                                  )
-                                : ""
+                                    ? " • " +
+                                      escapeHTML(
+                                          result.subject
+                                      )
+                                    : ""
                             }
 
                         </p>
@@ -1603,21 +1876,29 @@ function showResults() {
 
                             <span>
                                 कुल:
-                                ${result.total}
+                                ${Number(
+                                    result.total || 0
+                                )}
                             </span>
 
                             <span>
                                 सही:
-                                ${result.correct}
+                                ${Number(
+                                    result.correct || 0
+                                )}
                             </span>
 
                             <span>
                                 गलत:
-                                ${result.wrong}
+                                ${Number(
+                                    result.wrong || 0
+                                )}
                             </span>
 
                             <strong>
-                                ${result.percentage}%
+                                ${Number(
+                                    result.percentage || 0
+                                )}%
                             </strong>
 
                         </div>
@@ -1652,7 +1933,8 @@ function loadProfile() {
     const name =
         localStorage.getItem(
             "studentName"
-        ) || "Student";
+        ) ||
+        "Student";
 
     const studentName =
         document.getElementById(
@@ -1687,28 +1969,31 @@ function loadProfile() {
     let bestScore = 0;
 
     let totalQuestions = 0;
+
     let totalCorrect = 0;
 
-    results.forEach(result => {
+    results.forEach(
+        result => {
 
-        bestScore =
-            Math.max(
-                bestScore,
+            bestScore =
+                Math.max(
+                    bestScore,
+                    Number(
+                        result.percentage || 0
+                    )
+                );
+
+            totalQuestions +=
                 Number(
-                    result.percentage || 0
-                )
-            );
+                    result.total || 0
+                );
 
-        totalQuestions +=
-            Number(
-                result.total || 0
-            );
-
-        totalCorrect +=
-            Number(
-                result.correct || 0
-            );
-    });
+            totalCorrect +=
+                Number(
+                    result.correct || 0
+                );
+        }
+    );
 
     const accuracy =
         totalQuestions > 0
@@ -1771,7 +2056,9 @@ function saveName() {
             "msg"
         );
 
-    if (!input) return;
+    if (!input) {
+        return;
+    }
 
     const name =
         input.value.trim();
@@ -1860,10 +2147,17 @@ function adminAction(type) {
         );
 
         adminMessage.innerHTML = `
-            <h3>⚙️ Admin Module</h3>
+
+            <h3>
+                ⚙️ Admin Module
+            </h3>
+
             <p>
-                ${escapeHTML(message)}
+                ${escapeHTML(
+                    message
+                )}
             </p>
+
         `;
 
     } else {
@@ -1884,7 +2178,21 @@ function initializeTXTUpload() {
             "txtFile"
         );
 
-    if (!input) return;
+    if (!input) {
+        return;
+    }
+
+    /*
+     * Duplicate event listener से बचें
+     */
+    if (
+        input.dataset.initialized === "true"
+    ) {
+        return;
+    }
+
+    input.dataset.initialized =
+        "true";
 
     input.addEventListener(
         "change",
@@ -1893,7 +2201,9 @@ function initializeTXTUpload() {
             const file =
                 event.target.files[0];
 
-            if (!file) return;
+            if (!file) {
+                return;
+            }
 
             const reader =
                 new FileReader();
@@ -1939,11 +2249,14 @@ function initializeTXTUpload() {
                         subject:
                             "General Studies",
 
-                        questions
+                        questions:
+                            questions
                     };
 
                     testData.push(
-                        normalizeTest(test)
+                        normalizeTest(
+                            test
+                        )
                     );
 
                     alert(
@@ -1957,6 +2270,14 @@ function initializeTXTUpload() {
 
                     renderExamTests(
                         "TXT Test"
+                    );
+                };
+
+            reader.onerror =
+                function() {
+
+                    alert(
+                        "TXT file पढ़ने में समस्या हुई।"
                     );
                 };
 
@@ -1975,6 +2296,13 @@ function initializeTXTUpload() {
 
 function parseTXTQuestions(text) {
 
+    if (
+        !text ||
+        typeof text !== "string"
+    ) {
+        return [];
+    }
+
     const blocks =
         text
             .split(/\n\s*\n/)
@@ -1986,83 +2314,91 @@ function parseTXTQuestions(text) {
 
     const questions = [];
 
-    blocks.forEach(block => {
+    blocks.forEach(
+        block => {
 
-        const lines =
-            block
-                .split("\n")
-                .map(
-                    line =>
-                        line.trim()
-                )
-                .filter(Boolean);
+            const lines =
+                block
+                    .split("\n")
+                    .map(
+                        line =>
+                            line.trim()
+                    )
+                    .filter(Boolean);
 
-        if (!lines.length) return;
+            if (!lines.length) {
+                return;
+            }
 
-        let questionText = "";
+            let questionText = "";
 
-        const options = [];
+            const options = [];
 
-        let answer = "";
+            let answer = "";
 
-        lines.forEach(line => {
+            lines.forEach(
+                line => {
+
+                    if (
+                        /^[\(\[]?[A-Da-d][\)\].:-]/.test(
+                            line
+                        )
+                    ) {
+
+                        options.push(
+                            line.replace(
+                                /^[\(\[]?[A-Da-d][\)\].:-]\s*/,
+                                ""
+                            )
+                        );
+
+                    } else if (
+                        /^(उत्तर|answer|ans)\s*[:\-]/i.test(
+                            line
+                        )
+                    ) {
+
+                        answer =
+                            line.replace(
+                                /^(उत्तर|answer|ans)\s*[:\-]\s*/i,
+                                ""
+                            )
+                            .trim();
+
+                    } else {
+
+                        questionText +=
+                            (
+                                questionText
+                                    ? " "
+                                    : ""
+                            ) +
+                            line;
+                    }
+                }
+            );
 
             if (
-                /^[\(\[]?[A-Da-d][\)\].:-]/.test(
-                    line
-                )
+                questionText &&
+                options.length >= 2
             ) {
 
-                options.push(
-                    line.replace(
-                        /^[\(\[]?[A-Da-d][\)\].:-]\s*/,
-                        ""
-                    )
-                );
+                questions.push({
 
-            } else if (
-                /^(उत्तर|answer|ans)\s*[:\-]/i.test(
-                    line
-                )
-            ) {
+                    question:
+                        questionText,
 
-                answer =
-                    line.replace(
-                        /^(उत्तर|answer|ans)\s*[:\-]\s*/i,
-                        ""
-                    )
-                    .trim();
+                    options:
+                        options,
 
-            } else {
-
-                questionText +=
-                    (
-                        questionText
-                            ? " "
-                            : ""
-                    ) +
-                    line;
+                    answer:
+                        normalizeAnswer(
+                            answer
+                        )
+                });
             }
-        });
-
-        if (
-            questionText &&
-            options.length >= 2
-        ) {
-
-            questions.push({
-
-                question:
-                    questionText,
-
-                options:
-                    options,
-
-                answer:
-                    normalizeAnswer(answer)
-            });
         }
-    });
+    );
 
     return questions;
 }
@@ -2070,23 +2406,49 @@ function parseTXTQuestions(text) {
 
 /* =========================================================
    LOAD TEST INDEX
+   SAFE VERSION
 ========================================================= */
 
 async function loadTests() {
 
     try {
 
+        const controller =
+            new AbortController();
+
+        const timeout =
+            setTimeout(
+                function () {
+
+                    controller.abort();
+
+                },
+                8000
+            );
+
         const response =
             await fetch(
                 TEST_INDEX_URL +
                 "?v=" +
-                Date.now()
+                Date.now(),
+                {
+                    cache:
+                        "no-store",
+
+                    signal:
+                        controller.signal
+                }
             );
+
+        clearTimeout(
+            timeout
+        );
 
         if (!response.ok) {
 
             throw new Error(
-                "Index file not found"
+                "Index file not found: " +
+                response.status
             );
         }
 
@@ -2094,21 +2456,34 @@ async function loadTests() {
             await response.json();
 
         testData =
-            normalizeTestData(data);
+            normalizeTestData(
+                data
+            );
+
+        console.log(
+            "✅ Tests Loaded:",
+            testData.length
+        );
 
     } catch (error) {
 
-        console.warn(
-            "tests/index.json load नहीं हुआ:",
+        console.error(
+            "❌ tests/index.json loading error:",
             error
         );
 
         testData = [];
+
     }
 
+    /*
+     * JSON fail होने पर भी UI चलेगा
+     */
     initializeTestSelectors();
 
     renderHomeExamGrid();
+
+    return testData;
 }
 
 
@@ -2122,42 +2497,67 @@ function normalizeTestData(data) {
 
     if (Array.isArray(data)) {
 
-        tests = data;
+        tests =
+            data;
 
     } else if (
-        Array.isArray(data.tests)
+        data &&
+        Array.isArray(
+            data.tests
+        )
     ) {
 
-        tests = data.tests;
+        tests =
+            data.tests;
 
     } else if (
-        Array.isArray(data.data)
+        data &&
+        Array.isArray(
+            data.data
+        )
     ) {
 
-        tests = data.data;
+        tests =
+            data.data;
 
     } else if (
         data &&
         typeof data === "object"
     ) {
 
-        Object.keys(data).forEach(key => {
+        Object.keys(
+            data
+        ).forEach(
+            key => {
 
-            if (Array.isArray(data[key])) {
+                if (
+                    Array.isArray(
+                        data[key]
+                    )
+                ) {
 
-                data[key].forEach(test => {
+                    data[key].forEach(
+                        test => {
 
-                    tests.push({
+                            if (
+                                test &&
+                                typeof test === "object"
+                            ) {
 
-                        ...test,
+                                tests.push({
 
-                        exam:
-                            test.exam ||
-                            key
-                    });
-                });
+                                    ...test,
+
+                                    exam:
+                                        test.exam ||
+                                        key
+                                });
+                            }
+                        }
+                    );
+                }
             }
-        });
+        );
     }
 
     return tests.map(
@@ -2171,6 +2571,30 @@ function normalizeTestData(data) {
 ========================================================= */
 
 function normalizeTest(test) {
+
+    if (
+        !test ||
+        typeof test !== "object"
+    ) {
+
+        return {
+
+            title:
+                "Online Test",
+
+            exam:
+                "",
+
+            category:
+                "General",
+
+            subject:
+                "General Studies",
+
+            questions:
+                []
+        };
+    }
 
     const normalized = {
         ...test
@@ -2215,6 +2639,24 @@ function normalizeTest(test) {
 
 function normalizeQuestion(question) {
 
+    if (
+        !question ||
+        typeof question !== "object"
+    ) {
+
+        return {
+
+            question:
+                "",
+
+            options:
+                [],
+
+            answer:
+                ""
+        };
+    }
+
     const q = {
         ...question
     };
@@ -2226,7 +2668,9 @@ function normalizeQuestion(question) {
         "";
 
     q.options =
-        getQuestionOptions(q);
+        getQuestionOptions(
+            q
+        );
 
     q.answer =
         normalizeAnswer(
@@ -2246,7 +2690,16 @@ function normalizeQuestion(question) {
    GET QUESTION OPTIONS
 ========================================================= */
 
-function getQuestionOptions(question) {
+function getQuestionOptions(
+    question
+) {
+
+    if (
+        !question ||
+        typeof question !== "object"
+    ) {
+        return [];
+    }
 
     if (
         Array.isArray(
@@ -2268,7 +2721,12 @@ function getQuestionOptions(question) {
 
     const options = [];
 
-    ["A", "B", "C", "D"].forEach(
+    [
+        "A",
+        "B",
+        "C",
+        "D"
+    ].forEach(
         letter => {
 
             const value =
@@ -2283,7 +2741,9 @@ function getQuestionOptions(question) {
                 value !== ""
             ) {
 
-                options.push(value);
+                options.push(
+                    value
+                );
             }
         }
     );
@@ -2296,7 +2756,16 @@ function getQuestionOptions(question) {
    GET CORRECT ANSWER
 ========================================================= */
 
-function getCorrectAnswer(question) {
+function getCorrectAnswer(
+    question
+) {
+
+    if (
+        !question ||
+        typeof question !== "object"
+    ) {
+        return "";
+    }
 
     const answer =
         question.answer ??
@@ -2316,7 +2785,9 @@ function getCorrectAnswer(question) {
    NORMALIZE ANSWER
 ========================================================= */
 
-function normalizeAnswer(answer) {
+function normalizeAnswer(
+    answer
+) {
 
     if (
         answer === null ||
@@ -2343,25 +2814,30 @@ function normalizeAnswer(answer) {
             )
             .trim();
 
+    /*
+     * Direct A/B/C/D
+     */
     if (
-        ["A", "B", "C", "D"].includes(
-            value
-        )
+        [
+            "A",
+            "B",
+            "C",
+            "D"
+        ].includes(value)
     ) {
 
         return value;
     }
 
+    /*
+     * 0/1/2/3 format
+     */
     if (
         /^\d+$/.test(value)
     ) {
 
         const num =
             Number(value);
-
-        /*
-         * 0,1,2,3 format
-         */
 
         if (
             num >= 0 &&
@@ -2374,9 +2850,8 @@ function normalizeAnswer(answer) {
         }
 
         /*
-         * 1,2,3,4 format
+         * 1/2/3/4 format
          */
-
         if (
             num >= 1 &&
             num <= 4
@@ -2388,13 +2863,19 @@ function normalizeAnswer(answer) {
         }
     }
 
+    /*
+     * "(A)..." या "A - ..."
+     */
     const first =
         value.charAt(0);
 
     if (
-        ["A", "B", "C", "D"].includes(
-            first
-        )
+        [
+            "A",
+            "B",
+            "C",
+            "D"
+        ].includes(first)
     ) {
 
         return first;
@@ -2408,7 +2889,9 @@ function normalizeAnswer(answer) {
    GET TESTS BY EXAM
 ========================================================= */
 
-function getTestsByExam(exam) {
+function getTestsByExam(
+    exam
+) {
 
     return testData.filter(
         test =>
@@ -2433,7 +2916,9 @@ function renderHomeExamGrid() {
             "homeExamGrid"
         );
 
-    if (!grid) return;
+    if (!grid) {
+        return;
+    }
 
     grid.innerHTML = "";
 
@@ -2450,35 +2935,44 @@ function renderHomeExamGrid() {
             ? exams
             : DEFAULT_EXAMS;
 
-    finalExams.forEach(exam => {
+    finalExams.forEach(
+        exam => {
 
-        const button =
-            document.createElement(
-                "button"
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.type =
+                "button";
+
+            button.innerHTML = `
+
+                <strong>
+                    ${escapeHTML(
+                        exam
+                    )}
+                </strong>
+
+                <span>
+                    Test Series
+                </span>
+
+            `;
+
+            button.onclick =
+                function () {
+
+                    openExam(
+                        exam
+                    );
+                };
+
+            grid.appendChild(
+                button
             );
-
-        button.type = "button";
-
-        button.innerHTML = `
-
-            <strong>
-                ${escapeHTML(exam)}
-            </strong>
-
-            <span>
-                Test Series
-            </span>
-
-        `;
-
-        button.onclick =
-            function() {
-
-                openExam(exam);
-            };
-
-        grid.appendChild(button);
-    });
+        }
+    );
 }
 
 
@@ -2486,7 +2980,9 @@ function renderHomeExamGrid() {
    UNIQUE VALUES
 ========================================================= */
 
-function getUniqueValues(values) {
+function getUniqueValues(
+    values
+) {
 
     return [
         ...new Set(
@@ -2494,7 +2990,9 @@ function getUniqueValues(values) {
                 .filter(Boolean)
                 .map(
                     value =>
-                        String(value).trim()
+                        String(
+                            value
+                        ).trim()
                 )
                 .filter(Boolean)
         )
@@ -2506,7 +3004,9 @@ function getUniqueValues(values) {
    NORMALIZE TEXT
 ========================================================= */
 
-function normalizeText(value) {
+function normalizeText(
+    value
+) {
 
     return String(
         value || ""
@@ -2520,7 +3020,9 @@ function normalizeText(value) {
    FORMAT TIME
 ========================================================= */
 
-function formatTime(seconds) {
+function formatTime(
+    seconds
+) {
 
     seconds =
         Math.max(
@@ -2537,9 +3039,19 @@ function formatTime(seconds) {
         seconds % 60;
 
     return (
-        String(minutes).padStart(2, "0") +
+        String(
+            minutes
+        ).padStart(
+            2,
+            "0"
+        ) +
         ":" +
-        String(secs).padStart(2, "0")
+        String(
+            secs
+        ).padStart(
+            2,
+            "0"
+        )
     );
 }
 
@@ -2548,9 +3060,13 @@ function formatTime(seconds) {
    FORMAT DATE
 ========================================================= */
 
-function formatDate(date) {
+function formatDate(
+    date
+) {
 
-    if (!date) return "";
+    if (!date) {
+        return "";
+    }
 
     try {
 
@@ -2571,7 +3087,9 @@ function formatDate(date) {
    ESCAPE HTML
 ========================================================= */
 
-function escapeHTML(value) {
+function escapeHTML(
+    value
+) {
 
     return String(
         value ?? ""
@@ -2601,11 +3119,22 @@ function escapeHTML(value) {
 
 /* =========================================================
    APPLICATION START
+   SAFE VERSION
 ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
-    async function() {
+    function () {
+
+        /*
+         * Duplicate initialization रोकें
+         */
+        if (appInitialized) {
+            return;
+        }
+
+        appInitialized =
+            true;
 
         const userType =
             localStorage.getItem(
@@ -2613,28 +3142,11 @@ document.addEventListener(
             );
 
         /*
-         * Test data पहले load करें
+         * UI पहले दिखाएँ
          */
-
-        await loadTests();
-
-        /*
-         * TXT upload
-         */
-
-        initializeTXTUpload();
-
-        /*
-         * Profile
-         */
-
-        loadProfile();
-
-        /*
-         * Login state
-         */
-
-        if (userType === "admin") {
+        if (
+            userType === "admin"
+        ) {
 
             showPage(
                 "adminPanel"
@@ -2644,7 +3156,9 @@ document.addEventListener(
             userType === "student"
         ) {
 
-            showPage("home");
+            showPage(
+                "home"
+            );
 
         } else {
 
@@ -2652,6 +3166,22 @@ document.addEventListener(
                 "loginPage"
             );
         }
+
+        /*
+         * Profile तुरंत load करें
+         */
+        loadProfile();
+
+        /*
+         * TXT Upload
+         */
+        initializeTXTUpload();
+
+        /*
+         * Test data background में load करें
+         */
+        loadTests();
+
     }
 );
 
@@ -2663,7 +3193,7 @@ document.addEventListener(
 
 window.addEventListener(
     "beforeunload",
-    function(event) {
+    function (event) {
 
         if (
             currentTest &&
