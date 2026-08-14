@@ -1,2580 +1,1144 @@
-/* =========================================================
-   GS JUNCTION PRAYAGRAJ
-   MASTER APP.JS
-   ========================================================= */
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
 
-"use strict";
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-/* =========================================================
-   GLOBAL VARIABLES
-========================================================= */
+    <meta
+        name="theme-color"
+        content="#0f172a"
+    >
 
-let testData = [];
-let currentTest = null;
+    <meta
+        name="description"
+        content="GS Junction Prayagraj - PCS, UPSSSC, TGT, PGT, LT Grade, UGC NET, TET एवं CTET की तैयारी"
+    >
 
-let currentQuestion = 0;
-let score = 0;
-let correctAnswers = 0;
-let attempted = 0;
+    <title>GS Junction Prayagraj</title>
 
-let timerId = null;
-let timeLeft = 0;
+    <!-- MASTER CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
 
-let selectedAnswers = [];
+<body>
 
-let currentExam = "";
-let currentCategory = "";
-let currentSubject = "";
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-const SECONDS_PER_QUESTION = 45;
+<header class="site-header">
 
-const TEST_INDEX_URL = "tests/index.json";
+    <div class="header-inner">
 
+        <button
+            class="menu-btn"
+            type="button"
+            onclick="toggleNav()"
+            aria-label="Menu"
+        >
+            ☰
+        </button>
 
-/* =========================================================
-   DEFAULT EXAMS
-========================================================= */
+        <div class="brand">
 
-const DEFAULT_EXAMS = [
-    "PCS",
-    "UPSSSC",
-    "TGT",
-    "PGT",
-    "LT GRADE",
-    "UGC NET",
-    "TET",
-    "CTET"
-];
+            <h1>
+                GS JUNCTION PRAYAGRAJ
+            </h1>
 
-
-/* =========================================================
-   PAGE NAVIGATION
-========================================================= */
-
-function showPage(id) {
-
-    document
-        .querySelectorAll(".page")
-        .forEach(page => {
-            page.classList.remove("active");
-        });
-
-    const page = document.getElementById(id);
-
-    if (page) {
-        page.classList.add("active");
-    }
-
-    const nav = document.getElementById("nav");
-
-    if (nav) {
-        nav.classList.remove("open");
-    }
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-
-/* =========================================================
-   MOBILE NAVIGATION
-========================================================= */
-
-function toggleNav() {
-
-    const nav = document.getElementById("nav");
-
-    if (nav) {
-        nav.classList.toggle("open");
-    }
-}
-
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-function loginStudent() {
-
-    localStorage.setItem(
-        "userType",
-        "student"
-    );
-
-    if (!localStorage.getItem("studentName")) {
-        localStorage.setItem(
-            "studentName",
-            "Student"
-        );
-    }
-
-    showPage("home");
-
-    loadProfile();
-}
-
-
-/* =========================================================
-   ADMIN LOGIN
-========================================================= */
-
-function loginAdmin() {
-
-    const password = prompt(
-        "Admin Password दर्ज करें:"
-    );
-
-    if (password === "admin123") {
-
-        localStorage.setItem(
-            "userType",
-            "admin"
-        );
-
-        showPage("adminPanel");
-
-    } else {
-
-        alert(
-            "गलत Admin Password।"
-        );
-    }
-}
-
-
-/* =========================================================
-   LOGOUT
-========================================================= */
-
-function logout() {
-
-    localStorage.removeItem(
-        "userType"
-    );
-
-    stopTimer();
-
-    showPage("loginPage");
-}
-
-
-/* =========================================================
-   YOUTUBE
-========================================================= */
-
-function youtube() {
-
-    window.open(
-        "https://www.youtube.com/@LiveStudyAllahabad",
-        "_blank"
-    );
-}
-
-
-/* =========================================================
-   CONTACT
-========================================================= */
-
-function contactAdmin() {
-
-    alert(
-        "Course एवं अन्य जानकारी के लिए Live Study Allahabad से संपर्क करें।"
-    );
-}
-
-
-/* =========================================================
-   OPEN EXAM
-========================================================= */
-
-function openExam(exam) {
-
-    currentExam = exam;
-
-    const title =
-        document.getElementById("examTitle");
-
-    const description =
-        document.getElementById(
-            "examDescription"
-        );
-
-    if (title) {
-
-        title.textContent =
-            exam + " — Test Series";
-    }
-
-    if (description) {
-
-        description.textContent =
-            exam +
-            " के लिए उपलब्ध सभी Tests";
-    }
-
-    renderExamTests(exam);
-
-    showPage("examArea");
-}
-
-
-/* =========================================================
-   EXAM TEST DISPLAY
-========================================================= */
-
-function renderExamTests(exam) {
-
-    const container =
-        document.getElementById(
-            "examTests"
-        );
-
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    const filtered =
-        getTestsByExam(exam);
-
-    if (!filtered.length) {
-
-        container.innerHTML = `
-            <div class="empty-state">
-                <span>📝</span>
-                <h3>अभी कोई Test उपलब्ध नहीं है</h3>
-                <p>
-                    इस परीक्षा के लिए Test जल्द उपलब्ध कराया जाएगा।
-                </p>
-            </div>
-        `;
-
-        return;
-    }
-
-    filtered.forEach((test, index) => {
-
-        const button =
-            document.createElement("button");
-
-        button.className =
-            "dashboard-card";
-
-        button.type = "button";
-
-        button.innerHTML = `
-            <span>📝</span>
-
-            <strong>
-                ${escapeHTML(
-                    test.title ||
-                    `Test - ${index + 1}`
-                )}
-            </strong>
-
-            <small>
-                ${
-                    Number(test.questions?.length || 0)
-                } प्रश्न
-                •
-                ${
-                    Number(test.questions?.length || 0)
-                    * SECONDS_PER_QUESTION
-                } सेकंड
-            </small>
-        `;
-
-        button.onclick = function () {
-
-            startTestDirect(test);
-        };
-
-        container.appendChild(button);
-    });
-}
-
-
-/* =========================================================
-   START TEST DIRECTLY
-========================================================= */
-
-function startTestDirect(test) {
-
-    if (
-        !test ||
-        !Array.isArray(test.questions) ||
-        !test.questions.length
-    ) {
-
-        alert(
-            "इस Test में अभी कोई प्रश्न उपलब्ध नहीं है।"
-        );
-
-        return;
-    }
-
-    currentTest = normalizeTest(test);
-
-    currentQuestion = 0;
-    score = 0;
-    correctAnswers = 0;
-    attempted = 0;
-
-    selectedAnswers =
-        new Array(
-            currentTest.questions.length
-        ).fill(null);
-
-    showPage("tests");
-
-    renderTestArea();
-
-    startQuestionTimer();
-}
-
-
-/* =========================================================
-   TEST SELECTION SYSTEM
-========================================================= */
-
-function initializeTestSelectors() {
-
-    populateExamSelector();
-
-    const count =
-        document.getElementById("count");
-
-    if (count) {
-
-        count.innerHTML = "";
-
-        [10, 20, 30, 50, 100].forEach(num => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = num;
-
-            option.textContent =
-                `${num} Questions`;
-
-            count.appendChild(option);
-        });
-    }
-}
-
-
-/* =========================================================
-   EXAM SELECTOR
-========================================================= */
-
-function populateExamSelector() {
-
-    const select =
-        document.getElementById(
-            "examSelect"
-        );
-
-    if (!select) return;
-
-    select.innerHTML =
-        `<option value="">सभी Exams</option>`;
-
-    const exams =
-        getUniqueValues(
-            testData.map(test =>
-                test.exam
-            )
-        );
-
-    const finalExams =
-        exams.length
-            ? exams
-            : DEFAULT_EXAMS;
-
-    finalExams.forEach(exam => {
-
-        const option =
-            document.createElement("option");
-
-        option.value = exam;
-
-        option.textContent = exam;
-
-        select.appendChild(option);
-    });
-}
-
-
-/* =========================================================
-   CATEGORY SELECTOR
-========================================================= */
-
-function updateCategorySelector() {
-
-    const exam =
-        document.getElementById(
-            "examSelect"
-        )?.value || "";
-
-    currentExam = exam;
-
-    const select =
-        document.getElementById(
-            "categorySelect"
-        );
-
-    if (!select) return;
-
-    select.innerHTML =
-        `<option value="">सभी Categories</option>`;
-
-    let tests = testData;
-
-    if (exam) {
-
-        tests =
-            tests.filter(
-                test =>
-                    normalizeText(test.exam) ===
-                    normalizeText(exam)
-            );
-    }
-
-    const categories =
-        getUniqueValues(
-            tests.map(test =>
-                test.category
-            )
-        );
-
-    categories.forEach(category => {
-
-        const option =
-            document.createElement("option");
-
-        option.value = category;
-
-        option.textContent = category;
-
-        select.appendChild(option);
-    });
-
-    updateSubjectSelector();
-}
-
-
-/* =========================================================
-   SUBJECT SELECTOR
-========================================================= */
-
-function updateSubjectSelector() {
-
-    const exam =
-        document.getElementById(
-            "examSelect"
-        )?.value || "";
-
-    const category =
-        document.getElementById(
-            "categorySelect"
-        )?.value || "";
-
-    currentExam = exam;
-    currentCategory = category;
-
-    const select =
-        document.getElementById(
-            "subjectSelect"
-        );
-
-    if (!select) return;
-
-    select.innerHTML =
-        `<option value="">सभी Subjects</option>`;
-
-    let tests = testData;
-
-    if (exam) {
-
-        tests =
-            tests.filter(
-                test =>
-                    normalizeText(test.exam) ===
-                    normalizeText(exam)
-            );
-    }
-
-    if (category) {
-
-        tests =
-            tests.filter(
-                test =>
-                    normalizeText(test.category) ===
-                    normalizeText(category)
-            );
-    }
-
-    const subjects =
-        getUniqueValues(
-            tests.map(test =>
-                test.subject
-            )
-        );
-
-    subjects.forEach(subject => {
-
-        const option =
-            document.createElement("option");
-
-        option.value = subject;
-
-        option.textContent = subject;
-
-        select.appendChild(option);
-    });
-
-    updateTestSelector();
-}
-
-
-/* =========================================================
-   TEST SELECTOR
-========================================================= */
-
-function updateTestSelector() {
-
-    const exam =
-        document.getElementById(
-            "examSelect"
-        )?.value || "";
-
-    const category =
-        document.getElementById(
-            "categorySelect"
-        )?.value || "";
-
-    const subject =
-        document.getElementById(
-            "subjectSelect"
-        )?.value || "";
-
-    currentExam = exam;
-    currentCategory = category;
-    currentSubject = subject;
-
-    const select =
-        document.getElementById(
-            "testSelect"
-        );
-
-    if (!select) return;
-
-    select.innerHTML =
-        `<option value="">Test चुनें</option>`;
-
-    let tests = testData;
-
-    if (exam) {
-
-        tests =
-            tests.filter(
-                test =>
-                    normalizeText(test.exam) ===
-                    normalizeText(exam)
-            );
-    }
-
-    if (category) {
-
-        tests =
-            tests.filter(
-                test =>
-                    normalizeText(test.category) ===
-                    normalizeText(category)
-            );
-    }
-
-    if (subject) {
-
-        tests =
-            tests.filter(
-                test =>
-                    normalizeText(test.subject) ===
-                    normalizeText(subject)
-            );
-    }
-
-    tests.forEach((test, index) => {
-
-        const option =
-            document.createElement("option");
-
-        option.value =
-            String(
-                testData.indexOf(test)
-            );
-
-        option.textContent =
-            test.title ||
-            `Test ${index + 1}`;
-
-        select.appendChild(option);
-    });
-
-    showSelectedTestInfo();
-}
-
-
-/* =========================================================
-   SELECTED TEST INFO
-========================================================= */
-
-function showSelectedTestInfo() {
-
-    const select =
-        document.getElementById(
-            "testSelect"
-        );
-
-    const info =
-        document.getElementById(
-            "selectedTestInfo"
-        );
-
-    if (!select || !info) return;
-
-    const index =
-        Number(select.value);
-
-    if (
-        select.value === "" ||
-        !testData[index]
-    ) {
-
-        info.innerHTML =
-            "Exam → Category → Subject → Test Select करें।";
-
-        return;
-    }
-
-    const test =
-        testData[index];
-
-    const total =
-        test.questions?.length || 0;
-
-    const totalTime =
-        total * SECONDS_PER_QUESTION;
-
-    info.innerHTML = `
-        <strong>
-            ${escapeHTML(
-                test.title || "Online Test"
-            )}
-        </strong>
-
-        <br>
-
-        Exam:
-        ${escapeHTML(test.exam || "-")}
-
-        <br>
-
-        Category:
-        ${escapeHTML(test.category || "-")}
-
-        <br>
-
-        Subject:
-        ${escapeHTML(test.subject || "-")}
-
-        <br>
-
-        प्रश्न:
-        ${total}
-
-        <br>
-
-        प्रति प्रश्न:
-        ${SECONDS_PER_QUESTION} सेकंड
-
-        <br>
-
-        कुल समय:
-        ${formatTime(totalTime)}
-    `;
-}
-
-
-/* =========================================================
-   START SELECTED TEST
-========================================================= */
-
-function startTest() {
-
-    const select =
-        document.getElementById(
-            "testSelect"
-        );
-
-    if (
-        !select ||
-        select.value === ""
-    ) {
-
-        alert(
-            "कृपया पहले Test चुनें।"
-        );
-
-        return;
-    }
-
-    const index =
-        Number(select.value);
-
-    const test =
-        testData[index];
-
-    if (!test) {
-
-        alert(
-            "Test उपलब्ध नहीं है।"
-        );
-
-        return;
-    }
-
-    const countSelect =
-        document.getElementById(
-            "count"
-        );
-
-    let questionCount =
-        Number(
-            countSelect?.value || 0
-        );
-
-    const total =
-        test.questions?.length || 0;
-
-    if (
-        !questionCount ||
-        questionCount > total
-    ) {
-
-        questionCount = total;
-    }
-
-    const clonedTest =
-        JSON.parse(
-            JSON.stringify(test)
-        );
-
-    clonedTest.questions =
-        clonedTest.questions
-            .slice(0, questionCount);
-
-    startTestDirect(clonedTest);
-}
-
-
-/* =========================================================
-   RENDER TEST AREA
-========================================================= */
-
-function renderTestArea() {
-
-    const area =
-        document.getElementById(
-            "testArea"
-        );
-
-    if (!area || !currentTest) return;
-
-    area.classList.remove("hidden");
-
-    const q =
-        currentTest.questions[
-            currentQuestion
-        ];
-
-    if (!q) {
-
-        finishTest();
-
-        return;
-    }
-
-    const total =
-        currentTest.questions.length;
-
-    area.innerHTML = `
-
-        <div class="test-header">
-
-            <div>
-                <strong>
-                    ${escapeHTML(
-                        currentTest.title ||
-                        "Online Test"
-                    )}
-                </strong>
-
-                <small>
-                    प्रश्न ${currentQuestion + 1}
-                    / ${total}
-                </small>
-            </div>
-
-            <div
-                id="timer"
-                class="test-timer">
-
-                ${formatTime(timeLeft)}
-
-            </div>
-
-        </div>
-
-
-        <div class="question-card">
-
-            <div class="question-number">
-                प्रश्न ${currentQuestion + 1}
-            </div>
-
-            <h3 class="question-text">
-                ${escapeHTML(
-                    q.question ||
-                    q.text ||
-                    ""
-                )}
-            </h3>
-
-
-            <div class="options">
-
-                ${renderOptions(q)}
-
-            </div>
-
-
-            <div class="question-controls">
-
-                ${
-                    currentQuestion > 0
-                    ? `
-                        <button
-                            type="button"
-                            onclick="previousQuestion()">
-
-                            ◀ पिछला
-
-                        </button>
-                    `
-                    : ""
-                }
-
-
-                ${
-                    currentQuestion <
-                    total - 1
-                    ? `
-                        <button
-                            type="button"
-                            onclick="nextQuestion()">
-
-                            अगला ▶
-
-                        </button>
-                    `
-                    : `
-                        <button
-                            type="button"
-                            onclick="finishTest()">
-
-                            🏆 Test Submit करें
-
-                        </button>
-                    `
-                }
-
-            </div>
-
-        </div>
-
-    `;
-
-    restoreSelectedAnswer();
-}
-
-
-/* =========================================================
-   RENDER OPTIONS
-========================================================= */
-
-function renderOptions(question) {
-
-    const options =
-        getQuestionOptions(question);
-
-    if (!options.length) {
-
-        return `
             <p>
-                इस प्रश्न के विकल्प उपलब्ध नहीं हैं।
+                POWERED BY LIVE STUDY ALLAHABAD
             </p>
-        `;
-    }
 
-    return options.map(
-        (option, index) => {
-
-            const letter =
-                String.fromCharCode(
-                    65 + index
-                );
-
-            return `
-
-                <label
-                    class="option">
-
-                    <input
-                        type="radio"
-                        name="answer"
-                        value="${letter}"
-                        onchange="selectAnswer('${letter}')">
-
-                    <span>
-                        <strong>
-                            (${letter})
-                        </strong>
-
-                        ${escapeHTML(
-                            String(option)
-                        )}
-                    </span>
-
-                </label>
-
-            `;
-        }
-    ).join("");
-}
-
-
-/* =========================================================
-   SELECT ANSWER
-========================================================= */
-
-function selectAnswer(answer) {
-
-    selectedAnswers[
-        currentQuestion
-    ] = answer;
-}
-
-
-/* =========================================================
-   RESTORE ANSWER
-========================================================= */
-
-function restoreSelectedAnswer() {
-
-    const answer =
-        selectedAnswers[
-            currentQuestion
-        ];
-
-    if (!answer) return;
-
-    const input =
-        document.querySelector(
-            `input[name="answer"][value="${answer}"]`
-        );
-
-    if (input) {
-        input.checked = true;
-    }
-}
-
-
-/* =========================================================
-   NEXT QUESTION
-========================================================= */
-
-function nextQuestion() {
-
-    saveCurrentAnswer();
-
-    if (
-        currentQuestion <
-        currentTest.questions.length - 1
-    ) {
-
-        currentQuestion++;
-
-        resetQuestionTimer();
-
-        renderTestArea();
-
-    } else {
-
-        finishTest();
-    }
-}
-
-
-/* =========================================================
-   PREVIOUS QUESTION
-========================================================= */
-
-function previousQuestion() {
-
-    saveCurrentAnswer();
-
-    if (currentQuestion > 0) {
-
-        currentQuestion--;
-
-        resetQuestionTimer();
-
-        renderTestArea();
-    }
-}
-
-
-/* =========================================================
-   SAVE CURRENT ANSWER
-========================================================= */
-
-function saveCurrentAnswer() {
-
-    const selected =
-        document.querySelector(
-            'input[name="answer"]:checked'
-        );
-
-    if (selected) {
-
-        selectedAnswers[
-            currentQuestion
-        ] = selected.value;
-    }
-}
-
-
-/* =========================================================
-   TIMER
-   45 SECONDS PER QUESTION
-========================================================= */
-
-function startQuestionTimer() {
-
-    stopTimer();
-
-    timeLeft =
-        SECONDS_PER_QUESTION;
-
-    updateTimerDisplay();
-
-    timerId =
-        setInterval(
-            function () {
-
-                timeLeft--;
-
-                updateTimerDisplay();
-
-                if (timeLeft <= 0) {
-
-                    stopTimer();
-
-                    autoNextQuestion();
-                }
-
-            },
-            1000
-        );
-}
-
-
-/* =========================================================
-   RESET QUESTION TIMER
-========================================================= */
-
-function resetQuestionTimer() {
-
-    stopTimer();
-
-    timeLeft =
-        SECONDS_PER_QUESTION;
-
-    startQuestionTimer();
-}
-
-
-/* =========================================================
-   STOP TIMER
-========================================================= */
-
-function stopTimer() {
-
-    if (timerId) {
-
-        clearInterval(timerId);
-
-        timerId = null;
-    }
-}
-
-
-/* =========================================================
-   TIMER DISPLAY
-========================================================= */
-
-function updateTimerDisplay() {
-
-    const timer =
-        document.getElementById(
-            "timer"
-        );
-
-    if (!timer) return;
-
-    timer.textContent =
-        formatTime(timeLeft);
-}
-
-
-/* =========================================================
-   AUTO NEXT
-========================================================= */
-
-function autoNextQuestion() {
-
-    saveCurrentAnswer();
-
-    if (
-        currentQuestion <
-        currentTest.questions.length - 1
-    ) {
-
-        currentQuestion++;
-
-        renderTestArea();
-
-        startQuestionTimer();
-
-    } else {
-
-        finishTest();
-    }
-}
-
-
-/* =========================================================
-   FINISH TEST
-========================================================= */
-
-function finishTest() {
-
-    stopTimer();
-
-    saveCurrentAnswer();
-
-    if (!currentTest) return;
-
-    const questions =
-        currentTest.questions || [];
-
-    let correct = 0;
-    let attemptedCount = 0;
-
-    questions.forEach(
-        (question, index) => {
-
-            const userAnswer =
-                selectedAnswers[index];
-
-            if (userAnswer !== null) {
-
-                attemptedCount++;
-            }
-
-            const correctAnswer =
-                getCorrectAnswer(question);
-
-            if (
-                userAnswer &&
-                correctAnswer &&
-                normalizeText(
-                    userAnswer
-                ) ===
-                normalizeText(
-                    correctAnswer
-                )
-            ) {
-
-                correct++;
-            }
-        }
-    );
-
-    correctAnswers = correct;
-    attempted = attemptedCount;
-
-    score =
-        correctAnswers;
-
-    const total =
-        questions.length;
-
-    const wrong =
-        attempted - correct;
-
-    const unanswered =
-        total - attempted;
-
-    const percentage =
-        total > 0
-            ? Math.round(
-                (correct / total) * 100
-            )
-            : 0;
-
-    saveResult({
-        title:
-            currentTest.title ||
-            "Online Test",
-
-        exam:
-            currentTest.exam || "",
-
-        category:
-            currentTest.category || "",
-
-        subject:
-            currentTest.subject || "",
-
-        total,
-
-        correct,
-
-        wrong,
-
-        unanswered,
-
-        attempted,
-
-        percentage,
-
-        date:
-            new Date().toISOString()
-    });
-
-    showResult(
-        {
-            total,
-            correct,
-            wrong,
-            unanswered,
-            attempted,
-            percentage
-        }
-    );
-}
-
-
-/* =========================================================
-   SHOW RESULT
-========================================================= */
-
-function showResult(result) {
-
-    const area =
-        document.getElementById(
-            "testArea"
-        );
-
-    if (area) {
-
-        area.classList.add("hidden");
-    }
-
-    const resultArea =
-        document.querySelector(
-            "#tests #resultArea"
-        );
-
-    if (!resultArea) return;
-
-    resultArea.classList.remove(
-        "hidden"
-    );
-
-    resultArea.innerHTML = `
-
-        <div class="result-card">
+        </div>
+
+        <button
+            class="home-btn"
+            type="button"
+            onclick="showPage('home')"
+            aria-label="Home"
+        >
+            🏠
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     NAVIGATION
+===================================================== -->
+
+<nav id="nav" class="main-nav">
+
+    <button
+        type="button"
+        onclick="showPage('home')"
+    >
+        🏠 Home
+    </button>
+
+    <button
+        type="button"
+        onclick="showPage('tests')"
+    >
+        📝 Tests
+    </button>
+
+    <button
+        type="button"
+        onclick="showPage('courses')"
+    >
+        📚 Courses
+    </button>
+
+    <button
+        type="button"
+        onclick="showPage('notes')"
+    >
+        📄 Notes / PDF
+    </button>
+
+    <button
+        type="button"
+        onclick="showPage('results'); showResults()"
+    >
+        🏆 Result
+    </button>
+
+    <button
+        type="button"
+        onclick="showPage('notifications')"
+    >
+        🔔 Notifications
+    </button>
+
+    <button
+        type="button"
+        onclick="showPage('about')"
+    >
+        ℹ️ About
+    </button>
+
+</nav>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main>
+
+
+<!-- =====================================================
+     LOGIN PAGE
+===================================================== -->
+
+<section
+    id="loginPage"
+    class="page active"
+>
+
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <div class="login-logo">
+                🎓
+            </div>
 
             <h2>
-                🏆 Test Result
+                GS JUNCTION PRAYAGRAJ
+            </h2>
+
+            <p>
+                सभी प्रतियोगी परीक्षाओं की बेहतर तैयारी
+                एक ही स्थान पर
+            </p>
+
+            <div class="login-buttons">
+
+                <button
+                    type="button"
+                    onclick="loginStudent()"
+                >
+                    👨‍🎓 Student Login
+                </button>
+
+                <button
+                    type="button"
+                    onclick="loginAdmin()"
+                >
+                    ⚙️ Admin Login
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     HOME PAGE
+===================================================== -->
+
+<section
+    id="home"
+    class="page"
+>
+
+    <div class="hero-section">
+
+        <div class="hero-content">
+
+            <span class="hero-badge">
+                LIVE STUDY ALLAHABAD
+            </span>
+
+            <h2>
+                GS JUNCTION PRAYAGRAJ
             </h2>
 
             <h3>
-                ${escapeHTML(
-                    currentTest?.title ||
-                    "Online Test"
-                )}
+                सभी प्रतियोगी परीक्षाओं की बेहतर तैयारी
+                एक ही स्थान पर
             </h3>
 
+            <p>
+                PCS • UPSSSC • TGT • PGT • LT GRADE •
+                UGC NET • TET • CTET
+            </p>
 
-            <div class="result-stats">
-
-                <div>
-                    <strong>
-                        ${result.total}
-                    </strong>
-                    <span>
-                        कुल प्रश्न
-                    </span>
-                </div>
-
-
-                <div>
-                    <strong>
-                        ${result.correct}
-                    </strong>
-                    <span>
-                        सही
-                    </span>
-                </div>
-
-
-                <div>
-                    <strong>
-                        ${result.wrong}
-                    </strong>
-                    <span>
-                        गलत
-                    </span>
-                </div>
-
-
-                <div>
-                    <strong>
-                        ${result.unanswered}
-                    </strong>
-                    <span>
-                        अनुत्तरित
-                    </span>
-                </div>
-
-
-                <div>
-                    <strong>
-                        ${result.percentage}%
-                    </strong>
-                    <span>
-                        प्रतिशत
-                    </span>
-                </div>
-
-            </div>
-
-
-            <div class="result-actions">
+            <div class="hero-actions">
 
                 <button
                     type="button"
-                    onclick="showResults()">
-
-                    📊 सभी Results
-
+                    onclick="showPage('tests')"
+                >
+                    📝 Test Series
                 </button>
 
-
                 <button
                     type="button"
-                    onclick="showPage('home')">
-
-                    🏠 Home
-
+                    onclick="youtube()"
+                >
+                    ▶️ YouTube
                 </button>
 
             </div>
 
         </div>
 
-    `;
-
-    showPage("tests");
-}
+    </div>
 
 
-/* =========================================================
-   SAVE RESULT
-========================================================= */
+    <!-- PROFILE -->
 
-function saveResult(result) {
+    <div class="profile-section">
 
-    const results =
-        getResults();
+        <div class="profile-card">
 
-    results.push(result);
+            <div class="profile-icon">
+                👨‍🎓
+            </div>
 
-    localStorage.setItem(
-        "testResults",
-        JSON.stringify(results)
-    );
-}
-
-
-/* =========================================================
-   GET RESULTS
-========================================================= */
-
-function getResults() {
-
-    try {
-
-        return JSON.parse(
-            localStorage.getItem(
-                "testResults"
-            )
-        ) || [];
-
-    } catch (error) {
-
-        return [];
-    }
-}
-
-
-/* =========================================================
-   SHOW ALL RESULTS
-========================================================= */
-
-function showResults() {
-
-    const area =
-        document.querySelector(
-            "#results #resultArea"
-        );
-
-    if (!area) return;
-
-    const results =
-        getResults();
-
-    if (!results.length) {
-
-        area.innerHTML = `
-            <div class="empty-state">
-
-                <span>🏆</span>
-
-                <h3>
-                    अभी कोई Result उपलब्ध नहीं है
-                </h3>
+            <div>
 
                 <p>
-                    Test देने के बाद आपका Result यहाँ दिखाई देगा।
+                    स्वागत है
                 </p>
 
+                <h3 id="studentName">
+                    Student
+                </h3>
+
             </div>
-        `;
-
-        return;
-    }
-
-    area.innerHTML = `
-
-        <div class="results-list">
-
-            ${results
-                .slice()
-                .reverse()
-                .map(
-                    (result, index) => `
-
-                    <div class="result-item">
-
-                        <h3>
-                            ${escapeHTML(
-                                result.title ||
-                                "Online Test"
-                            )}
-                        </h3>
-
-                        <p>
-                            ${escapeHTML(
-                                result.exam ||
-                                ""
-                            )}
-                            ${
-                                result.subject
-                                ? " • " +
-                                  escapeHTML(
-                                      result.subject
-                                  )
-                                : ""
-                            }
-                        </p>
-
-                        <div class="result-row">
-
-                            <span>
-                                कुल:
-                                ${result.total}
-                            </span>
-
-                            <span>
-                                सही:
-                                ${result.correct}
-                            </span>
-
-                            <span>
-                                गलत:
-                                ${result.wrong}
-                            </span>
-
-                            <strong>
-                                ${result.percentage}%
-                            </strong>
-
-                        </div>
-
-                        <small>
-                            ${formatDate(
-                                result.date
-                            )}
-                        </small>
-
-                    </div>
-                `
-                )
-                .join("")}
 
         </div>
 
-    `;
-}
-
-
-/* =========================================================
-   PROFILE
-========================================================= */
-
-function loadProfile() {
-
-    const name =
-        localStorage.getItem(
-            "studentName"
-        ) || "Student";
-
-    const studentName =
-        document.getElementById(
-            "studentName"
-        );
 
-    const nameInput =
-        document.getElementById(
-            "name"
-        );
+        <div class="profile-stats">
 
-    if (studentName) {
+            <div class="stat-card">
 
-        studentName.textContent =
-            name;
-    }
+                <strong id="totalTests">
+                    0
+                </strong>
 
-    if (nameInput) {
+                <span>
+                    Total Tests
+                </span>
 
-        nameInput.value =
-            name === "Student"
-                ? ""
-                : name;
-    }
+            </div>
 
-    const results =
-        getResults();
+            <div class="stat-card">
 
-    const totalTests =
-        results.length;
+                <strong id="bestScore">
+                    0%
+                </strong>
 
-    let bestScore = 0;
+                <span>
+                    Best Score
+                </span>
 
-    let totalQuestions = 0;
-    let totalCorrect = 0;
+            </div>
 
-    results.forEach(result => {
+            <div class="stat-card">
 
-        bestScore =
-            Math.max(
-                bestScore,
-                Number(
-                    result.percentage || 0
-                )
-            );
+                <strong id="accuracy">
+                    0%
+                </strong>
 
-        totalQuestions +=
-            Number(
-                result.total || 0
-            );
+                <span>
+                    Accuracy
+                </span>
 
-        totalCorrect +=
-            Number(
-                result.correct || 0
-            );
-    });
+            </div>
 
-    const accuracy =
-        totalQuestions > 0
-            ? Math.round(
-                (
-                    totalCorrect /
-                    totalQuestions
-                ) * 100
-            )
-            : 0;
+        </div>
 
-    const totalTestsElement =
-        document.getElementById(
-            "totalTests"
-        );
+    </div>
 
-    const bestScoreElement =
-        document.getElementById(
-            "bestScore"
-        );
 
-    const accuracyElement =
-        document.getElementById(
-            "accuracy"
-        );
+    <!-- EXAM GRID -->
 
-    if (totalTestsElement) {
+    <div class="section-heading">
 
-        totalTestsElement.textContent =
-            totalTests;
-    }
+        <h2>
+            📚 परीक्षा चुनें
+        </h2>
 
-    if (bestScoreElement) {
+        <p>
+            अपनी परीक्षा के अनुसार Test Series चुनें
+        </p>
 
-        bestScoreElement.textContent =
-            bestScore + "%";
-    }
+    </div>
 
-    if (accuracyElement) {
+    <div
+        id="homeExamGrid"
+        class="exam-grid"
+    >
+    </div>
 
-        accuracyElement.textContent =
-            accuracy + "%";
-    }
-}
 
+    <!-- QUICK LINKS -->
 
-/* =========================================================
-   SAVE NAME
-========================================================= */
+    <div class="quick-grid">
 
-function saveName() {
+        <button
+            type="button"
+            onclick="showPage('courses')"
+        >
+            📚
+            <strong>Courses</strong>
+            <span>Courses देखें</span>
+        </button>
 
-    const input =
-        document.getElementById(
-            "name"
-        );
+        <button
+            type="button"
+            onclick="showPage('notes')"
+        >
+            📄
+            <strong>Notes / PDF</strong>
+            <span>Study Material</span>
+        </button>
 
-    const msg =
-        document.getElementById(
-            "msg"
-        );
+        <button
+            type="button"
+            onclick="showPage('results'); showResults()"
+        >
+            🏆
+            <strong>My Results</strong>
+            <span>अपना Result देखें</span>
+        </button>
 
-    if (!input) return;
+        <button
+            type="button"
+            onclick="contactAdmin()"
+        >
+            📞
+            <strong>Contact</strong>
+            <span>हमसे संपर्क करें</span>
+        </button>
 
-    const name =
-        input.value.trim();
+    </div>
 
-    if (!name) {
 
-        if (msg) {
+    <!-- NAME -->
 
-            msg.textContent =
-                "कृपया अपना नाम लिखें।";
-        }
+    <div class="name-section">
 
-        return;
-    }
+        <h2>
+            👤 अपना नाम सेट करें
+        </h2>
 
-    localStorage.setItem(
-        "studentName",
-        name
-    );
+        <div class="name-form">
 
-    const studentName =
-        document.getElementById(
-            "studentName"
-        );
+            <input
+                type="text"
+                id="name"
+                placeholder="अपना नाम लिखें"
+                autocomplete="name"
+            >
 
-    if (studentName) {
+            <button
+                type="button"
+                onclick="saveName()"
+            >
+                Save
+            </button>
 
-        studentName.textContent =
-            name;
-    }
+        </div>
 
-    if (msg) {
+        <p id="msg"></p>
 
-        msg.textContent =
-            "✅ नाम सुरक्षित हो गया।";
-    }
-}
+    </div>
 
+</section>
 
-/* =========================================================
-   ADMIN ACTION
-========================================================= */
 
-function adminAction(type) {
+<!-- =====================================================
+     TEST SELECTION PAGE
+===================================================== -->
 
-    const messages = {
+<section
+    id="tests"
+    class="page"
+>
 
-        tests:
-            "Test Management module जल्द activate किया जाएगा।",
+    <div class="page-header">
 
-        questions:
-            "Question Bank module जल्द activate किया जाएगा।",
+        <h2>
+            📝 Online Test Series
+        </h2>
 
-        students:
-            "Student Management module जल्द activate किया जाएगा।",
+        <p>
+            परीक्षा → Category → Subject → Test चुनें
+        </p>
 
-        notes:
-            "Notes / PDF Management module जल्द activate किया जाएगा।",
+    </div>
 
-        notifications:
-            "Notification Management module जल्द activate किया जाएगा।",
 
-        links:
-            "Social Links Management module जल्द activate किया जाएगा।",
+    <div class="test-selector-card">
 
-        courses:
-            "Course Management module जल्द activate किया जाएगा।",
+        <!-- EXAM -->
 
-        settings:
-            "App Settings module जल्द activate किया जाएगा।"
-    };
+        <div class="form-group">
 
-    const message =
-        messages[type] ||
-        "Admin module जल्द activate किया जाएगा।";
+            <label for="examSelect">
+                परीक्षा
+            </label>
 
-    const adminMessage =
-        document.getElementById(
-            "adminMessage"
-        );
+            <select
+                id="examSelect"
+                onchange="updateCategorySelector()"
+            >
 
-    if (adminMessage) {
+                <option value="">
+                    सभी Exams
+                </option>
 
-        adminMessage.classList.remove(
-            "hidden"
-        );
+            </select>
 
-        adminMessage.innerHTML = `
-            <h3>⚙️ Admin Module</h3>
-            <p>
-                ${escapeHTML(message)}
-            </p>
-        `;
+        </div>
 
-    } else {
 
-        alert(message);
-    }
-}
+        <!-- CATEGORY -->
 
+        <div class="form-group">
 
-/* =========================================================
-   TXT FILE UPLOAD
-========================================================= */
+            <label for="categorySelect">
+                Category
+            </label>
 
-function initializeTXTUpload() {
+            <select
+                id="categorySelect"
+                onchange="updateSubjectSelector()"
+            >
 
-    const input =
-        document.getElementById(
-            "txtFile"
-        );
+                <option value="">
+                    सभी Categories
+                </option>
 
-    if (!input) return;
+            </select>
 
-    input.addEventListener(
-        "change",
-        function(event) {
+        </div>
 
-            const file =
-                event.target.files[0];
 
-            if (!file) return;
+        <!-- SUBJECT -->
 
-            const reader =
-                new FileReader();
+        <div class="form-group">
 
-            reader.onload =
-                function(e) {
+            <label for="subjectSelect">
+                Subject
+            </label>
 
-                    const text =
-                        e.target.result;
+            <select
+                id="subjectSelect"
+                onchange="updateTestSelector()"
+            >
 
-                    const questions =
-                        parseTXTQuestions(
-                            text
-                        );
+                <option value="">
+                    सभी Subjects
+                </option>
 
-                    if (!questions.length) {
+            </select>
 
-                        alert(
-                            "TXT file में प्रश्न नहीं मिले।"
-                        );
+        </div>
 
-                        return;
-                    }
 
-                    const test = {
+        <!-- TEST -->
 
-                        id:
-                            "txt-" +
-                            Date.now(),
+        <div class="form-group">
 
-                        title:
-                            file.name.replace(
-                                /\.txt$/i,
-                                ""
-                            ),
+            <label for="testSelect">
+                Test
+            </label>
 
-                        exam:
-                            "TXT Test",
+            <select
+                id="testSelect"
+                onchange="showSelectedTestInfo()"
+            >
 
-                        category:
-                            "Uploaded",
+                <option value="">
+                    Test चुनें
+                </option>
 
-                        subject:
-                            "General Studies",
+            </select>
 
-                        questions
-                    };
+        </div>
 
-                    testData.push(test);
 
-                    alert(
-                        questions.length +
-                        " प्रश्न successfully load हो गए।"
-                    );
+        <!-- QUESTION COUNT -->
 
-                    renderExamTests(
-                        "TXT Test"
-                    );
-                };
+        <div class="form-group">
 
-            reader.readAsText(
-                file,
-                "UTF-8"
-            );
-        }
-    );
-}
+            <label for="count">
+                प्रश्नों की संख्या
+            </label>
 
+            <select id="count">
 
-/* =========================================================
-   PARSE TXT QUESTIONS
-========================================================= */
+                <option value="10">
+                    10 Questions
+                </option>
 
-function parseTXTQuestions(text) {
+                <option value="20">
+                    20 Questions
+                </option>
 
-    const blocks =
-        text
-            .split(/\n\s*\n/)
-            .map(
-                block =>
-                    block.trim()
-            )
-            .filter(Boolean);
+                <option value="30">
+                    30 Questions
+                </option>
 
-    const questions = [];
+                <option value="50">
+                    50 Questions
+                </option>
 
-    blocks.forEach(block => {
+                <option value="100">
+                    100 Questions
+                </option>
 
-        const lines =
-            block
-                .split("\n")
-                .map(
-                    line =>
-                        line.trim()
-                )
-                .filter(Boolean);
+            </select>
 
-        if (!lines.length) return;
+        </div>
 
-        let questionText = "";
-        const options = [];
-        let answer = "";
 
-        lines.forEach(line => {
+        <!-- SELECTED TEST INFO -->
 
-            if (
-                /^[\(\[]?[A-Da-d][\)\].:-]/.test(
-                    line
-                )
-            ) {
+        <div
+            id="selectedTestInfo"
+            class="selected-test-info"
+        >
+            Exam → Category → Subject → Test Select करें।
+        </div>
 
-                options.push(
-                    line
-                        .replace(
-                            /^[\(\[]?[A-Da-d][\)\].:-]\s*/,
-                            ""
-                        )
-                );
 
-            } else if (
-                /^(उत्तर|answer|ans)\s*[:\-]/i.test(
-                    line
-                )
-            ) {
+        <!-- START -->
 
-                answer =
-                    line
-                        .replace(
-                            /^(उत्तर|answer|ans)\s*[:\-]\s*/i,
-                            ""
-                        )
-                        .trim();
+        <button
+            class="primary-btn"
+            type="button"
+            onclick="startTest()"
+        >
+            🚀 Test शुरू करें
+        </button>
 
-            } else {
+    </div>
 
-                questionText +=
-                    (
-                        questionText
-                            ? " "
-                            : ""
-                    ) +
-                    line;
-            }
-        });
 
-        if (
-            questionText &&
-            options.length >= 2
-        ) {
+    <!-- TEST AREA -->
 
-            questions.push({
+    <div
+        id="testArea"
+        class="test-area hidden"
+    >
+    </div>
 
-                question:
-                    questionText,
 
-                options:
-                    options,
+    <!-- RESULT AREA -->
 
-                answer:
-                    normalizeAnswer(answer)
-            });
-        }
-    });
+    <div
+        id="resultArea"
+        class="result-area hidden"
+    >
+    </div>
 
-    return questions;
-}
+</section>
 
 
-/* =========================================================
-   LOAD TEST INDEX
-========================================================= */
+<!-- =====================================================
+     EXAM AREA
+===================================================== -->
 
-async function loadTests() {
+<section
+    id="examArea"
+    class="page"
+>
 
-    try {
+    <div class="page-header">
 
-        const response =
-            await fetch(
-                TEST_INDEX_URL +
-                "?v=" +
-                Date.now()
-            );
+        <button
+            type="button"
+            class="back-btn"
+            onclick="showPage('home')"
+        >
+            ← Home
+        </button>
 
-        if (!response.ok) {
+        <h2 id="examTitle">
+            Test Series
+        </h2>
 
-            throw new Error(
-                "Index file not found"
-            );
-        }
+        <p id="examDescription">
+            उपलब्ध Tests
+        </p>
 
-        const data =
-            await response.json();
+    </div>
 
-        testData =
-            normalizeTestData(data);
 
-    } catch (error) {
+    <div
+        id="examTests"
+        class="exam-tests"
+    >
+    </div>
 
-        console.warn(
-            "tests/index.json load नहीं हुआ:",
-            error
-        );
+</section>
 
-        testData = [];
-    }
 
-    initializeTestSelectors();
+<!-- =====================================================
+     COURSES
+===================================================== -->
 
-    renderHomeExamGrid();
-}
+<section
+    id="courses"
+    class="page"
+>
 
+    <div class="page-header">
 
-/* =========================================================
-   NORMALIZE TEST DATA
-========================================================= */
+        <h2>
+            📚 Courses
+        </h2>
 
-function normalizeTestData(data) {
+        <p>
+            Live Study Allahabad के Courses
+        </p>
 
-    let tests = [];
+    </div>
 
-    if (Array.isArray(data)) {
 
-        tests = data;
+    <div class="content-grid">
 
-    } else if (
-        Array.isArray(data.tests)
-    ) {
-
-        tests = data.tests;
-
-    } else if (
-        Array.isArray(data.data)
-    ) {
-
-        tests = data.data;
-
-    } else if (
-        typeof data === "object"
-    ) {
-
-        Object.keys(data).forEach(key => {
-
-            if (Array.isArray(data[key])) {
-
-                data[key].forEach(test => {
-
-                    tests.push({
-                        ...test,
-                        exam:
-                            test.exam ||
-                            key
-                    });
-                });
-            }
-        });
-    }
-
-    return tests.map(
-        normalizeTest
-    );
-}
-
-
-/* =========================================================
-   NORMALIZE TEST
-========================================================= */
-
-function normalizeTest(test) {
-
-    const normalized = {
-        ...test
-    };
-
-    normalized.questions =
-        Array.isArray(
-            test.questions
-        )
-            ? test.questions.map(
-                normalizeQuestion
-            )
-            : [];
-
-    normalized.exam =
-        test.exam ||
-        test.examName ||
-        "";
-
-    normalized.category =
-        test.category ||
-        test.type ||
-        "General";
-
-    normalized.subject =
-        test.subject ||
-        test.subjectName ||
-        "General Studies";
-
-    normalized.title =
-        test.title ||
-        test.name ||
-        "Online Test";
-
-    return normalized;
-}
-
-
-/* =========================================================
-   NORMALIZE QUESTION
-========================================================= */
-
-function normalizeQuestion(question) {
-
-    const q = {
-        ...question
-    };
-
-    q.question =
-        q.question ||
-        q.text ||
-        q.q ||
-        "";
-
-    q.options =
-        getQuestionOptions(q);
-
-    q.answer =
-        normalizeAnswer(
-            q.answer ??
-            q.correct ??
-            q.correctAnswer ??
-            q.correct_option ??
-            q.correctOption ??
-            ""
-        );
-
-    return q;
-}
-
-
-/* =========================================================
-   GET QUESTION OPTIONS
-========================================================= */
-
-function getQuestionOptions(question) {
-
-    if (
-        Array.isArray(
-            question.options
-        )
-    ) {
-
-        return question.options;
-    }
-
-    if (
-        Array.isArray(
-            question.choices
-        )
-    ) {
-
-        return question.choices;
-    }
-
-    const options = [];
-
-    ["A", "B", "C", "D"].forEach(
-        letter => {
-
-            const value =
-                question[
-                    "option" +
-                    letter
-                ];
-
-            if (
-                value !== undefined &&
-                value !== null &&
-                value !== ""
-            ) {
-
-                options.push(value);
-            }
-        }
-    );
-
-    return options;
-}
-
-
-/* =========================================================
-   GET CORRECT ANSWER
-========================================================= */
-
-function getCorrectAnswer(question) {
-
-    let answer =
-        question.answer ??
-        question.correct ??
-        question.correctAnswer ??
-        question.correct_option ??
-        question.correctOption ??
-        "";
-
-    return normalizeAnswer(
-        answer
-    );
-}
-
-
-/* =========================================================
-   NORMALIZE ANSWER
-========================================================= */
-
-function normalizeAnswer(answer) {
-
-    if (
-        answer === null ||
-        answer === undefined
-    ) {
-
-        return "";
-    }
-
-    let value =
-        String(answer)
-            .trim()
-            .toUpperCase();
-
-    value =
-        value
-            .replace(
-                /^[\(\[]/,
-                ""
-            )
-            .replace(
-                /[\)\].:]$/,
-                ""
-            )
-            .trim();
-
-    if (
-        ["A", "B", "C", "D"].includes(
-            value
-        )
-    ) {
-
-        return value;
-    }
-
-    if (
-        /^\d+$/.test(value)
-    ) {
-
-        const num =
-            Number(value);
-
-        if (
-            num >= 0 &&
-            num <= 3
-        ) {
-
-            return String.fromCharCode(
-                65 + num
-            );
-        }
-
-        if (
-            num >= 1 &&
-            num <= 4
-        ) {
-
-            return String.fromCharCode(
-                64 + num
-            );
-        }
-    }
-
-    const first =
-        value.charAt(0);
-
-    if (
-        ["A", "B", "C", "D"].includes(
-            first
-        )
-    ) {
-
-        return first;
-    }
-
-    return value;
-}
-
-
-/* =========================================================
-   GET TESTS BY EXAM
-========================================================= */
-
-function getTestsByExam(exam) {
-
-    return testData.filter(
-        test =>
-            normalizeText(
-                test.exam
-            ) ===
-            normalizeText(
-                exam
-            )
-    );
-}
-
-
-/* =========================================================
-   HOME EXAM GRID
-========================================================= */
-
-function renderHomeExamGrid() {
-
-    const grid =
-        document.getElementById(
-            "homeExamGrid"
-        );
-
-    if (!grid) return;
-
-    grid.innerHTML = "";
-
-    const exams =
-        getUniqueValues(
-            testData.map(
-                test =>
-                    test.exam
-            )
-        );
-
-    const finalExams =
-        exams.length
-            ? exams
-            : DEFAULT_EXAMS;
-
-    finalExams.forEach(exam => {
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-        button.type = "button";
-
-        button.innerHTML = `
-            <strong>
-                ${escapeHTML(exam)}
-            </strong>
+        <div class="content-card">
 
             <span>
-                Test Series
+                🎓
             </span>
-        `;
 
-        button.onclick =
-            function() {
+            <h3>
+                TGT Political Science
+            </h3>
 
-                openExam(exam);
-            };
+            <p>
+                TGT स्तर की राजनीति विज्ञान की सम्पूर्ण तैयारी।
+            </p>
 
-        grid.appendChild(button);
-    });
-}
+            <button
+                type="button"
+                onclick="contactAdmin()"
+            >
+                जानकारी लें
+            </button>
 
-
-/* =========================================================
-   UNIQUE VALUES
-========================================================= */
-
-function getUniqueValues(values) {
-
-    return [
-        ...new Set(
-            values
-                .filter(Boolean)
-                .map(
-                    value =>
-                        String(value).trim()
-                )
-                .filter(Boolean)
-        )
-    ];
-}
+        </div>
 
 
-/* =========================================================
-   NORMALIZE TEXT
-========================================================= */
+        <div class="content-card">
 
-function normalizeText(value) {
+            <span>
+                📖
+            </span>
 
-    return String(
-        value || ""
-    )
-        .trim()
-        .toLowerCase();
-}
+            <h3>
+                PGT Political Science
+            </h3>
 
+            <p>
+                PGT परीक्षा के लिए विषयवार तैयारी।
+            </p>
 
-/* =========================================================
-   FORMAT TIME
-========================================================= */
+            <button
+                type="button"
+                onclick="contactAdmin()"
+            >
+                जानकारी लें
+            </button>
 
-function formatTime(seconds) {
-
-    seconds =
-        Math.max(
-            0,
-            Number(seconds) || 0
-        );
-
-    const minutes =
-        Math.floor(
-            seconds / 60
-        );
-
-    const secs =
-        seconds % 60;
-
-    return (
-        String(minutes).padStart(2, "0") +
-        ":" +
-        String(secs).padStart(2, "0")
-    );
-}
+        </div>
 
 
-/* =========================================================
-   FORMAT DATE
-========================================================= */
+        <div class="content-card">
 
-function formatDate(date) {
+            <span>
+                🌍
+            </span>
 
-    if (!date) return "";
+            <h3>
+                Geography
+            </h3>
 
-    try {
+            <p>
+                TGT एवं PGT स्तर की भूगोल तैयारी।
+            </p>
 
-        return new Date(
-            date
-        ).toLocaleString(
-            "hi-IN"
-        );
+            <button
+                type="button"
+                onclick="contactAdmin()"
+            >
+                जानकारी लें
+            </button>
 
-    } catch (error) {
-
-        return "";
-    }
-}
-
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHTML(value) {
-
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
+        </div>
 
 
-/* =========================================================
-   APPLICATION START
-========================================================= */
+        <div class="content-card">
 
-document.addEventListener(
-    "DOMContentLoaded",
-    async function() {
+            <span>
+                📚
+            </span>
 
-        const userType =
-            localStorage.getItem(
-                "userType"
-            );
+            <h3>
+                सामान्य अध्ययन
+            </h3>
 
-        /*
-         * Test data पहले load करें
-         */
+            <p>
+                विभिन्न प्रतियोगी परीक्षाओं के लिए GS।
+            </p>
 
-        await loadTests();
+            <button
+                type="button"
+                onclick="contactAdmin()"
+            >
+                जानकारी लें
+            </button>
 
-        /*
-         * TXT upload
-         */
+        </div>
 
-        initializeTXTUpload();
+    </div>
 
-        /*
-         * Profile
-         */
-
-        loadProfile();
-
-        /*
-         * Login state
-         */
-
-        if (userType === "admin") {
-
-            showPage(
-                "adminPanel"
-            );
-
-        } else if (
-            userType === "student"
-        ) {
-
-            showPage("home");
-
-        } else {
-
-            showPage(
-                "loginPage"
-            );
-        }
-    }
-);
+</section>
 
 
-/* =========================================================
-   PREVENT ACCIDENTAL PAGE REFRESH DURING TEST
-========================================================= */
+<!-- =====================================================
+     NOTES
+===================================================== -->
 
-window.addEventListener(
-    "beforeunload",
-    function(event) {
+<section
+    id="notes"
+    class="page"
+>
 
-        if (
-            currentTest &&
-            timerId
-        ) {
+    <div class="page-header">
 
-            event.preventDefault();
+        <h2>
+            📄 Notes / PDF
+        </h2>
 
-            event.returnValue = "";
-        }
-    }
-);
+        <p>
+            Study Material एवं PDF
+        </p>
+
+    </div>
+
+
+    <div class="empty-state">
+
+        <span>
+            📄
+        </span>
+
+        <h3>
+            Study Material जल्द उपलब्ध होगा
+        </h3>
+
+        <p>
+            Notes और PDF यहाँ उपलब्ध कराए जाएंगे।
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     RESULTS
+===================================================== -->
+
+<section
+    id="results"
+    class="page"
+>
+
+    <div class="page-header">
+
+        <h2>
+            🏆 My Results
+        </h2>
+
+        <p>
+            आपके सभी Test Results
+        </p>
+
+    </div>
+
+
+    <div
+        id="resultArea"
+        class="result-area"
+    >
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     NOTIFICATIONS
+===================================================== -->
+
+<section
+    id="notifications"
+    class="page"
+>
+
+    <div class="page-header">
+
+        <h2>
+            🔔 Notifications
+        </h2>
+
+        <p>
+            Latest Updates
+        </p>
+
+    </div>
+
+
+    <div class="empty-state">
+
+        <span>
+            🔔
+        </span>
+
+        <h3>
+            अभी कोई Notification नहीं है
+        </h3>
+
+        <p>
+            नई जानकारी यहाँ दिखाई जाएगी।
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ABOUT
+===================================================== -->
+
+<section
+    id="about"
+    class="page"
+>
+
+    <div class="page-header">
+
+        <h2>
+            ℹ️ About
+        </h2>
+
+        <p>
+            GS Junction Prayagraj
+        </p>
+
+    </div>
+
+
+    <div class="about-card">
+
+        <h2>
+            GS JUNCTION PRAYAGRAJ
+        </h2>
+
+        <p>
+            POWERED BY LIVE STUDY ALLAHABAD
+        </p>
+
+        <p>
+            PCS • UPSSSC • TGT • PGT • LT GRADE
+            • UGC NET • TET • CTET
+        </p>
+
+        <p>
+            प्रतियोगी परीक्षाओं की बेहतर तैयारी के लिए
+            Online Classes, Test Series एवं Study Material।
+        </p>
+
+        <button
+            type="button"
+            onclick="youtube()"
+        >
+            ▶️ YouTube Channel
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ADMIN PANEL
+===================================================== -->
+
+<section
+    id="adminPanel"
+    class="page"
+>
+
+    <div class="page-header">
+
+        <h2>
+            ⚙️ Admin Panel
+        </h2>
+
+        <p>
+            GS Junction Management
+        </p>
+
+    </div>
+
+
+    <div class="admin-grid">
+
+        <button
+            type="button"
+            onclick="adminAction('tests')"
+        >
+            📝
+            <strong>Test Management</strong>
+            <span>Tests Manage करें</span>
+        </button>
+
+
+        <button
+            type="button"
+            onclick="adminAction('questions')"
+        >
+            ❓
+            <strong>Question Bank</strong>
+            <span>Questions Manage करें</span>
+        </button>
+
+
+        <button
+            type="button"
+            onclick="adminAction('students')"
+        >
+            👨‍🎓
+            <strong>Students</strong>
+            <span>Student Management</span>
+        </button>
+
+
+        <button
+            type="button"
+            onclick="adminAction('notes')"
+        >
+            📄
+            <strong>Notes / PDF</strong>
+            <span>Study Material</span>
+        </button>
+
+
+        <button
+            type="button"
+            onclick="adminAction('notifications')"
+        >
+            🔔
+            <strong>Notifications</strong>
+            <span>Updates Manage करें</span>
+        </button>
+
+
+        <button
+            type="button"
+            onclick="adminAction('links')"
+        >
+            🔗
+            <strong>Social Links</strong>
+            <span>Links Manage करें</span>
+        </button>
+
+
+        <button
+            type="button"
+            onclick="adminAction('courses')"
+        >
+            📚
+            <strong>Courses</strong>
+            <span>Courses Manage करें</span>
+        </button>
+
+
+        <button
+            type="button"
+            onclick="adminAction('settings')"
+        >
+            ⚙️
+            <strong>Settings</strong>
+            <span>App Settings</span>
+        </button>
+
+    </div>
+
+
+    <!-- ADMIN MESSAGE -->
+
+    <div
+        id="adminMessage"
+        class="admin-message hidden"
+    >
+    </div>
+
+
+    <!-- TXT UPLOAD -->
+
+    <div class="admin-upload-card">
+
+        <h2>
+            📥 TXT से Questions Upload करें
+        </h2>
+
+        <p>
+            TXT file चुनें और Questions को Test में load करें।
+        </p>
+
+        <input
+            type="file"
+            id="txtFile"
+            accept=".txt"
+        >
+
+    </div>
+
+
+    <button
+        type="button"
+        class="logout-btn"
+        onclick="logout()"
+    >
+        🚪 Logout
+    </button>
+
+</section>
+
+
+</main>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer class="site-footer">
+
+    <div class="footer-brand">
+
+        <h3>
+            GS JUNCTION PRAYAGRAJ
+        </h3>
+
+        <p>
+            POWERED BY LIVE STUDY ALLAHABAD
+        </p>
+
+    </div>
+
+
+    <div class="footer-links">
+
+        <button
+            type="button"
+            onclick="showPage('home')"
+        >
+            Home
+        </button>
+
+        <button
+            type="button"
+            onclick="showPage('tests')"
+        >
+            Tests
+        </button>
+
+        <button
+            type="button"
+            onclick="showPage('courses')"
+        >
+            Courses
+        </button>
+
+        <button
+            type="button"
+            onclick="showPage('about')"
+        >
+            About
+        </button>
+
+    </div>
+
+
+    <p class="copyright">
+        © 2026 GS Junction Prayagraj.
+        All Rights Reserved.
+    </p>
+
+</footer>
+
+
+<!-- =====================================================
+     MASTER APP.JS
+===================================================== -->
+
+<script src="app.js"></script>
+
+</body>
+</html>
