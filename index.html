@@ -6,11 +6,14 @@
 
     <title>GS Junction Prayagraj</title>
 
-    <meta name="description"
-          content="GS Junction Prayagraj - PCS, UPSSSC, TGT, PGT, LT Grade, UGC NET, TET, CTET एवं अन्य परीक्षाओं की तैयारी">
+    <meta
+        name="description"
+        content="GS Junction Prayagraj - PCS, UPSSSC, TGT, PGT, LT Grade, UGC NET, TET, CTET एवं अन्य परीक्षाओं की तैयारी"
+    >
+
+    <meta name="theme-color" content="#0f172a">
 
     <link rel="manifest" href="manifest.json">
-
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -30,9 +33,11 @@
 
         <div class="brand-text">
 
-            <h1>GS JUNCTION PRAYAGRAJ</h1>
+            <h1 id="siteName">
+                GS JUNCTION PRAYAGRAJ
+            </h1>
 
-            <p>
+            <p id="siteTagline">
                 POWERED BY LIVE STUDY ALLAHABAD
             </p>
 
@@ -69,7 +74,7 @@
             📄 Notes/PDF
         </button>
 
-        <button onclick="showPage('results')">
+        <button onclick="showPage('results'); showResults()">
             🏆 Result
         </button>
 
@@ -94,7 +99,7 @@
 
 
 <!-- =====================================================
-     LOGIN PAGE
+     LOGIN
 ===================================================== -->
 
 <section id="loginPage" class="page active">
@@ -110,8 +115,8 @@
         </h2>
 
         <p>
-            सभी प्रतियोगी परीक्षाओं की तैयारी के लिए
-            एक ही प्लेटफॉर्म
+            सभी प्रतियोगी परीक्षाओं हेतु
+            गुणवत्तापूर्ण अध्ययन एवं टेस्ट प्लेटफॉर्म
         </p>
 
 
@@ -122,7 +127,10 @@
                 onclick="loginStudent()">
 
                 👨‍🎓
-                <strong>Student Login</strong>
+
+                <strong>
+                    Student Login
+                </strong>
 
                 <span>
                     टेस्ट, कोर्स, नोट्स एवं रिजल्ट
@@ -136,7 +144,10 @@
                 onclick="loginAdmin()">
 
                 🔐
-                <strong>Admin Login</strong>
+
+                <strong>
+                    Admin Login
+                </strong>
 
                 <span>
                     Test एवं Content Management
@@ -153,7 +164,7 @@
 
 
 <!-- =====================================================
-     HOME
+     STUDENT HOME
 ===================================================== -->
 
 <section id="home" class="page">
@@ -175,7 +186,6 @@
             <p>
                 PCS • UPSSSC • TGT • PGT • LT GRADE
                 • UGC NET • TET • CTET
-                एवं अन्य परीक्षाएँ
             </p>
 
         </div>
@@ -184,7 +194,6 @@
 
 
     <div class="dashboard-grid">
-
 
         <button
             class="dashboard-card"
@@ -256,7 +265,7 @@
 
         <button
             class="dashboard-card"
-            onclick="showPage('results')">
+            onclick="showPage('results'); showResults()">
 
             <span>🏆</span>
 
@@ -307,7 +316,7 @@
 
         <button
             class="dashboard-card"
-            onclick="showPage('profile')">
+            onclick="showPage('profile'); loadProfile()">
 
             <span>👤</span>
 
@@ -324,76 +333,26 @@
     </div>
 
 
-    <!-- EXAM CATEGORIES -->
+    <!-- =================================================
+         EXAMS
+    ================================================= -->
 
     <div class="section-title">
 
         <h2>
-            📝 परीक्षा-वार Test
+            📝 परीक्षा-वार Test Series
         </h2>
 
         <p>
-            प्रत्येक परीक्षा के लिए अलग Test Series
+            प्रत्येक परीक्षा की अलग Test Series
         </p>
 
     </div>
 
 
-    <div class="exam-grid">
-
-
-        <button onclick="openExam('PCS')">
-            <strong>PCS</strong>
-            <span>General Studies</span>
-        </button>
-
-
-        <button onclick="openExam('UPSSSC')">
-            <strong>UPSSSC</strong>
-            <span>General Studies</span>
-        </button>
-
-
-        <button onclick="openExam('TGT')">
-            <strong>TGT</strong>
-            <span>GS एवं Subject Tests</span>
-        </button>
-
-
-        <button onclick="openExam('PGT')">
-            <strong>PGT</strong>
-            <span>GS एवं Subject Tests</span>
-        </button>
-
-
-        <button onclick="openExam('LT GRADE')">
-            <strong>LT GRADE</strong>
-            <span>GS एवं Subject Tests</span>
-        </button>
-
-
-        <button onclick="openExam('UGC NET')">
-            <strong>UGC NET</strong>
-            <span>General Studies / Subject</span>
-        </button>
-
-
-        <button onclick="openExam('TET')">
-            <strong>TET</strong>
-            <span>General Studies</span>
-        </button>
-
-
-        <button onclick="openExam('CTET')">
-            <strong>CTET</strong>
-            <span>General Studies</span>
-        </button>
-
-
-        <button onclick="openExam('OTHER')">
-            <strong>अन्य परीक्षाएँ</strong>
-            <span>General Studies</span>
-        </button>
+    <div
+        id="homeExamGrid"
+        class="exam-grid">
 
     </div>
 
@@ -402,7 +361,7 @@
 
 
 <!-- =====================================================
-     TESTS
+     TEST SELECTION
 ===================================================== -->
 
 <section id="tests" class="page">
@@ -414,45 +373,148 @@
         </h2>
 
         <p>
-            परीक्षा का चयन करें
+            Exam → Category → Subject → Test चुनें
         </p>
 
     </div>
 
 
-    <div class="exam-grid">
+    <div class="test-selection-card">
 
-        <button onclick="openExam('PCS')">
-            📝 PCS Test
-        </button>
+        <div class="selection-step">
 
-        <button onclick="openExam('UPSSSC')">
-            📝 UPSSSC Test
-        </button>
+            <label>
+                1. Exam Select करें
+            </label>
 
-        <button onclick="openExam('TGT')">
-            📝 TGT Test
-        </button>
+            <select
+                id="examSelect"
+                class="test-select"
+                onchange="updateCategorySelector()">
 
-        <button onclick="openExam('PGT')">
-            📝 PGT Test
-        </button>
+                <option value="">
+                    सभी Exams
+                </option>
 
-        <button onclick="openExam('LT GRADE')">
-            📝 LT Grade Test
-        </button>
+            </select>
 
-        <button onclick="openExam('UGC NET')">
-            📝 UGC NET Test
-        </button>
+        </div>
 
-        <button onclick="openExam('TET')">
-            📝 TET Test
-        </button>
 
-        <button onclick="openExam('CTET')">
-            📝 CTET Test
-        </button>
+        <div class="selection-step">
+
+            <label>
+                2. Category Select करें
+            </label>
+
+            <select
+                id="categorySelect"
+                class="test-select"
+                onchange="updateSubjectSelector()">
+
+                <option value="">
+                    सभी Categories
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="selection-step">
+
+            <label>
+                3. Subject Select करें
+            </label>
+
+            <select
+                id="subjectSelect"
+                class="test-select"
+                onchange="updateTestSelector()">
+
+                <option value="">
+                    सभी Subjects
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="selection-step">
+
+            <label>
+                4. Test Select करें
+            </label>
+
+            <select
+                id="testSelect"
+                class="test-select"
+                onchange="showSelectedTestInfo()">
+
+                <option value="">
+                    Test चुनें
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="selectedTestInfo"
+            class="selected-test-info">
+
+            Exam → Category → Subject →
+            Test Select करें।
+
+        </div>
+
+
+        <div class="test-start-controls">
+
+            <label>
+                प्रश्नों की संख्या
+            </label>
+
+            <select
+                id="count"
+                class="test-select">
+
+            </select>
+
+
+            <button
+                type="button"
+                onclick="startTest()">
+
+                🚀 Start Test
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         TEST AREA
+    ================================================= -->
+
+    <div
+        id="testArea"
+        class="test-area hidden">
+
+    </div>
+
+
+    <!-- =================================================
+         RESULT
+    ================================================= -->
+
+    <div
+        id="resultArea"
+        class="content-card hidden">
 
     </div>
 
@@ -663,7 +725,7 @@
 
 
 <!-- =====================================================
-     STUDENT PROFILE
+     PROFILE
 ===================================================== -->
 
 <section id="profile" class="page">
@@ -691,9 +753,11 @@
             GS Junction Prayagraj
         </p>
 
+
         <div class="profile-stats">
 
             <div>
+
                 <strong id="totalTests">
                     0
                 </strong>
@@ -701,10 +765,12 @@
                 <span>
                     Tests
                 </span>
+
             </div>
 
 
             <div>
+
                 <strong id="bestScore">
                     0
                 </strong>
@@ -712,10 +778,12 @@
                 <span>
                     Best Score
                 </span>
+
             </div>
 
 
             <div>
+
                 <strong id="accuracy">
                     0%
                 </strong>
@@ -723,9 +791,38 @@
                 <span>
                     Accuracy
                 </span>
+
             </div>
 
         </div>
+
+
+        <div class="profile-form">
+
+            <input
+                id="name"
+                type="text"
+                placeholder="अपना नाम लिखें">
+
+            <button
+                type="button"
+                onclick="saveName()">
+
+                💾 नाम सुरक्षित करें
+
+            </button>
+
+            <p id="msg"></p>
+
+        </div>
+
+        <button
+            type="button"
+            onclick="logout()">
+
+            🚪 Logout
+
+        </button>
 
     </div>
 
@@ -742,7 +839,7 @@
     <div class="page-header">
 
         <h2>
-            ℹ️ About
+            ℹ️ About Us
         </h2>
 
     </div>
@@ -755,9 +852,14 @@
         </h2>
 
         <p>
+            सभी प्रतियोगी परीक्षाओं हेतु
+            गुणवत्तापूर्ण अध्ययन एवं टेस्ट प्लेटफॉर्म।
+        </p>
+
+        <p>
             PCS, UPSSSC, TGT, PGT, LT Grade,
             UGC NET, TET, CTET एवं अन्य
-            प्रतियोगी परीक्षाओं हेतु अध्ययन मंच।
+            प्रतियोगी परीक्षाओं की तैयारी।
         </p>
 
         <p>
@@ -932,12 +1034,49 @@
 
     </div>
 
+
+    <!-- ADMIN TEST PREVIEW -->
+
+    <div
+        id="adminMessage"
+        class="content-card hidden">
+
+    </div>
+
+
+    <div class="content-card">
+
+        <h3>
+            📂 TXT Test Upload
+        </h3>
+
+        <p>
+            TXT file से प्रश्न पढ़कर temporary test
+            उपलब्ध कराया जा सकता है।
+        </p>
+
+        <input
+            id="txtFile"
+            type="file"
+            accept=".txt,text/plain">
+
+    </div>
+
+
+    <button
+        type="button"
+        onclick="logout()">
+
+        🚪 Admin Logout
+
+    </button>
+
 </section>
 
 
 
 <!-- =====================================================
-     EXAM TEST AREA
+     EXAM AREA
 ===================================================== -->
 
 <section id="examArea" class="page">
@@ -962,7 +1101,6 @@
     </div>
 
 </section>
-
 
 
 </main>
@@ -1022,260 +1160,10 @@
 
 
 <!-- =====================================================
-     BASIC APP FUNCTIONS
+     APP JS
 ===================================================== -->
 
-<script>
-
-function showPage(id) {
-
-    document
-        .querySelectorAll('.page')
-        .forEach(page => {
-
-            page.classList.remove('active');
-
-        });
-
-
-    const page =
-        document.getElementById(id);
-
-
-    if (page) {
-
-        page.classList.add('active');
-
-    }
-
-
-    const nav =
-        document.getElementById('nav');
-
-
-    if (nav) {
-
-        nav.classList.remove('open');
-
-    }
-
-
-    window.scrollTo(0, 0);
-}
-
-
-
-function toggleNav() {
-
-    const nav =
-        document.getElementById('nav');
-
-
-    if (nav) {
-
-        nav.classList.toggle('open');
-
-    }
-}
-
-
-
-function loginStudent() {
-
-    localStorage.setItem(
-        'userType',
-        'student'
-    );
-
-    showPage('home');
-
-}
-
-
-
-function loginAdmin() {
-
-    const password =
-        prompt(
-            'Admin Password दर्ज करें:'
-        );
-
-
-    if (password === 'admin123') {
-
-        localStorage.setItem(
-            'userType',
-            'admin'
-        );
-
-        showPage('adminPanel');
-
-    } else {
-
-        alert(
-            'गलत Admin Password।'
-        );
-
-    }
-}
-
-
-
-function logout() {
-
-    localStorage.removeItem(
-        'userType'
-    );
-
-    showPage('loginPage');
-
-}
-
-
-
-function youtube() {
-
-    window.open(
-        'https://www.youtube.com/',
-        '_blank'
-    );
-
-}
-
-
-
-function contactAdmin() {
-
-    alert(
-        'Contact सुविधा Admin Panel से जोड़ी जाएगी।'
-    );
-
-}
-
-
-
-function openExam(exam) {
-
-    const title =
-        document.getElementById(
-            'examTitle'
-        );
-
-
-    const description =
-        document.getElementById(
-            'examDescription'
-        );
-
-
-    const container =
-        document.getElementById(
-            'examTests'
-        );
-
-
-    if (title) {
-
-        title.textContent =
-            exam + ' — Test Series';
-
-    }
-
-
-    if (description) {
-
-        description.textContent =
-            exam +
-            ' के लिए उपलब्ध सभी Tests';
-
-    }
-
-
-    if (container) {
-
-        container.innerHTML = `
-
-            <button
-                class="dashboard-card"
-                onclick="startExamTest('${exam}')">
-
-                <span>📝</span>
-
-                <strong>
-                    ${exam} GS Test - 01
-                </strong>
-
-                <small>
-                    Test शुरू करें
-                </small>
-
-            </button>
-
-        `;
-
-    }
-
-
-    showPage('examArea');
-
-}
-
-
-
-function startExamTest(exam) {
-
-    alert(
-        exam +
-        ' Test System अगली stage में app.js से connect होगा।'
-    );
-
-}
-
-
-
-function adminAction(type) {
-
-    alert(
-        'Admin ' +
-        type +
-        ' management अगली stage में activate किया जाएगा।'
-    );
-
-}
-
-
-
-document.addEventListener(
-    'DOMContentLoaded',
-    function() {
-
-        const userType =
-            localStorage.getItem(
-                'userType'
-            );
-
-
-        /*
-           अभी login page से शुरुआत।
-           बाद में persistent login को
-           app.js में properly handle करेंगे।
-        */
-
-        if (userType === 'admin') {
-
-            showPage('adminPanel');
-
-        } else {
-
-            showPage('loginPage');
-
-        }
-
-    }
-);
-
-</script>
-
+<script src="app.js"></script>
 
 </body>
 </html>
