@@ -1,32 +1,14 @@
 /* =========================================================
    GS JUNCTION PRAYAGRAJ
-   ONLINE TEST SYSTEM - SCALABLE VERSION
-   =========================================================
-   Features:
-   • tests/index.json से Tests Auto Load
-   • Published / Draft support
-   • Exam / Category / Subject support
-   • Test-specific timePerQuestion
-   • Test-specific marks
-   • Negative marking
-   • 150 Questions तक
-   • Previous / Next / Skip
-   • Question Palette
-   • Mark Question
-   • Score / Accuracy / Result
-   • Student Name
-   • LocalStorage Result History
-   • TXT Question Parser
-   • File Upload
-   • PWA Service Worker
+   SCALABLE ONLINE EDUCATION + TEST PLATFORM
    ========================================================= */
 
 'use strict';
 
 
 /* =========================================================
-   GLOBAL VARIABLES
-   ========================================================= */
+   GLOBAL STATE
+========================================================= */
 
 let test = [];
 let current = 0;
@@ -43,10 +25,14 @@ let currentTestInfo = null;
 let testStartedAt = null;
 let testTimeLimit = 0;
 
+let currentExamFilter = '';
+let currentCategoryFilter = '';
+let currentSubjectFilter = '';
+
 
 /* =========================================================
-   SETTINGS
-   ========================================================= */
+   CONFIG
+========================================================= */
 
 const DEFAULT_TIME_PER_QUESTION = 45;
 const DEFAULT_MARKS = 1;
@@ -54,15 +40,16 @@ const DEFAULT_NEGATIVE_MARKING = 0;
 
 const MAX_QUESTIONS = 150;
 
-const TEST_INDEX_FILE = 'tests/index.json';
+const TEST_INDEX_FILE =
+    'tests/index.json';
 
 
 /* =========================================================
-   EXAM CATEGORIES
-   ========================================================= */
+   DEFAULT EXAMS
+========================================================= */
 
-const EXAMS = [
-    'PCS',
+const DEFAULT_EXAMS = [
+    'UPPSC / PCS',
     'UPSSSC',
     'TGT',
     'PGT',
@@ -75,56 +62,183 @@ const EXAMS = [
 
 /* =========================================================
    PAGE NAVIGATION
-   ========================================================= */
+========================================================= */
 
-function show(id) {
+function showPage(id) {
 
-    document.querySelectorAll('main section').forEach(section => {
-        section.classList.remove('active');
-    });
+    document
+        .querySelectorAll('.page')
+        .forEach(page => {
 
-    const element = document.getElementById(id);
+            page.classList.remove('active');
 
-    if (element) {
-        element.classList.add('active');
+        });
+
+
+    const page =
+        document.getElementById(id);
+
+
+    if (page) {
+
+        page.classList.add('active');
+
     }
+
+
+    closeMobileNav();
+
 
     window.scrollTo({
         top: 0,
         behavior: 'smooth'
     });
+}
 
-    closeMobileNav();
+
+/*
+   Compatibility with old HTML
+*/
+
+function show(id) {
+    showPage(id);
 }
 
 
 /* =========================================================
    MOBILE NAVIGATION
-   ========================================================= */
+========================================================= */
 
 function toggleNav() {
 
-    const nav = document.getElementById('nav');
+    const nav =
+        document.getElementById('nav');
+
 
     if (nav) {
+
         nav.classList.toggle('open');
+
     }
 }
 
 
 function closeMobileNav() {
 
-    const nav = document.getElementById('nav');
+    const nav =
+        document.getElementById('nav');
+
 
     if (nav) {
+
         nav.classList.remove('open');
+
     }
 }
 
 
 /* =========================================================
+   LOGIN
+========================================================= */
+
+function loginStudent() {
+
+    localStorage.setItem(
+        'userType',
+        'student'
+    );
+
+    showPage('home');
+
+    updateStudentProfile();
+
+}
+
+
+function loginAdmin() {
+
+    const password =
+        prompt(
+            'Admin Password दर्ज करें:'
+        );
+
+
+    /*
+       FRONTEND DEMO PASSWORD ONLY
+
+       Production में Backend Authentication
+       लगाना आवश्यक होगा।
+    */
+
+    if (password === 'admin123') {
+
+        localStorage.setItem(
+            'userType',
+            'admin'
+        );
+
+        showPage('adminPanel');
+
+    } else {
+
+        alert(
+            'गलत Admin Password।'
+        );
+
+    }
+}
+
+
+function logout() {
+
+    clearInterval(timerId);
+
+    localStorage.removeItem(
+        'userType'
+    );
+
+    resetTest();
+
+    showPage('loginPage');
+
+}
+
+
+/* =========================================================
+   USER ROLE
+========================================================= */
+
+function getUserType() {
+
+    return (
+        localStorage.getItem(
+            'userType'
+        ) || ''
+    );
+}
+
+
+function isAdmin() {
+
+    return (
+        getUserType() ===
+        'admin'
+    );
+}
+
+
+function isStudent() {
+
+    return (
+        getUserType() ===
+        'student'
+    );
+}
+
+
+/* =========================================================
    YOUTUBE
-   ========================================================= */
+========================================================= */
 
 function youtube() {
 
@@ -137,80 +251,285 @@ function youtube() {
 
 
 /* =========================================================
-   SAVE STUDENT NAME
-   ========================================================= */
+   CONTACT
+========================================================= */
+
+function contactAdmin() {
+
+    alert(
+        'Contact details जल्द ही Admin Panel से configurable होंगे।'
+    );
+}
+
+
+/* =========================================================
+   STUDENT NAME
+========================================================= */
 
 function saveName() {
 
     const input =
-        document.getElementById('name');
+        document.getElementById(
+            'name'
+        );
+
 
     const msg =
-        document.getElementById('msg');
+        document.getElementById(
+            'msg'
+        );
+
 
     const name =
         input
             ? input.value.trim()
             : '';
 
+
     if (!name) {
 
         if (msg) {
+
             msg.textContent =
                 'कृपया अपना नाम लिखें।';
+
         }
 
         return;
     }
+
 
     localStorage.setItem(
         'gsName',
         name
     );
 
+
     if (msg) {
+
         msg.textContent =
-            'प्रोफाइल सुरक्षित: ' + name;
+            'प्रोफाइल सुरक्षित: ' +
+            name;
+
     }
+
+
+    updateStudentProfile();
 }
 
-
-/* =========================================================
-   GET STUDENT NAME
-   ========================================================= */
 
 function getStudentName() {
 
     const input =
-        document.getElementById('name');
+        document.getElementById(
+            'name'
+        );
 
-    if (input && input.value.trim()) {
+
+    if (
+        input &&
+        input.value.trim()
+    ) {
+
         return input.value.trim();
+
     }
 
+
     return (
-        localStorage.getItem('gsName') ||
+        localStorage.getItem(
+            'gsName'
+        ) ||
         'Student'
     );
 }
 
 
 /* =========================================================
-   QUESTION COUNT OPTIONS
-   ========================================================= */
+   PROFILE
+========================================================= */
+
+function loadProfile() {
+
+    updateStudentProfile();
+
+}
+
+
+function updateStudentProfile() {
+
+    const name =
+        getStudentName();
+
+
+    const nameElement =
+        document.getElementById(
+            'studentName'
+        );
+
+
+    if (nameElement) {
+
+        nameElement.textContent =
+            name;
+
+    }
+
+
+    const nameInput =
+        document.getElementById(
+            'name'
+        );
+
+
+    if (
+        nameInput &&
+        !nameInput.value
+    ) {
+
+        nameInput.value =
+            name !== 'Student'
+                ? name
+                : '';
+
+    }
+
+
+    let history = [];
+
+
+    try {
+
+        history =
+            JSON.parse(
+                localStorage.getItem(
+                    'testHistory'
+                ) || '[]'
+            );
+
+        if (
+            !Array.isArray(history)
+        ) {
+
+            history = [];
+
+        }
+
+    } catch {
+
+        history = [];
+
+    }
+
+
+    const totalTests =
+        document.getElementById(
+            'totalTests'
+        );
+
+
+    const bestScore =
+        document.getElementById(
+            'bestScore'
+        );
+
+
+    const accuracyElement =
+        document.getElementById(
+            'accuracy'
+        );
+
+
+    if (totalTests) {
+
+        totalTests.textContent =
+            history.length;
+
+    }
+
+
+    let best = 0;
+
+
+    let accuracySum = 0;
+
+
+    history.forEach(
+        item => {
+
+            const numericScore =
+                Number(
+                    item.score
+                ) || 0;
+
+
+            if (
+                numericScore >
+                best
+            ) {
+
+                best =
+                    numericScore;
+
+            }
+
+
+            accuracySum +=
+                Number(
+                    item.accuracy
+                ) || 0;
+
+        }
+    );
+
+
+    if (bestScore) {
+
+        bestScore.textContent =
+            best;
+
+    }
+
+
+    if (accuracyElement) {
+
+        const average =
+            history.length
+                ? Math.round(
+                    accuracySum /
+                    history.length
+                  )
+                : 0;
+
+
+        accuracyElement.textContent =
+            average + '%';
+
+    }
+}
+
+
+/* =========================================================
+   QUESTION COUNT
+========================================================= */
 
 function setupCountOptions() {
 
-    const countSelect =
-        document.getElementById('count');
+    const select =
+        document.getElementById(
+            'count'
+        );
 
-    if (!countSelect) {
+
+    if (!select) {
         return;
     }
 
-    countSelect.innerHTML = '';
 
-    const options = [
+    select.innerHTML = '';
+
+
+    [
         5,
         10,
         20,
@@ -219,28 +538,40 @@ function setupCountOptions() {
         75,
         100,
         150
-    ];
+    ].forEach(
+        number => {
 
-    options.forEach(number => {
+            const option =
+                document.createElement(
+                    'option'
+                );
 
-        const option =
-            document.createElement('option');
 
-        option.value = number;
+            option.value =
+                number;
 
-        option.textContent =
-            number + ' प्रश्न';
 
-        countSelect.appendChild(option);
-    });
+            option.textContent =
+                number +
+                ' प्रश्न';
 
-    countSelect.value = '150';
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    select.value =
+        '150';
 }
 
 
 /* =========================================================
-   GET CURRENT TIME PER QUESTION
-   ========================================================= */
+   TIME / MARKING
+========================================================= */
 
 function getTimePerQuestion() {
 
@@ -249,20 +580,20 @@ function getTimePerQuestion() {
             currentTestInfo?.timePerQuestion
         );
 
+
     if (
         Number.isFinite(value) &&
         value > 0
     ) {
+
         return value;
+
     }
+
 
     return DEFAULT_TIME_PER_QUESTION;
 }
 
-
-/* =========================================================
-   GET MARKS
-   ========================================================= */
 
 function getMarks() {
 
@@ -271,19 +602,19 @@ function getMarks() {
             currentTestInfo?.marks
         );
 
+
     if (
         Number.isFinite(value)
     ) {
+
         return value;
+
     }
+
 
     return DEFAULT_MARKS;
 }
 
-
-/* =========================================================
-   GET NEGATIVE MARKING
-   ========================================================= */
 
 function getNegativeMarking() {
 
@@ -292,22 +623,24 @@ function getNegativeMarking() {
             currentTestInfo?.negativeMarking
         );
 
+
     if (
         Number.isFinite(value) &&
         value >= 0
     ) {
+
         return value;
+
     }
+
 
     return DEFAULT_NEGATIVE_MARKING;
 }
 
 
-/* =========================================================
-   TOTAL TIME
-   ========================================================= */
-
-function calculateTotalTime(count) {
+function calculateTotalTime(
+    count
+) {
 
     return (
         Number(count) *
@@ -318,9 +651,11 @@ function calculateTotalTime(count) {
 
 /* =========================================================
    FORMAT TIME
-   ========================================================= */
+========================================================= */
 
-function formatDuration(seconds) {
+function formatDuration(
+    seconds
+) {
 
     seconds =
         Math.max(
@@ -328,16 +663,22 @@ function formatDuration(seconds) {
             Number(seconds) || 0
         );
 
+
     const hours =
-        Math.floor(seconds / 3600);
+        Math.floor(
+            seconds / 3600
+        );
+
 
     const minutes =
         Math.floor(
             (seconds % 3600) / 60
         );
 
+
     const remaining =
         seconds % 60;
+
 
     if (hours > 0) {
 
@@ -349,7 +690,9 @@ function formatDuration(seconds) {
             remaining +
             ' सेकंड'
         );
+
     }
+
 
     return (
         minutes +
@@ -361,12 +704,16 @@ function formatDuration(seconds) {
 
 
 /* =========================================================
-   HTML ESCAPE
-   ========================================================= */
+   ESCAPE HTML
+========================================================= */
 
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
-    return String(value ?? '').replace(
+    return String(
+        value ?? ''
+    ).replace(
         /[&<>"']/g,
         character => {
 
@@ -380,7 +727,11 @@ function escapeHtml(value) {
 
             };
 
-            return map[character];
+
+            return map[
+                character
+            ];
+
         }
     );
 }
@@ -388,66 +739,87 @@ function escapeHtml(value) {
 
 /* =========================================================
    CLEAN TEXT
-   ========================================================= */
+========================================================= */
 
-function cleanText(text) {
+function cleanText(
+    text
+) {
 
     if (!text) {
         return '';
     }
 
+
     return String(text)
         .replace(/\r/g, '')
         .replace(/\*\*/g, '')
-        .replace(/__([^_]+)__/g, '$1')
-        .replace(/\n{3,}/g, '\n\n')
+        .replace(
+            /__([^_]+)__/g,
+            '$1'
+        )
+        .replace(
+            /\n{3,}/g,
+            '\n\n'
+        )
         .trim();
 }
 
 
 /* =========================================================
-   PARSE ANSWER
-   ========================================================= */
+   ANSWER PARSER
+========================================================= */
 
-function parseAnswer(text) {
+function parseAnswer(
+    text
+) {
 
     if (!text) {
         return -1;
     }
+
 
     const match =
         text.match(
             /(?:उत्तर|answer)\s*:\s*\(?([ABCD])\)?/i
         );
 
+
     if (!match) {
+
         return -1;
+
     }
+
 
     return (
         match[1]
             .toUpperCase()
-            .charCodeAt(0) - 65
+            .charCodeAt(0) -
+        65
     );
 }
 
 
 /* =========================================================
-   PARSE TXT QUESTIONS
-   ========================================================= */
+   TXT QUESTION PARSER
+========================================================= */
 
-function parseQuestions(text) {
+function parseQuestions(
+    text
+) {
 
     if (!text) {
         return [];
     }
 
+
     text =
         String(text)
             .replace(/\r/g, '');
 
+
     /*
-       Markdown headings हटाएँ
+       Remove markdown headings
     */
 
     text =
@@ -456,8 +828,9 @@ function parseQuestions(text) {
             ''
         );
 
+
     /*
-       Question formats:
+       Question detection
 
        1.
        1)
@@ -466,15 +839,22 @@ function parseQuestions(text) {
     */
 
     const questionRegex =
-        /(?:^|\n)\s*(?:\*\*)?\s*(\d{1,3})\s*[\.\)]\s*(?:\*\*)?\s*/g;
+        /(?:^|\n)\s*(?:\*\*)?\s*(\d{1,4})\s*[\.\)]\s*(?:\*\*)?\s*/g;
+
 
     const matches = [];
 
+
     let match;
 
+
     while (
-        (match =
-            questionRegex.exec(text)) !== null
+        (
+            match =
+                questionRegex.exec(
+                    text
+                )
+        ) !== null
     ) {
 
         matches.push({
@@ -487,10 +867,14 @@ function parseQuestions(text) {
 
             contentStart:
                 questionRegex.lastIndex
+
         });
+
     }
 
+
     const questions = [];
+
 
     for (
         let i = 0;
@@ -499,24 +883,36 @@ function parseQuestions(text) {
     ) {
 
         const start =
-            matches[i].contentStart;
+            matches[i]
+                .contentStart;
+
 
         const end =
-            i + 1 < matches.length
+            i + 1 <
+            matches.length
                 ? matches[i + 1].start
                 : text.length;
 
+
         let block =
             text
-                .slice(start, end)
+                .slice(
+                    start,
+                    end
+                )
                 .trim();
+
 
         if (!block) {
             continue;
         }
 
+
         /*
-           Answer detection
+           Answer
+
+           उत्तर: (B)
+           Answer: B
         */
 
         const answerMatch =
@@ -524,18 +920,18 @@ function parseQuestions(text) {
                 /(?:उत्तर|answer)\s*:\s*\(?([ABCD])\)?(?:\s*[^\n]*)?/i
             );
 
+
         if (!answerMatch) {
             continue;
         }
 
+
         const answer =
             answerMatch[1]
                 .toUpperCase()
-                .charCodeAt(0) - 65;
+                .charCodeAt(0) -
+            65;
 
-        /*
-           Answer हटाएँ
-        */
 
         let questionPart =
             block
@@ -545,6 +941,7 @@ function parseQuestions(text) {
                 )
                 .trim();
 
+
         /*
            Options
         */
@@ -552,14 +949,20 @@ function parseQuestions(text) {
         const optionRegex =
             /(?:^|\n|\s)(?:\*\*)?\s*\(([ABCD])\)\s*(?:\*\*)?\s*/gi;
 
+
         const optionMatches = [];
+
 
         let optionMatch;
 
+
         while (
-            (optionMatch =
-                optionRegex.exec(questionPart))
-            !== null
+            (
+                optionMatch =
+                    optionRegex.exec(
+                        questionPart
+                    )
+            ) !== null
         ) {
 
             optionMatches.push({
@@ -573,8 +976,11 @@ function parseQuestions(text) {
 
                 contentStart:
                     optionRegex.lastIndex
+
             });
+
         }
+
 
         /*
            Inline fallback
@@ -587,12 +993,17 @@ function parseQuestions(text) {
             const inlineRegex =
                 /(?:\*\*)?\(([ABCD])\)(?:\*\*)?\s*/gi;
 
+
             optionMatches.length = 0;
 
+
             while (
-                (optionMatch =
-                    inlineRegex.exec(questionPart))
-                !== null
+                (
+                    optionMatch =
+                        inlineRegex.exec(
+                            questionPart
+                        )
+                ) !== null
             ) {
 
                 optionMatches.push({
@@ -606,19 +1017,22 @@ function parseQuestions(text) {
 
                     contentStart:
                         inlineRegex.lastIndex
+
                 });
+
             }
+
         }
+
 
         if (
             optionMatches.length < 4
         ) {
+
             continue;
+
         }
 
-        /*
-           Question
-        */
 
         const questionText =
             cleanText(
@@ -628,7 +1042,9 @@ function parseQuestions(text) {
                 )
             );
 
+
         const options = [];
+
 
         for (
             let j = 0;
@@ -640,10 +1056,13 @@ function parseQuestions(text) {
                 optionMatches[j]
                     .contentStart;
 
+
             const optionEnd =
-                j + 1 < optionMatches.length
+                j + 1 <
+                optionMatches.length
                     ? optionMatches[j + 1].index
                     : questionPart.length;
+
 
             const optionText =
                 cleanText(
@@ -653,16 +1072,26 @@ function parseQuestions(text) {
                     )
                 );
 
+
             if (optionText) {
-                options.push(optionText);
+
+                options.push(
+                    optionText
+                );
+
             }
+
         }
+
 
         if (
             options.length < 4
         ) {
+
             continue;
+
         }
+
 
         questions.push({
 
@@ -670,21 +1099,26 @@ function parseQuestions(text) {
                 questionText,
 
             o:
-                options.slice(0, 4),
+                options.slice(
+                    0,
+                    4
+                ),
 
             a:
                 answer
 
         });
+
     }
+
 
     return questions;
 }
 
 
 /* =========================================================
-   LOAD JSON
-   ========================================================= */
+   LOAD TEST INDEX
+========================================================= */
 
 async function loadTestIndex() {
 
@@ -697,34 +1131,40 @@ async function loadTestIndex() {
                 Date.now()
             );
 
+
         if (!response.ok) {
 
             throw new Error(
                 'tests/index.json नहीं मिली।'
             );
+
         }
+
 
         const data =
             await response.json();
 
-        /*
-           Array format support
-        */
 
-        if (Array.isArray(data)) {
+        if (
+            Array.isArray(data)
+        ) {
+
             return data;
+
         }
 
-        /*
-           Object format support
-        */
 
         if (
             data &&
-            Array.isArray(data.tests)
+            Array.isArray(
+                data.tests
+            )
         ) {
+
             return data.tests;
+
         }
+
 
         return [];
 
@@ -735,16 +1175,20 @@ async function loadTestIndex() {
             error
         );
 
+
         return [];
+
     }
 }
 
 
 /* =========================================================
    LOAD TEST FILE
-   ========================================================= */
+========================================================= */
 
-async function loadTestFile(file) {
+async function loadTestFile(
+    file
+) {
 
     try {
 
@@ -755,19 +1199,26 @@ async function loadTestFile(file) {
                 Date.now()
             );
 
+
         if (!response.ok) {
 
             throw new Error(
                 'File नहीं मिली: ' +
                 file
             );
+
         }
+
 
         const text =
             await response.text();
 
+
         const questions =
-            parseQuestions(text);
+            parseQuestions(
+                text
+            );
+
 
         console.log(
             file +
@@ -775,6 +1226,7 @@ async function loadTestFile(file) {
             questions.length +
             ' प्रश्न मिले।'
         );
+
 
         return questions;
 
@@ -785,67 +1237,91 @@ async function loadTestFile(file) {
             error
         );
 
+
         return [];
+
     }
 }
 
 
 /* =========================================================
-   AUTO LOAD TESTS
-   ========================================================= */
+   LOAD ALL TESTS
+========================================================= */
 
 async function loadAvailableTests() {
 
     availableTests = [];
 
+
     const indexData =
         await loadTestIndex();
 
+
     if (
-        !indexData ||
-        indexData.length === 0
+        !indexData.length
     ) {
 
         console.warn(
             'tests/index.json में कोई Test नहीं मिला।'
         );
 
-        setupTestSelector();
+
+        setupAllSelectors();
+
 
         return;
+
     }
+
 
     for (
         const item of indexData
     ) {
 
         let file = '';
-        let exam = 'GS';
-        let category = 'GS';
-        let subject = 'GS';
+
+        let exam =
+            'OTHER';
+
+        let category =
+            'GS';
+
+        let subject =
+            'General Studies';
+
         let title = '';
 
         let id = '';
+
         let questionsCount = 0;
+
         let timePerQuestion =
             DEFAULT_TIME_PER_QUESTION;
+
         let marks =
             DEFAULT_MARKS;
+
         let negativeMarking =
             DEFAULT_NEGATIVE_MARKING;
-        let published = true;
+
+        let published =
+            true;
+
 
         /*
            String format
         */
 
         if (
-            typeof item === 'string'
+            typeof item ===
+            'string'
         ) {
 
-            file = item;
+            file =
+                item;
 
         }
+
 
         /*
            Object format
@@ -853,12 +1329,14 @@ async function loadAvailableTests() {
 
         else if (
             item &&
-            typeof item === 'object'
+            typeof item ===
+            'object'
         ) {
 
             id =
                 item.id ||
                 '';
+
 
             file =
                 item.file ||
@@ -866,32 +1344,39 @@ async function loadAvailableTests() {
                 item.url ||
                 '';
 
+
             exam =
                 item.exam ||
-                'GS';
+                'OTHER';
+
 
             category =
                 item.category ||
                 'GS';
 
+
             subject =
                 item.subject ||
-                'GS';
+                'General Studies';
+
 
             title =
                 item.name ||
                 item.title ||
                 '';
 
+
             questionsCount =
                 Number(
                     item.questions
                 ) || 0;
 
+
             timePerQuestion =
                 Number(
                     item.timePerQuestion
                 );
+
 
             if (
                 !Number.isFinite(
@@ -899,26 +1384,36 @@ async function loadAvailableTests() {
                 ) ||
                 timePerQuestion <= 0
             ) {
+
                 timePerQuestion =
                     DEFAULT_TIME_PER_QUESTION;
+
             }
+
 
             marks =
                 Number(
                     item.marks
                 );
 
+
             if (
-                !Number.isFinite(marks)
+                !Number.isFinite(
+                    marks
+                )
             ) {
+
                 marks =
                     DEFAULT_MARKS;
+
             }
+
 
             negativeMarking =
                 Number(
                     item.negativeMarking
                 );
+
 
             if (
                 !Number.isFinite(
@@ -926,42 +1421,42 @@ async function loadAvailableTests() {
                 ) ||
                 negativeMarking < 0
             ) {
+
                 negativeMarking =
                     DEFAULT_NEGATIVE_MARKING;
+
             }
 
-            /*
-               published false = hidden
-            */
 
             published =
                 item.published !== false;
+
         }
 
-        /*
-           Invalid file
-        */
 
         if (!file) {
             continue;
         }
 
-        /*
-           Draft / unpublished test को load नहीं करेंगे
-        */
 
         if (!published) {
 
             console.log(
-                'Unpublished Test skipped:',
-                title || file
+                'Draft skipped:',
+                title ||
+                file
             );
 
             continue;
+
         }
 
+
         const questions =
-            await loadTestFile(file);
+            await loadTestFile(
+                file
+            );
+
 
         if (
             questions.length === 0
@@ -973,7 +1468,9 @@ async function loadAvailableTests() {
             );
 
             continue;
+
         }
+
 
         availableTests.push({
 
@@ -1016,129 +1513,754 @@ async function loadAvailableTests() {
                 published
 
         });
+
     }
 
+
     console.log(
-        'कुल उपलब्ध Published Tests:',
+        'कुल Published Tests:',
         availableTests.length
     );
 
-    setupTestSelector();
+
+    setupAllSelectors();
+
+    renderHomeExamGrid();
 }
 
 
 /* =========================================================
-   TEST SELECTOR
-   ========================================================= */
+   UNIQUE VALUES
+========================================================= */
 
-function setupTestSelector() {
+function uniqueValues(
+    values
+) {
 
-    let selector =
+    return [
+        ...new Set(
+            values
+                .filter(
+                    value =>
+                        value !==
+                        undefined &&
+                        value !==
+                        null &&
+                        String(value)
+                            .trim() !== ''
+                )
+                .map(
+                    value =>
+                        String(value)
+                            .trim()
+                )
+        )
+    ];
+}
+
+
+/* =========================================================
+   EXAM SELECTOR
+========================================================= */
+
+function setupExamSelector() {
+
+    const selector =
         document.getElementById(
-            'testSelect'
+            'examSelect'
         );
+
 
     if (!selector) {
-
-        const setup =
-            document.getElementById(
-                'testSetup'
-            );
-
-        if (!setup) {
-            return;
-        }
-
-        selector =
-            document.createElement(
-                'select'
-            );
-
-        selector.id =
-            'testSelect';
-
-        selector.className =
-            'test-select';
-
-        setup.insertBefore(
-            selector,
-            setup.firstChild
-        );
-    }
-
-    selector.innerHTML = '';
-
-    if (
-        availableTests.length === 0
-    ) {
-
-        const option =
-            document.createElement(
-                'option'
-            );
-
-        option.value = '';
-
-        option.textContent =
-            'कोई Published Test उपलब्ध नहीं है';
-
-        selector.appendChild(
-            option
-        );
-
         return;
     }
 
-    availableTests.forEach(
-        (item, index) => {
+
+    const exams =
+        uniqueValues(
+            [
+                ...DEFAULT_EXAMS,
+                ...availableTests.map(
+                    item =>
+                        item.exam
+                )
+            ]
+        );
+
+
+    selector.innerHTML =
+        '<option value="">सभी Exams</option>';
+
+
+    exams.forEach(
+        exam => {
 
             const option =
                 document.createElement(
                     'option'
                 );
 
+
             option.value =
-                String(index);
+                exam;
+
 
             option.textContent =
-                `${item.exam} • ${item.category} • ${item.subject} • ${item.title} • ${item.questions.length} प्रश्न`;
+                exam;
+
 
             selector.appendChild(
                 option
             );
+
+        }
+    );
+
+
+    if (
+        currentExamFilter &&
+        exams.includes(
+            currentExamFilter
+        )
+    ) {
+
+        selector.value =
+            currentExamFilter;
+
+    }
+}
+
+
+/* =========================================================
+   CATEGORY SELECTOR
+========================================================= */
+
+function updateCategorySelector() {
+
+    const examSelect =
+        document.getElementById(
+            'examSelect'
+        );
+
+
+    const categorySelect =
+        document.getElementById(
+            'categorySelect'
+        );
+
+
+    if (
+        !examSelect ||
+        !categorySelect
+    ) {
+        return;
+    }
+
+
+    currentExamFilter =
+        examSelect.value;
+
+
+    const filtered =
+        availableTests.filter(
+            item =>
+                !currentExamFilter ||
+                item.exam ===
+                currentExamFilter
+        );
+
+
+    const categories =
+        uniqueValues(
+            filtered.map(
+                item =>
+                    item.category
+            )
+        );
+
+
+    categorySelect.innerHTML =
+        '<option value="">सभी Categories</option>';
+
+
+    categories.forEach(
+        category => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+
+            option.value =
+                category;
+
+
+            option.textContent =
+                category;
+
+
+            categorySelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    currentCategoryFilter =
+        '';
+
+
+    currentSubjectFilter =
+        '';
+
+
+    updateSubjectSelector();
+
+}
+
+
+/* =========================================================
+   SUBJECT SELECTOR
+========================================================= */
+
+function updateSubjectSelector() {
+
+    const categorySelect =
+        document.getElementById(
+            'categorySelect'
+        );
+
+
+    const subjectSelect =
+        document.getElementById(
+            'subjectSelect'
+        );
+
+
+    if (
+        !categorySelect ||
+        !subjectSelect
+    ) {
+        return;
+    }
+
+
+    currentCategoryFilter =
+        categorySelect.value;
+
+
+    const filtered =
+        availableTests.filter(
+            item => {
+
+                const examMatch =
+                    !currentExamFilter ||
+                    item.exam ===
+                    currentExamFilter;
+
+
+                const categoryMatch =
+                    !currentCategoryFilter ||
+                    item.category ===
+                    currentCategoryFilter;
+
+
+                return (
+                    examMatch &&
+                    categoryMatch
+                );
+
+            }
+        );
+
+
+    const subjects =
+        uniqueValues(
+            filtered.map(
+                item =>
+                    item.subject
+            )
+        );
+
+
+    subjectSelect.innerHTML =
+        '<option value="">सभी Subjects</option>';
+
+
+    subjects.forEach(
+        subject => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+
+            option.value =
+                subject;
+
+
+            option.textContent =
+                subject;
+
+
+            subjectSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    currentSubjectFilter =
+        '';
+
+
+    updateTestSelector();
+
+}
+
+
+/* =========================================================
+   TEST SELECTOR
+========================================================= */
+
+function updateTestSelector() {
+
+    const subjectSelect =
+        document.getElementById(
+            'subjectSelect'
+        );
+
+
+    const testSelect =
+        document.getElementById(
+            'testSelect'
+        );
+
+
+    if (
+        !subjectSelect ||
+        !testSelect
+    ) {
+        return;
+    }
+
+
+    currentSubjectFilter =
+        subjectSelect.value;
+
+
+    const filtered =
+        availableTests.filter(
+            item => {
+
+                const examMatch =
+                    !currentExamFilter ||
+                    item.exam ===
+                    currentExamFilter;
+
+
+                const categoryMatch =
+                    !currentCategoryFilter ||
+                    item.category ===
+                    currentCategoryFilter;
+
+
+                const subjectMatch =
+                    !currentSubjectFilter ||
+                    item.subject ===
+                    currentSubjectFilter;
+
+
+                return (
+                    examMatch &&
+                    categoryMatch &&
+                    subjectMatch
+                );
+
+            }
+        );
+
+
+    testSelect.innerHTML =
+        '<option value="">Test चुनें</option>';
+
+
+    filtered.forEach(
+        item => {
+
+            const index =
+                availableTests.indexOf(
+                    item
+                );
+
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+
+            option.value =
+                String(index);
+
+
+            option.textContent =
+                `${item.title} — ${item.questions.length} प्रश्न`;
+
+
+            testSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    showSelectedTestInfo();
+
+}
+
+
+/* =========================================================
+   SETUP ALL SELECTORS
+========================================================= */
+
+function setupAllSelectors() {
+
+    setupExamSelector();
+
+    updateCategorySelector();
+
+    setupCountOptions();
+
+}
+
+
+/* =========================================================
+   SELECTED TEST INFO
+========================================================= */
+
+function showSelectedTestInfo() {
+
+    const select =
+        document.getElementById(
+            'testSelect'
+        );
+
+
+    const info =
+        document.getElementById(
+            'selectedTestInfo'
+        );
+
+
+    if (
+        !select ||
+        !info
+    ) {
+        return;
+    }
+
+
+    const index =
+        Number(
+            select.value
+        );
+
+
+    const item =
+        availableTests[index];
+
+
+    if (!item) {
+
+        info.innerHTML =
+            'Exam → Category → Subject → Test Select करें।';
+
+        return;
+
+    }
+
+
+    const totalTime =
+        calculateTotalTimeForItem(
+            item,
+            item.questions.length
+        );
+
+
+    info.innerHTML = `
+
+        <strong>
+            ${escapeHtml(
+                item.title
+            )}
+        </strong>
+
+        <p>
+            ${escapeHtml(
+                item.exam
+            )}
+            •
+            ${escapeHtml(
+                item.category
+            )}
+            •
+            ${escapeHtml(
+                item.subject
+            )}
+        </p>
+
+        <p>
+            प्रश्न:
+            <strong>
+                ${item.questions.length}
+            </strong>
+
+            |
+
+            प्रति प्रश्न:
+            <strong>
+                ${item.timePerQuestion} सेकंड
+            </strong>
+
+            |
+
+            समय:
+            <strong>
+                ${formatDuration(totalTime)}
+            </strong>
+        </p>
+
+        <p>
+            Marks:
+            <strong>
+                +${item.marks}
+            </strong>
+
+            |
+
+            Negative:
+            <strong>
+                ${item.negativeMarking}
+            </strong>
+        </p>
+
+    `;
+
+}
+
+
+/* =========================================================
+   CALCULATE ITEM TIME
+========================================================= */
+
+function calculateTotalTimeForItem(
+    item,
+    count
+) {
+
+    const seconds =
+        Number(
+            item?.timePerQuestion
+        );
+
+
+    return (
+        count *
+        (
+            Number.isFinite(
+                seconds
+            ) &&
+            seconds > 0
+                ? seconds
+                : DEFAULT_TIME_PER_QUESTION
+        )
+    );
+}
+
+
+/* =========================================================
+   HOME EXAM GRID
+========================================================= */
+
+function renderHomeExamGrid() {
+
+    const grid =
+        document.getElementById(
+            'homeExamGrid'
+        );
+
+
+    if (!grid) {
+        return;
+    }
+
+
+    const exams =
+        uniqueValues(
+            [
+                ...DEFAULT_EXAMS,
+                ...availableTests.map(
+                    item =>
+                        item.exam
+                )
+            ]
+        );
+
+
+    grid.innerHTML = '';
+
+
+    exams.forEach(
+        exam => {
+
+            const count =
+                availableTests.filter(
+                    item =>
+                        item.exam ===
+                        exam
+                ).length;
+
+
+            const button =
+                document.createElement(
+                    'button'
+                );
+
+
+            button.type =
+                'button';
+
+
+            button.innerHTML = `
+
+                <strong>
+                    ${escapeHtml(exam)}
+                </strong>
+
+                <span>
+                    ${count}
+                    Published Test
+                    ${count === 1 ? '' : 's'}
+                </span>
+
+            `;
+
+
+            button.onclick =
+                () => openExam(exam);
+
+
+            grid.appendChild(
+                button
+            );
+
         }
     );
 }
 
 
 /* =========================================================
+   OPEN EXAM
+========================================================= */
+
+function openExam(
+    exam
+) {
+
+    currentExamFilter =
+        exam;
+
+
+    currentCategoryFilter =
+        '';
+
+
+    currentSubjectFilter =
+        '';
+
+
+    showPage('tests');
+
+
+    const examSelect =
+        document.getElementById(
+            'examSelect'
+        );
+
+
+    if (examSelect) {
+
+        examSelect.value =
+            exam;
+
+    }
+
+
+    updateCategorySelector();
+
+}
+
+
+/* =========================================================
+   OLD COMPATIBILITY
+========================================================= */
+
+function startExamTest(
+    exam
+) {
+
+    openExam(exam);
+
+}
+
+
+/* =========================================================
    START TEST
-   ========================================================= */
+========================================================= */
 
 async function startTest() {
 
-    clearInterval(timerId);
+    clearInterval(
+        timerId
+    );
+
 
     test = [];
+
     current = 0;
+
     score = 0;
+
     timeLeft = 0;
 
     selectedAnswers = [];
+
     markedQuestions = [];
+
 
     testStartedAt =
         Date.now();
 
+
     if (
-        availableTests.length === 0
+        availableTests.length ===
+        0
     ) {
 
         await loadAvailableTests();
+
     }
 
+
     if (
-        availableTests.length === 0
+        availableTests.length ===
+        0
     ) {
 
         alert(
@@ -1146,29 +2268,44 @@ async function startTest() {
             'tests/index.json और TXT files जाँचें।'
         );
 
+
         return;
+
     }
+
 
     const selector =
         document.getElementById(
             'testSelect'
         );
 
-    let testIndex = 0;
 
     if (
-        selector &&
-        selector.value !== ''
+        !selector ||
+        selector.value === ''
     ) {
 
-        testIndex =
-            Number(
-                selector.value
-            );
+        alert(
+            'कृपया पहले Test Select करें।'
+        );
+
+
+        return;
+
     }
 
+
+    const testIndex =
+        Number(
+            selector.value
+        );
+
+
     currentTestInfo =
-        availableTests[testIndex];
+        availableTests[
+            testIndex
+        ];
+
 
     if (!currentTestInfo) {
 
@@ -1176,16 +2313,21 @@ async function startTest() {
             'Test नहीं मिला।'
         );
 
+
         return;
+
     }
+
 
     const countElement =
         document.getElementById(
             'count'
         );
 
+
     let requestedCount =
         MAX_QUESTIONS;
+
 
     if (
         countElement &&
@@ -1196,7 +2338,9 @@ async function startTest() {
             Number(
                 countElement.value
             );
+
     }
+
 
     if (
         !Number.isFinite(
@@ -1206,7 +2350,9 @@ async function startTest() {
 
         requestedCount =
             MAX_QUESTIONS;
+
     }
+
 
     requestedCount =
         Math.max(
@@ -1217,8 +2363,10 @@ async function startTest() {
             )
         );
 
+
     const availableQuestions =
         currentTestInfo.questions;
+
 
     const count =
         Math.min(
@@ -1226,9 +2374,6 @@ async function startTest() {
             availableQuestions.length
         );
 
-    /*
-       Random Question Selection
-    */
 
     test =
         shuffle(
@@ -1238,69 +2383,78 @@ async function startTest() {
             count
         );
 
+
     if (
-        test.length === 0
+        test.length ===
+        0
     ) {
 
         alert(
             'इस Test में प्रश्न उपलब्ध नहीं हैं।'
         );
 
+
         return;
+
     }
+
 
     selectedAnswers =
         new Array(
             test.length
         );
 
+
     markedQuestions =
         new Array(
             test.length
         ).fill(false);
 
-    /*
-       Test-specific timer
-    */
 
     testTimeLimit =
         calculateTotalTime(
             test.length
         );
 
+
     timeLeft =
         testTimeLimit;
 
-    const setup =
+
+    const testArea =
         document.getElementById(
-            'testSetup'
+            'testArea'
         );
+
 
     const result =
         document.getElementById(
             'resultArea'
         );
 
-    const area =
-        document.getElementById(
-            'testArea'
+
+    if (testArea) {
+
+        testArea.classList.remove(
+            'hidden'
         );
 
-    if (setup) {
-        setup.classList.add('hidden');
     }
+
 
     if (result) {
-        result.classList.add('hidden');
+
+        result.classList.add(
+            'hidden'
+        );
+
     }
 
-    if (area) {
-        area.classList.remove('hidden');
-    }
 
     renderQuestion();
 
     updateTimer();
+
 
     timerId =
         setInterval(
@@ -1310,6 +2464,7 @@ async function startTest() {
 
                 updateTimer();
 
+
                 if (
                     timeLeft <= 0
                 ) {
@@ -1318,30 +2473,42 @@ async function startTest() {
                         timerId
                     );
 
-                    timeLeft = 0;
+
+                    timeLeft =
+                        0;
+
 
                     updateTimer();
 
-                    finishTest(true);
+
+                    finishTest(
+                        true
+                    );
+
                 }
 
             },
             1000
         );
+
 }
 
 
 /* =========================================================
    SHUFFLE
-   ========================================================= */
+========================================================= */
 
-function shuffle(array) {
+function shuffle(
+    array
+) {
 
     const result =
         [...array];
 
+
     for (
-        let i = result.length - 1;
+        let i =
+            result.length - 1;
         i > 0;
         i--
     ) {
@@ -1352,6 +2519,7 @@ function shuffle(array) {
                 (i + 1)
             );
 
+
         [
             result[i],
             result[j]
@@ -1360,7 +2528,9 @@ function shuffle(array) {
             result[j],
             result[i]
         ];
+
     }
+
 
     return result;
 }
@@ -1368,7 +2538,7 @@ function shuffle(array) {
 
 /* =========================================================
    TIMER
-   ========================================================= */
+========================================================= */
 
 function updateTimer() {
 
@@ -1377,9 +2547,11 @@ function updateTimer() {
             'timer'
         );
 
+
     if (!timer) {
         return;
     }
+
 
     timeLeft =
         Math.max(
@@ -1387,19 +2559,29 @@ function updateTimer() {
             timeLeft
         );
 
+
     const minutes =
         Math.floor(
             timeLeft / 60
         )
         .toString()
-        .padStart(2, '0');
+        .padStart(
+            2,
+            '0'
+        );
+
 
     const seconds =
         (
-            timeLeft % 60
+            timeLeft %
+            60
         )
         .toString()
-        .padStart(2, '0');
+        .padStart(
+            2,
+            '0'
+        );
+
 
     timer.textContent =
         '⏱️ ' +
@@ -1407,9 +2589,6 @@ function updateTimer() {
         ':' +
         seconds;
 
-    /*
-       Last 10 seconds
-    */
 
     timer.classList.toggle(
         'danger',
@@ -1420,32 +2599,35 @@ function updateTimer() {
 
 /* =========================================================
    RENDER QUESTION
-   ========================================================= */
+========================================================= */
 
 function renderQuestion() {
 
     const question =
         test[current];
 
+
     const area =
         document.getElementById(
             'testArea'
         );
 
+
     if (
         !area ||
         !question
     ) {
+
         return;
+
     }
+
 
     let html = '';
 
-    /*
-       TEST HEADER
-    */
 
     html += `
+
         <div class="test-header">
 
             <div>
@@ -1469,30 +2651,26 @@ function renderQuestion() {
                     •
                     ${escapeHtml(
                         currentTestInfo?.subject ||
-                        'GS'
+                        ''
                     )}
                 </span>
 
             </div>
+
 
             <div class="timer-box">
 
                 <span
                     id="timer"
                     class="timer">
+
                 </span>
 
             </div>
 
         </div>
-    `;
 
 
-    /*
-       TEST INFORMATION
-    */
-
-    html += `
         <div class="test-info">
 
             <strong>
@@ -1504,7 +2682,8 @@ function renderQuestion() {
 
             <span>
                 प्रति प्रश्न:
-                ${getTimePerQuestion()} सेकंड
+                ${getTimePerQuestion()}
+                सेकंड
             </span>
 
             <span>
@@ -1519,30 +2698,23 @@ function renderQuestion() {
                             गलत:
                             -${getNegativeMarking()}
                         </span>
-                    `
+                      `
                     : ''
             }
 
         </div>
-    `;
 
 
-    /*
-       PROGRESS
-    */
-
-    html += `
         <div class="progress">
-            प्रश्न ${current + 1} / ${test.length}
+
+            प्रश्न
+            ${current + 1}
+            /
+            ${test.length}
+
         </div>
-    `;
 
 
-    /*
-       QUESTION
-    */
-
-    html += `
         <div class="question-card">
 
             <div class="question-text">
@@ -1557,22 +2729,26 @@ function renderQuestion() {
                 </h3>
 
             </div>
+
     `;
 
 
-    /*
-       OPTIONS
-    */
-
     question.o.forEach(
-        (option, index) => {
+        (
+            option,
+            index
+        ) => {
 
             const selected =
-                selectedAnswers[current] === index
+                selectedAnswers[
+                    current
+                ] === index
                     ? 'selected'
                     : '';
 
+
             html += `
+
                 <button
                     type="button"
                     class="option ${selected}"
@@ -1595,20 +2771,20 @@ function renderQuestion() {
                     </span>
 
                 </button>
+
             `;
+
         }
     );
+
 
     html += `
         </div>
     `;
 
 
-    /*
-       NAVIGATION
-    */
-
     html += `
+
         <div class="test-nav">
 
             <button
@@ -1620,6 +2796,7 @@ function renderQuestion() {
 
             </button>
 
+
             <button
                 type="button"
                 onclick="skipQuestion()">
@@ -1628,12 +2805,14 @@ function renderQuestion() {
 
             </button>
 
+
             <button
                 type="button"
                 onclick="nextQuestion()">
 
                 ${
-                    current === test.length - 1
+                    current ===
+                    test.length - 1
                         ? '🏁 समाप्त करें'
                         : 'अगला ➡️'
                 }
@@ -1641,14 +2820,8 @@ function renderQuestion() {
             </button>
 
         </div>
-    `;
 
 
-    /*
-       MARK BUTTON
-    */
-
-    html += `
         <div class="mark-area">
 
             <button
@@ -1656,7 +2829,9 @@ function renderQuestion() {
                 onclick="toggleMark()">
 
                 ${
-                    markedQuestions[current]
+                    markedQuestions[
+                        current
+                    ]
                         ? '⭐ Mark हटाएँ'
                         : '☆ प्रश्न Mark करें'
                 }
@@ -1664,46 +2839,65 @@ function renderQuestion() {
             </button>
 
         </div>
-    `;
 
 
-    /*
-       QUESTION PALETTE
-    */
-
-    html += `
         <div class="palette-title">
+
             प्रश्न सूची
+
         </div>
 
+
         <div class="palette">
+
     `;
 
+
     test.forEach(
-        (_, index) => {
+        (
+            _,
+            index
+        ) => {
 
             let classes = '';
+
 
             if (
                 index === current
             ) {
-                classes += 'current ';
+
+                classes +=
+                    'current ';
+
             }
 
-            if (
-                selectedAnswers[index] !==
-                undefined
-            ) {
-                classes += 'answered ';
-            }
 
             if (
-                markedQuestions[index]
+                selectedAnswers[
+                    index
+                ] !== undefined
             ) {
-                classes += 'marked ';
+
+                classes +=
+                    'answered ';
+
             }
+
+
+            if (
+                markedQuestions[
+                    index
+                ]
+            ) {
+
+                classes +=
+                    'marked ';
+
+            }
+
 
             html += `
+
                 <button
                     type="button"
                     class="${classes}"
@@ -1712,16 +2906,21 @@ function renderQuestion() {
                     ${index + 1}
 
                 </button>
+
             `;
+
         }
     );
+
 
     html += `
         </div>
     `;
 
+
     area.innerHTML =
         html;
+
 
     updateTimer();
 }
@@ -1729,19 +2928,27 @@ function renderQuestion() {
 
 /* =========================================================
    ANSWER
-   ========================================================= */
+========================================================= */
 
-function answer(number) {
+function answer(
+    number
+) {
 
     if (
         number < 0 ||
         number > 3
     ) {
+
         return;
+
     }
 
-    selectedAnswers[current] =
+
+    selectedAnswers[
+        current
+    ] =
         number;
+
 
     renderQuestion();
 }
@@ -1749,7 +2956,7 @@ function answer(number) {
 
 /* =========================================================
    NEXT
-   ========================================================= */
+========================================================= */
 
 function nextQuestion() {
 
@@ -1765,13 +2972,14 @@ function nextQuestion() {
     } else {
 
         finishTest(false);
+
     }
 }
 
 
 /* =========================================================
    PREVIOUS
-   ========================================================= */
+========================================================= */
 
 function prevQuestion() {
 
@@ -1782,13 +2990,14 @@ function prevQuestion() {
         current--;
 
         renderQuestion();
+
     }
 }
 
 
 /* =========================================================
    SKIP
-   ========================================================= */
+========================================================= */
 
 function skipQuestion() {
 
@@ -1804,15 +3013,18 @@ function skipQuestion() {
     } else {
 
         finishTest(false);
+
     }
 }
 
 
 /* =========================================================
    GO QUESTION
-   ========================================================= */
+========================================================= */
 
-function goQuestion(index) {
+function goQuestion(
+    index
+) {
 
     if (
         index >= 0 &&
@@ -1822,19 +3034,26 @@ function goQuestion(index) {
         current =
             index;
 
+
         renderQuestion();
+
     }
 }
 
 
 /* =========================================================
    MARK QUESTION
-   ========================================================= */
+========================================================= */
 
 function toggleMark() {
 
-    markedQuestions[current] =
-        !markedQuestions[current];
+    markedQuestions[
+        current
+    ] =
+        !markedQuestions[
+            current
+        ];
+
 
     renderQuestion();
 }
@@ -1842,7 +3061,7 @@ function toggleMark() {
 
 /* =========================================================
    FINISH TEST
-   ========================================================= */
+========================================================= */
 
 function finishTest(
     timeout = false
@@ -1851,23 +3070,29 @@ function finishTest(
     if (
         test.length === 0
     ) {
+
         return;
+
     }
+
 
     clearInterval(
         timerId
     );
 
-    /*
-       Calculate result
-    */
 
     let correct = 0;
+
     let wrong = 0;
+
     let attempted = 0;
 
+
     selectedAnswers.forEach(
-        (answerValue, index) => {
+        (
+            answerValue,
+            index
+        ) => {
 
             if (
                 answerValue !==
@@ -1876,6 +3101,7 @@ function finishTest(
             ) {
 
                 attempted++;
+
 
                 if (
                     answerValue ===
@@ -1887,8 +3113,11 @@ function finishTest(
                 } else {
 
                     wrong++;
+
                 }
+
             }
+
         }
     );
 
@@ -1896,32 +3125,34 @@ function finishTest(
     const total =
         test.length;
 
+
     const unanswered =
         total -
         attempted;
 
 
-    /*
-       Score calculation
-    */
-
     const marksPerQuestion =
         getMarks();
 
+
     const negative =
         getNegativeMarking();
+
 
     const positiveMarks =
         correct *
         marksPerQuestion;
 
+
     const negativeMarks =
         wrong *
         negative;
 
+
     const finalScore =
         positiveMarks -
         negativeMarks;
+
 
     score =
         Number(
@@ -1929,18 +3160,10 @@ function finishTest(
         );
 
 
-    /*
-       Maximum marks
-    */
-
     const maximumMarks =
         total *
         marksPerQuestion;
 
-
-    /*
-       Accuracy
-    */
 
     const accuracy =
         attempted > 0
@@ -1948,14 +3171,11 @@ function finishTest(
                 (
                     correct /
                     attempted
-                ) * 100
+                ) *
+                100
               )
             : 0;
 
-
-    /*
-       Time
-    */
 
     const timeTaken =
         Math.max(
@@ -1965,53 +3185,10 @@ function finishTest(
         );
 
 
-    /*
-       Hide Test
-    */
-
-    const testArea =
-        document.getElementById(
-            'testArea'
-        );
-
-    if (testArea) {
-
-        testArea.classList.add(
-            'hidden'
-        );
-    }
-
-
-    /*
-       Result Area
-    */
-
-    const result =
-        document.getElementById(
-            'resultArea'
-        );
-
-    if (!result) {
-        return;
-    }
-
-    result.classList.remove(
-        'hidden'
-    );
-
-
-    const student =
-        getStudentName();
-
-
-    /*
-       Result Data
-    */
-
     const resultData = {
 
         student:
-            student,
+            getStudentName(),
 
         exam:
             currentTestInfo?.exam ||
@@ -2027,7 +3204,7 @@ function finishTest(
 
         test:
             currentTestInfo?.title ||
-            '',
+            'GS Test',
 
         testId:
             currentTestInfo?.id ||
@@ -2077,12 +3254,40 @@ function finishTest(
                 .toLocaleString(
                     'hi-IN'
                 )
+
     };
 
 
-    /*
-       Result HTML
-    */
+    const testArea =
+        document.getElementById(
+            'testArea'
+        );
+
+
+    if (testArea) {
+
+        testArea.classList.add(
+            'hidden'
+        );
+
+    }
+
+
+    const result =
+        document.getElementById(
+            'resultArea'
+        );
+
+
+    if (!result) {
+        return;
+    }
+
+
+    result.classList.remove(
+        'hidden'
+    );
+
 
     result.innerHTML = `
 
@@ -2092,14 +3297,17 @@ function finishTest(
                 🏆 Test Complete
             </div>
 
+
             <h2>
-                ${escapeHtml(student)}
+                ${escapeHtml(
+                    resultData.student
+                )}
             </h2>
+
 
             <h3>
                 ${escapeHtml(
-                    currentTestInfo?.title ||
-                    'GS Test'
+                    resultData.test
                 )}
             </h3>
 
@@ -2114,140 +3322,79 @@ function finishTest(
 
 
             <p>
-
                 📚 कुल प्रश्न:
-
-                <strong>
-                    ${total}
-                </strong>
-
+                <strong>${total}</strong>
             </p>
 
 
             <p>
-
                 📝 Attempted:
-
-                <strong>
-                    ${attempted}
-                </strong>
-
+                <strong>${attempted}</strong>
             </p>
 
 
             <p>
-
                 ✅ सही:
-
-                <strong>
-                    ${correct}
-                </strong>
-
+                <strong>${correct}</strong>
             </p>
 
 
             <p>
-
                 ❌ गलत:
-
-                <strong>
-                    ${wrong}
-                </strong>
-
+                <strong>${wrong}</strong>
             </p>
 
 
             <p>
-
                 ⭕ अनुत्तरित:
-
-                <strong>
-                    ${unanswered}
-                </strong>
-
+                <strong>${unanswered}</strong>
             </p>
 
 
             <p>
-
                 🎯 Accuracy:
-
-                <strong>
-                    ${accuracy}%
-                </strong>
-
+                <strong>${accuracy}%</strong>
             </p>
 
 
             <p>
-
-                ➕ प्रति सही उत्तर:
-
-                <strong>
-                    ${marksPerQuestion}
-                </strong>
-
+                ➕ प्रति सही:
+                <strong>${marksPerQuestion}</strong>
             </p>
 
 
             <p>
-
-                ➖ Negative Marking:
-
-                <strong>
-                    ${negative}
-                </strong>
-
+                ➖ Negative:
+                <strong>${negative}</strong>
             </p>
 
 
             <p>
-
                 ⏱️ प्रति प्रश्न:
-
                 <strong>
-                    ${getTimePerQuestion()} सेकंड
+                    ${getTimePerQuestion()}
+                    सेकंड
                 </strong>
-
             </p>
 
 
             <p>
-
-                ⏰ कुल समय:
-
-                <strong>
-                    ${formatDuration(
-                        testTimeLimit
-                    )}
-                </strong>
-
-            </p>
-
-
-            <p>
-
                 ⌛ समय लिया:
-
                 <strong>
                     ${formatDuration(
                         timeTaken
                     )}
                 </strong>
-
             </p>
 
 
             <p>
-
                 ⏳ समय बचा:
-
                 <strong>
                     ${formatDuration(
                         timeLeft
                     )}
                 </strong>
-
             </p>
 
 
@@ -2255,11 +3402,9 @@ function finishTest(
                 timeout
                     ? `
                         <p class="timeout">
-
                             ⏰ समय समाप्त हो गया।
-
                         </p>
-                    `
+                      `
                     : ''
             }
 
@@ -2287,21 +3432,16 @@ function finishTest(
 
             <button
                 type="button"
-                onclick="show('home')">
+                onclick="showPage('home')">
 
                 🏠 Home
 
             </button>
 
-
         </div>
 
     `;
 
-
-    /*
-       Save Last Result
-    */
 
     localStorage.setItem(
         'lastScore',
@@ -2311,19 +3451,18 @@ function finishTest(
     );
 
 
-    /*
-       Save Result History
-    */
-
     saveResultHistory(
         resultData
     );
+
+
+    updateStudentProfile();
 }
 
 
 /* =========================================================
    ANSWER REVIEW
-   ========================================================= */
+========================================================= */
 
 function showAnswerReview() {
 
@@ -2332,9 +3471,11 @@ function showAnswerReview() {
             'resultArea'
         );
 
+
     if (!result) {
         return;
     }
+
 
     let html = `
 
@@ -2348,17 +3489,23 @@ function showAnswerReview() {
 
 
     test.forEach(
-        (question, index) => {
+        (
+            question,
+            index
+        ) => {
 
             const studentAnswer =
-                selectedAnswers[index];
+                selectedAnswers[
+                    index
+                ];
+
 
             const correctAnswer =
                 question.a;
 
 
-            let status =
-                '';
+            let status;
+
 
             if (
                 studentAnswer ===
@@ -2380,6 +3527,7 @@ function showAnswerReview() {
 
                 status =
                     '❌ गलत';
+
             }
 
 
@@ -2388,10 +3536,9 @@ function showAnswerReview() {
                 <div class="history-item">
 
                     <h3>
-
                         प्रश्न ${index + 1}
-
                     </h3>
+
 
                     <p>
 
@@ -2403,46 +3550,38 @@ function showAnswerReview() {
 
                     </p>
 
+
                     <p>
-
                         स्थिति:
-
                         <strong>
                             ${status}
                         </strong>
-
                     </p>
 
 
                     <p>
-
                         आपका उत्तर:
-
                         <strong>
 
                             ${
                                 studentAnswer !==
                                 undefined
 
-                                    ? escapeHtml(
-                                        String.fromCharCode(
-                                            65 +
-                                            studentAnswer
-                                        )
+                                    ? String.fromCharCode(
+                                        65 +
+                                        studentAnswer
                                       )
 
                                     : 'नहीं दिया'
+
                             }
 
                         </strong>
-
                     </p>
 
 
                     <p>
-
                         सही उत्तर:
-
                         <strong>
 
                             ${String.fromCharCode(
@@ -2451,14 +3590,16 @@ function showAnswerReview() {
                             )}
 
                         </strong>
-
                     </p>
 
 
                     <div>
 
                         ${question.o.map(
-                            (option, optionIndex) => `
+                            (
+                                option,
+                                optionIndex
+                            ) => `
 
                                 <p>
 
@@ -2483,6 +3624,7 @@ function showAnswerReview() {
                 </div>
 
             `;
+
         }
     );
 
@@ -2497,9 +3639,10 @@ function showAnswerReview() {
 
             </button>
 
+
             <button
                 type="button"
-                onclick="show('home')">
+                onclick="showPage('home')">
 
                 🏠 Home
 
@@ -2513,6 +3656,7 @@ function showAnswerReview() {
     result.innerHTML =
         html;
 
+
     result.classList.remove(
         'hidden'
     );
@@ -2521,11 +3665,14 @@ function showAnswerReview() {
 
 /* =========================================================
    RESULT HISTORY
-   ========================================================= */
+========================================================= */
 
-function saveResultHistory(resultData) {
+function saveResultHistory(
+    resultData
+) {
 
     let history = [];
+
 
     try {
 
@@ -2536,15 +3683,21 @@ function saveResultHistory(resultData) {
                 ) || '[]'
             );
 
+
         if (
-            !Array.isArray(history)
+            !Array.isArray(
+                history
+            )
         ) {
+
             history = [];
+
         }
 
     } catch {
 
         history = [];
+
     }
 
 
@@ -2562,14 +3715,16 @@ function saveResultHistory(resultData) {
 
     localStorage.setItem(
         'testHistory',
-        JSON.stringify(history)
+        JSON.stringify(
+            history
+        )
     );
 }
 
 
 /* =========================================================
-   SHOW RESULT HISTORY
-   ========================================================= */
+   SHOW RESULTS
+========================================================= */
 
 function showResults() {
 
@@ -2578,11 +3733,14 @@ function showResults() {
             'resultArea'
         );
 
+
     if (!result) {
         return;
     }
 
+
     let history = [];
+
 
     try {
 
@@ -2593,13 +3751,16 @@ function showResults() {
                 ) || '[]'
             );
 
+
     } catch {
 
         history = [];
+
     }
 
 
     if (
+        !Array.isArray(history) ||
         history.length === 0
     ) {
 
@@ -2619,9 +3780,11 @@ function showResults() {
 
         `;
 
+
         result.classList.remove(
             'hidden'
         );
+
 
         return;
     }
@@ -2646,12 +3809,10 @@ function showResults() {
                 <div class="history-item">
 
                     <strong>
-
                         ${escapeHtml(
                             item.test ||
                             'GS Test'
                         )}
-
                     </strong>
 
 
@@ -2682,17 +3843,13 @@ function showResults() {
                     <p>
 
                         Score:
-
                         ${item.score}
-
                         /
-
                         ${item.maximumMarks}
 
                         |
 
                         Accuracy:
-
                         ${item.accuracy}%
 
                     </p>
@@ -2701,44 +3858,38 @@ function showResults() {
                     <p>
 
                         सही:
-
                         ${item.correct}
 
                         |
 
                         गलत:
-
                         ${item.wrong}
 
                         |
 
                         Unanswered:
-
                         ${item.unanswered}
 
                     </p>
 
 
                     <small>
-
                         ${escapeHtml(
                             item.date ||
                             ''
                         )}
-
                     </small>
 
                 </div>
 
             `;
+
         }
     );
 
 
     html += `
-
         </div>
-
     `;
 
 
@@ -2754,13 +3905,14 @@ function showResults() {
 
 /* =========================================================
    RESET TEST
-   ========================================================= */
+========================================================= */
 
 function resetTest() {
 
     clearInterval(
         timerId
     );
+
 
     test = [];
 
@@ -2786,14 +3938,10 @@ function resetTest() {
             'resultArea'
         );
 
+
     const testArea =
         document.getElementById(
             'testArea'
-        );
-
-    const setup =
-        document.getElementById(
-            'testSetup'
         );
 
 
@@ -2802,6 +3950,7 @@ function resetTest() {
         result.classList.add(
             'hidden'
         );
+
     }
 
 
@@ -2810,24 +3959,21 @@ function resetTest() {
         testArea.classList.add(
             'hidden'
         );
+
     }
 
 
-    if (setup) {
-
-        setup.classList.remove(
-            'hidden'
-        );
-    }
+    showPage('tests');
 
 
     setupCountOptions();
+
 }
 
 
 /* =========================================================
    TXT FILE UPLOAD
-   ========================================================= */
+========================================================= */
 
 function setupFileUpload() {
 
@@ -2835,6 +3981,7 @@ function setupFileUpload() {
         document.getElementById(
             'txtFile'
         );
+
 
     if (!fileInput) {
         return;
@@ -2875,7 +4022,9 @@ function setupFileUpload() {
                         'इस TXT में सही format के प्रश्न नहीं मिले।'
                     );
 
+
                     return;
+
                 }
 
 
@@ -2895,7 +4044,7 @@ function setupFileUpload() {
                         'GS',
 
                     subject:
-                        'GS',
+                        'General Studies',
 
                     title:
                         file.name,
@@ -2921,32 +4070,16 @@ function setupFileUpload() {
                 });
 
 
-                setupTestSelector();
+                setupAllSelectors();
 
-
-                const selector =
-                    document.getElementById(
-                        'testSelect'
-                    );
-
-
-                if (selector) {
-
-                    selector.value =
-                        String(
-                            availableTests.length - 1
-                        );
-                }
+                renderHomeExamGrid();
 
 
                 alert(
 
                     file.name +
-
                     ' सफलतापूर्वक Load हुआ।\n\n' +
-
                     questions.length +
-
                     ' प्रश्न मिले।'
 
                 );
@@ -2962,15 +4095,106 @@ function setupFileUpload() {
                 alert(
                     'TXT file पढ़ने में समस्या हुई।'
                 );
+
             }
+
         }
     );
 }
 
 
 /* =========================================================
-   SHOW LAST RESULT
-   ========================================================= */
+   ADMIN ACTION
+========================================================= */
+
+function adminAction(
+    type
+) {
+
+    if (!isAdmin()) {
+
+        alert(
+            'Admin access required.'
+        );
+
+
+        showPage(
+            'loginPage'
+        );
+
+
+        return;
+
+    }
+
+
+    const message =
+        document.getElementById(
+            'adminMessage'
+        );
+
+
+    if (!message) {
+        return;
+    }
+
+
+    const labels = {
+
+        tests:
+            '📝 Test Management',
+
+        questions:
+            '❓ Question Bank',
+
+        students:
+            '👨‍🎓 Student Management',
+
+        notes:
+            '📄 Notes / PDF',
+
+        notifications:
+            '🔔 Notifications',
+
+        links:
+            '🔗 Social Links',
+
+        courses:
+            '📚 Courses',
+
+        settings:
+            '⚙️ App Settings'
+
+    };
+
+
+    message.innerHTML = `
+
+        <h3>
+            ${labels[type] || 'Admin'}
+        </h3>
+
+        <p>
+            यह Admin Module अगले development
+            चरण में activate किया जाएगा।
+        </p>
+
+        <p>
+            मौजूदा Test System सुरक्षित है।
+        </p>
+
+    `;
+
+
+    message.classList.remove(
+        'hidden'
+    );
+}
+
+
+/* =========================================================
+   LAST RESULT
+========================================================= */
 
 function showLastResult() {
 
@@ -2978,6 +4202,7 @@ function showLastResult() {
         document.getElementById(
             'resultArea'
         );
+
 
     if (!result) {
         return;
@@ -3008,9 +4233,11 @@ function showLastResult() {
 
         `;
 
+
         result.classList.remove(
             'hidden'
         );
+
 
         return;
     }
@@ -3022,11 +4249,14 @@ function showLastResult() {
     try {
 
         data =
-            JSON.parse(saved);
+            JSON.parse(
+                saved
+            );
 
     } catch {
 
         data = null;
+
     }
 
 
@@ -3045,85 +4275,62 @@ function showLastResult() {
 
 
             <h3>
-
                 ${escapeHtml(
                     data.test ||
                     'GS Test'
                 )}
-
             </h3>
 
 
             <p>
-
                 👤
-
                 ${escapeHtml(
                     data.student ||
                     'Student'
                 )}
-
             </p>
 
 
             <div class="result-score">
 
                 ${data.score}
-
                 /
-
                 ${data.maximumMarks}
 
             </div>
 
 
             <p>
-
                 🎯 Accuracy:
-
                 ${data.accuracy}%
-
             </p>
 
 
             <p>
-
                 ✅ Correct:
-
                 ${data.correct}
-
             </p>
 
 
             <p>
-
                 ❌ Wrong:
-
                 ${data.wrong}
-
             </p>
 
 
             <p>
-
                 ⭕ Unanswered:
-
                 ${data.unanswered}
-
             </p>
 
 
             <p>
-
                 📅
-
                 ${escapeHtml(
                     data.date ||
                     ''
                 )}
-
             </p>
-
 
         </div>
 
@@ -3138,15 +4345,11 @@ function showLastResult() {
 
 /* =========================================================
    PAGE LOAD
-   ========================================================= */
+========================================================= */
 
 window.addEventListener(
     'DOMContentLoaded',
     async () => {
-
-        /*
-           Saved Name
-        */
 
         const savedName =
             localStorage.getItem(
@@ -3167,32 +4370,59 @@ window.addEventListener(
 
             nameInput.value =
                 savedName;
+
         }
 
-
-        /*
-           Count
-        */
 
         setupCountOptions();
 
 
-        /*
-           Tests
-        */
-
         await loadAvailableTests();
 
-
-        /*
-           File Upload
-        */
 
         setupFileUpload();
 
 
+        updateStudentProfile();
+
+
         /*
-           Service Worker
+           Role based initial interface
+        */
+
+        const userType =
+            getUserType();
+
+
+        if (
+            userType ===
+            'admin'
+        ) {
+
+            showPage(
+                'adminPanel'
+            );
+
+        } else if (
+            userType ===
+            'student'
+        ) {
+
+            showPage(
+                'home'
+            );
+
+        } else {
+
+            showPage(
+                'loginPage'
+            );
+
+        }
+
+
+        /*
+           PWA
         */
 
         if (
@@ -3224,6 +4454,7 @@ window.addEventListener(
 
                     }
                 );
+
         }
 
 
