@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "id": "uppsc-gs-001",
+      "name": "UPPSC / PCS GS Test 1",
+      "exam": "UPPSC / PCS",
+      "category": "GS",
+      "subject": "General Studies",
+      "file": "tests/uppsc-gs-001.txt",
+      "questions": 150,
+      "timePerQuestion": 45,
+      "marks": 1,
+      "negativeMarking": 0,
+      "published": true
+    }
+  ]
+}
