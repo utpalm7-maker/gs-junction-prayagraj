@@ -105,6 +105,11 @@ function showPage(id) {
 
     if (page) {
         page.classList.add("active");
+    } else {
+        console.warn(
+            "Page not found:",
+            id
+        );
     }
 
     const nav =
@@ -625,7 +630,9 @@ function parseTXTQuestions(text) {
 
     lines.forEach(line => {
 
-        /* Answer */
+        /* =================================================
+           ANSWER
+        ================================================= */
 
         if (
             /^(उत्तर|उत्तर है|सही उत्तर|answer|ans|correct|correct answer)\s*[:\-–]\s*/i
@@ -646,11 +653,22 @@ function parseTXTQuestions(text) {
         }
 
 
-        /* Option */
+        /* =================================================
+           OPTION
+
+           Supported:
+
+           A. Text
+           A) Text
+           A: Text
+           A- Text
+           (A) Text
+           (A). Text
+        ================================================= */
 
         const optionMatch =
             line.match(
-                /^\s*(?:\(?([A-Da-d])\)?)[.:\-–)]\s*(.+)$/u
+                /^\s*\(?([A-Da-d])\)?(?:[.:)–-])?\s+(.+)$/i
             );
 
         if (optionMatch) {
@@ -667,11 +685,13 @@ function parseTXTQuestions(text) {
         }
 
 
-        /* Numbered Question */
+        /* =================================================
+           NUMBERED QUESTION
+        ================================================= */
 
         const questionMatch =
             line.match(
-                /^\s*(?:Q(?:uestion)?\s*)?(\d+)\s*[\.\):\-]\s*(.+)$/iu
+                /^\s*(?:Q(?:uestion)?\s*)?(\d+)\s*[.):–-]\s*(.+)$/i
             );
 
         if (questionMatch) {
@@ -694,11 +714,13 @@ function parseTXTQuestions(text) {
         }
 
 
-        /* Hindi Question */
+        /* =================================================
+           HINDI QUESTION
+        ================================================= */
 
         const hindiQuestionMatch =
             line.match(
-                /^\s*प्रश्न\s*(\d+)\s*[\.\):\-]?\s*(.*)$/u
+                /^\s*प्रश्न\s*(\d+)\s*[.):–-]?\s*(.*)$/
             );
 
         if (hindiQuestionMatch) {
@@ -724,7 +746,9 @@ function parseTXTQuestions(text) {
         }
 
 
-        /* Normal Text */
+        /* =================================================
+           NORMAL TEXT
+        ================================================= */
 
         if (!current) {
             current = createQuestion();
@@ -792,14 +816,16 @@ function parseTXTQuestionsFallback(text) {
         if (!lines.length) return;
 
         let questionText = "";
+
         const options = [];
+
         let answer = "";
 
         lines.forEach(line => {
 
             const optionMatch =
                 line.match(
-                    /^\s*(?:\(?([A-Da-d])\)?)[.:\-–)]\s*(.+)$/u
+                    /^\s*\(?([A-Da-d])\)?(?:[.:)–-])?\s+(.+)$/i
                 );
 
             if (optionMatch) {
@@ -868,7 +894,14 @@ function initializeTestSelectors() {
 
     count.innerHTML = "";
 
-    [10, 20, 30, 50, 100, 150].forEach(num => {
+    [
+        10,
+        20,
+        30,
+        50,
+        100,
+        150
+    ].forEach(num => {
 
         const option =
             document.createElement("option");
@@ -882,13 +915,16 @@ function initializeTestSelectors() {
         count.appendChild(option);
     });
 
-    if (getMaximumQuestionCount() > 0) {
+    const maximum =
+        getMaximumQuestionCount();
+
+    if (maximum > 0) {
 
         count.value =
             String(
                 Math.min(
                     10,
-                    getMaximumQuestionCount()
+                    maximum
                 )
             );
     }
@@ -3313,9 +3349,22 @@ function getCorrectAnswer(question) {
 /* =========================================================
    NORMALIZE ANSWER
    ---------------------------------------------------------
-   A/B/C/D
-   1/2/3/4
-   0/1/2/3
+   Supports:
+
+   A / B / C / D
+
+   1 / 2 / 3 / 4
+
+   0 / 1 / 2 / 3
+
+   (A)
+   A)
+   A.
+   A:
+   A-
+
+   C) Text
+   C. Text
 ========================================================= */
 
 function normalizeAnswer(answer) {
@@ -3324,6 +3373,7 @@ function normalizeAnswer(answer) {
         answer === null ||
         answer === undefined
     ) {
+
         return "";
     }
 
@@ -3332,39 +3382,53 @@ function normalizeAnswer(answer) {
             .trim()
             .toUpperCase();
 
+    /* Remove surrounding brackets */
+
     value =
         value
-            .replace(/^[\(\[]/, "")
-            .replace(/[\)\].:]$/, "")
+            .replace(/^[([]/, "")
+            .replace(/[)\].:]+$/, "")
             .trim();
 
-    /* A, B, C, D */
+    /* Exact A/B/C/D */
 
     if (
         ["A", "B", "C", "D"].includes(value)
     ) {
+
         return value;
     }
 
-    /* 1, 2, 3, 4 */
+    /* 1/2/3/4 */
 
-    if (/^[1-4]$/.test(value)) {
+    if (
+        /^[1-4]$/.test(value)
+    ) {
 
         return String.fromCharCode(
             64 + Number(value)
         );
     }
 
-    /* 0, 1, 2, 3 */
+    /* 0/1/2/3 */
 
-    if (/^[0-3]$/.test(value)) {
+    if (
+        /^[0-3]$/.test(value)
+    ) {
 
         return String.fromCharCode(
             65 + Number(value)
         );
     }
 
-    /* C) / C. / C: */
+    /*
+       Examples:
+
+       C) भारत
+       C. भारत
+       C: भारत
+       C - भारत
+    */
 
     const first =
         value.charAt(0);
@@ -3372,6 +3436,7 @@ function normalizeAnswer(answer) {
     if (
         ["A", "B", "C", "D"].includes(first)
     ) {
+
         return first;
     }
 
@@ -3856,7 +3921,7 @@ window.addEventListener(
 
 /* =========================================================
    KEYBOARD SUPPORT
-   ---------------------------------------------------------
+
    ← Previous
    → Next
    1-4 Select Answer
@@ -3953,6 +4018,58 @@ window.addEventListener(
         );
     }
 );
+
+
+/* =========================================================
+   MAKE FUNCTIONS AVAILABLE TO HTML INLINE onclick
+   ---------------------------------------------------------
+   This is important for:
+   onclick="showPage('home')"
+   onclick="startTest()"
+   onclick="nextQuestion()"
+   etc.
+========================================================= */
+
+window.showPage = showPage;
+window.toggleNav = toggleNav;
+
+window.loginStudent = loginStudent;
+window.loginAdmin = loginAdmin;
+window.logout = logout;
+
+window.youtube = youtube;
+window.contactAdmin = contactAdmin;
+
+window.openExam = openExam;
+
+window.startTest = startTest;
+window.startTestDirect = startTestDirect;
+
+window.selectAnswer = selectAnswer;
+
+window.nextQuestion = nextQuestion;
+window.previousQuestion = previousQuestion;
+
+window.finishTest = finishTest;
+
+window.showResults = showResults;
+
+window.loadProfile = loadProfile;
+window.saveName = saveName;
+
+window.adminAction = adminAction;
+
+window.updateCategorySelector =
+    updateCategorySelector;
+
+window.updateSubjectSelector =
+    updateSubjectSelector;
+
+window.updateTestSelector =
+    updateTestSelector;
+
+window.showSelectedTestInfo =
+    showSelectedTestInfo;
 
 
 /* =========================================================
