@@ -1,2662 +1,493 @@
-/* =========================================================
-   GS JUNCTION PRAYAGRAJ
-   POWERED BY LIVE STUDY ALLAHABAD
-
-   10X THINK — COMPLETE + SAFE + SCALABLE MASTER STYLE
-   Education + Test + Student + Admin Platform
-   ========================================================= */
-
-
-/* =========================================================
-   1. RESET
-   ========================================================= */
+/* ================= GLOBAL & VARIABLE SETUP ================= */
+:root {
+    --primary-color: #1a365d;
+    --secondary-color: #2b6cb0;
+    --accent-color: #d69e2e;
+    --bg-light: #f7fafc;
+    --card-bg: #ffffff;
+    --text-color: #2d3748;
+    --border-color: #e2e8f0;
+    
+    /* Palette Status Colors */
+    --status-current: #3182ce;
+    --status-answered: #38a169;
+    --status-skipped: #dd6b20;
+    --status-unanswered: #cbd5e0;
+}
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-}
-
-html {
-    scroll-behavior: smooth;
-    width: 100%;
-    overflow-x: hidden;
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
 }
 
 body {
-    width: 100%;
+    background-color: var(--bg-light);
+    color: var(--text-color);
     min-height: 100vh;
-    overflow-x: hidden;
-
-    font-family:
-        "Noto Sans Devanagari",
-        "Nirmala UI",
-        "Mangal",
-        Arial,
-        sans-serif;
-
-    background: var(--bg);
-    color: var(--text);
-
-    line-height: 1.6;
-
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+    display: flex;
+    flex-direction: column;
 }
 
-
-/* =========================================================
-   2. ROOT VARIABLES
-   ========================================================= */
-
-:root {
-
-    /* ---------- BRAND ---------- */
-
-    --primary: #123f91;
-    --primary-dark: #0b2d68;
-    --primary-light: #2563eb;
-
-    --secondary: #1e293b;
-
-    --accent: #f59e0b;
-    --accent-light: #fbbf24;
-
-    /* ---------- STATUS ---------- */
-
-    --success: #16a34a;
-    --success-light: #dcfce7;
-
-    --danger: #dc2626;
-    --danger-light: #fee2e2;
-
-    --warning: #d97706;
-    --warning-light: #fef3c7;
-
-    --info: #0284c7;
-    --info-light: #e0f2fe;
-
-    /* ---------- BASIC ---------- */
-
-    --white: #ffffff;
-    --black: #111827;
-
-    --bg: #f4f7fb;
-    --card: #ffffff;
-
-    --border: #dbe3ef;
-    --border-light: #e8eef6;
-
-    --text: #172033;
-    --muted: #64748b;
-
-    /* ---------- SHADOW ---------- */
-
-    --shadow-xs:
-        0 1px 4px rgba(15, 23, 42, 0.05);
-
-    --shadow-sm:
-        0 2px 8px rgba(15, 23, 42, 0.06);
-
-    --shadow:
-        0 8px 25px rgba(15, 23, 42, 0.08);
-
-    --shadow-lg:
-        0 15px 40px rgba(15, 23, 42, 0.12);
-
-    --shadow-xl:
-        0 20px 60px rgba(15, 23, 42, 0.16);
-
-    /* ---------- RADIUS ---------- */
-
-    --radius-xs: 6px;
-    --radius-sm: 8px;
-    --radius: 14px;
-    --radius-lg: 20px;
-    --radius-xl: 28px;
-
-    /* ---------- LAYOUT ---------- */
-
-    --container: 1320px;
-    --content-width: 1100px;
-
-    /* ---------- TRANSITION ---------- */
-
-    --transition-fast: 0.15s ease;
-    --transition: 0.2s ease;
-    --transition-slow: 0.35s ease;
+/* ================= HEADER ================= */
+.app-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-
-/* =========================================================
-   3. COMMON
-   ========================================================= */
-
-img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
-
-button,
-input,
-select,
-textarea {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-}
-
-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-ul,
-ol {
-    list-style: none;
-}
-
-section,
-main,
-header,
-footer,
-nav,
-div {
-    max-width: 100%;
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid var(--border);
-}
-
-
-/* =========================================================
-   4. MAIN CONTAINER
-   ========================================================= */
-
-.container,
-.wrapper,
-main {
-    width: 100%;
-    max-width: var(--container);
-    margin-left: auto;
-    margin-right: auto;
-}
-
-
-/* =========================================================
-   5. HEADER
-   ========================================================= */
-
-header {
-    width: 100%;
-
-    background:
-        linear-gradient(
-            135deg,
-            #123f91 0%,
-            #174da7 50%,
-            #0b2d68 100%
-        );
-
-    color: var(--white);
-
-    box-shadow:
-        0 5px 20px rgba(15, 23, 42, 0.15);
-
-    position: relative;
-    z-index: 1000;
-}
-
-
-/* =========================================================
-   6. HEADER INNER
-   ========================================================= */
-
-.header-container,
-.header-inner {
-
-    width: 100%;
-    max-width: var(--container);
-
+.header-container {
+    max-width: 1200px;
     margin: 0 auto;
-
-    min-height: 210px;
-
-    padding: 28px 24px 20px;
-
     display: flex;
-
-    align-items: center;
     justify-content: space-between;
-
-    gap: 30px;
-}
-
-
-/* =========================================================
-   7. LOGO / BRAND
-   ========================================================= */
-
-.logo,
-.brand,
-.site-brand {
-
-    flex: 0 0 auto;
-
-    display: flex;
-
     align-items: center;
-
-    gap: 14px;
-
-    min-width: 260px;
 }
 
-.logo img,
-.brand img,
-.site-logo {
-
-    width: 68px;
-    height: 68px;
-
-    object-fit: contain;
-
-    border-radius: 16px;
-}
-
-.logo-icon {
-
-    width: 68px;
-    height: 68px;
-
+.brand-info {
     display: flex;
-
     align-items: center;
-    justify-content: center;
-
-    background: var(--accent-light);
-
-    color: var(--text);
-
-    border-radius: 16px;
-
-    font-size: 34px;
-
-    box-shadow:
-        0 8px 20px rgba(0, 0, 0, 0.18);
+    gap: 12px;
 }
 
-.logo-text h1,
-.brand h1,
-.site-title {
-
-    font-size: clamp(24px, 2.3vw, 40px);
-
-    font-weight: 800;
-
-    line-height: 1.1;
-
-    letter-spacing: 0.3px;
-
-    color: var(--white);
+.brand-icon {
+    font-size: 2.2rem;
+    color: var(--accent-color);
 }
 
-.logo-text p,
-.brand p,
-.site-tagline {
-
-    margin-top: 8px;
-
-    font-size: 15px;
-
+.brand-title {
+    font-size: 1.4rem;
     font-weight: 700;
-
-    letter-spacing: 0.3px;
-
-    color: #dbeafe;
+    letter-spacing: 0.5px;
 }
 
-
-/* =========================================================
-   8. 10X THINK BRANDING
-   Safe: Does not modify existing HTML structure
-   ========================================================= */
-
-.tenx-think,
-.ten-x-think,
-.tenXThink,
-.tenx-brand {
-
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 6px;
-
-    padding: 6px 12px;
-
-    border-radius: 999px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(245, 158, 11, 0.18),
-            rgba(251, 191, 36, 0.10)
-        );
-
-    border: 1px solid rgba(251, 191, 36, 0.45);
-
-    color: #fbbf24;
-
-    font-size: 12px;
-
-    font-weight: 800;
-
-    letter-spacing: 0.7px;
-
-    white-space: nowrap;
+.brand-subtext {
+    font-size: 0.75rem;
+    color: #e2e8f0;
+    opacity: 0.9;
 }
 
-.tenx-think strong,
-.ten-x-think strong,
-.tenXThink strong,
-.tenx-brand strong {
-    color: #ffffff;
+.role-badge {
+    background: var(--accent-color);
+    color: #000;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-right: 10px;
 }
 
-
-/* =========================================================
-   9. NAVIGATION
-   ========================================================= */
-
-nav {
+/* ================= MAIN INTERFACE ================= */
+.main-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 20px auto;
+    padding: 0 15px;
     flex: 1;
-    min-width: 0;
 }
 
-.nav-menu,
-.nav-links,
-.navigation {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: flex-end;
-
-    gap: 4px;
-
-    flex-wrap: nowrap;
-
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    scrollbar-width: thin;
-
-    padding: 5px;
-}
-
-.nav-menu::-webkit-scrollbar,
-.nav-links::-webkit-scrollbar,
-.navigation::-webkit-scrollbar {
-    height: 5px;
-}
-
-.nav-menu::-webkit-scrollbar-thumb,
-.nav-links::-webkit-scrollbar-thumb,
-.navigation::-webkit-scrollbar-thumb {
-
-    background:
-        rgba(255, 255, 255, 0.35);
-
-    border-radius: 20px;
-}
-
-.nav-menu a,
-.nav-links a,
-.navigation a,
-nav a {
-
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-
-    min-height: 48px;
-
-    padding: 10px 14px;
-
-    border-radius: 10px;
-
-    color: var(--white);
-
-    font-size: 15px;
-
-    font-weight: 700;
-
-    white-space: nowrap;
-
-    transition:
-        background var(--transition),
-        transform var(--transition),
-        color var(--transition);
-}
-
-.nav-menu a:hover,
-.nav-links a:hover,
-.navigation a:hover,
-nav a:hover {
-
-    background:
-        rgba(255, 255, 255, 0.16);
-
-    transform: translateY(-1px);
-}
-
-.nav-menu a.active,
-.nav-links a.active,
-.navigation a.active {
-
-    background:
-        rgba(255, 255, 255, 0.22);
-
-    box-shadow:
-        inset 0 0 0 1px
-        rgba(255, 255, 255, 0.08);
-}
-
-
-/* =========================================================
-   10. MENU BUTTON
-   ========================================================= */
-
-.menu-toggle,
-#menuToggle,
-.hamburger {
-
+.interface-section {
     display: none;
-
-    width: 44px;
-    height: 44px;
-
-    border: 0;
-
-    border-radius: 10px;
-
-    background:
-        rgba(255, 255, 255, 0.14);
-
-    color: var(--white);
-
-    font-size: 24px;
-
-    align-items: center;
-    justify-content: center;
 }
 
-
-/* =========================================================
-   11. MAIN AREA
-   ========================================================= */
-
-main {
-    padding: 0 20px 50px;
+.interface-section.active {
+    display: block;
 }
 
-
-/* =========================================================
-   12. HERO
-   ========================================================= */
-
-.hero,
-.hero-section {
-
-    width: 100%;
-
-    max-width: var(--container);
-
-    margin: 0 auto;
-
-    padding: 52px 4px 30px;
-
-    position: relative;
-}
-
-.hero-content {
-    max-width: 850px;
-}
-
-.hero-eyebrow {
-
-    font-size: 18px;
-
-    color: var(--primary);
-
-    margin-bottom: 8px;
-
-    font-weight: 600;
-}
-
-.hero h1,
-.hero-title {
-
-    font-size: clamp(28px, 3vw, 42px);
-
-    line-height: 1.2;
-
-    color: var(--primary);
-
-    font-weight: 800;
-
-    margin-bottom: 10px;
-}
-
-.hero h2 {
-
-    font-size: clamp(21px, 2.2vw, 30px);
-
-    color: var(--text);
-
-    margin-bottom: 8px;
-
-    font-weight: 800;
-}
-
-.hero p {
-
-    font-size: 18px;
-
-    color: var(--text);
-
-    margin-bottom: 8px;
-}
-
-.exam-list {
-
-    margin-top: 5px;
-
-    font-size: 17px;
-
-    font-weight: 600;
-
-    color: var(--secondary);
-
-    word-spacing: 4px;
-}
-
-
-/* =========================================================
-   13. HERO BUTTONS
-   ========================================================= */
-
-.hero-buttons,
-.action-buttons {
-
+/* ================= NAVIGATION TABS ================= */
+.nav-tabs {
     display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 12px;
-
-    margin-top: 20px;
-}
-
-.btn,
-button.btn,
-.primary-btn,
-.secondary-btn {
-
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 8px;
-
-    min-height: 48px;
-
-    padding: 11px 20px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    font-size: 16px;
-
-    font-weight: 700;
-
-    transition:
-        transform var(--transition),
-        box-shadow var(--transition),
-        background var(--transition);
-}
-
-.btn-primary,
-.primary-btn {
-
-    background:
-        linear-gradient(
-            135deg,
-            #2563eb,
-            #123f91
-        );
-
-    color: var(--white);
-
-    box-shadow:
-        0 5px 14px
-        rgba(37, 99, 235, 0.25);
-}
-
-.btn-secondary,
-.secondary-btn {
-
-    background: var(--white);
-
-    color: var(--primary);
-
-    border: 1px solid #cbd5e1;
-}
-
-.btn:hover,
-.primary-btn:hover,
-.secondary-btn:hover {
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 8px 18px
-        rgba(15, 23, 42, 0.14);
-}
-
-
-/* =========================================================
-   14. WELCOME CARD
-   ========================================================= */
-
-.welcome-card,
-.student-welcome,
-#welcomeCard {
-
-    width: 100%;
-
-    max-width: 1100px;
-
-    margin: 20px auto 30px;
-
-    padding: 30px 25px;
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-lg);
-
-    box-shadow: var(--shadow);
-
-    text-align: center;
-}
-
-.welcome-card .icon,
-.student-welcome .icon {
-
-    font-size: 28px;
-
-    margin-bottom: 5px;
-}
-
-.welcome-card h2,
-.student-welcome h2 {
-
-    color: var(--text);
-
-    font-size: 24px;
-
-    margin-bottom: 5px;
-}
-
-.welcome-card p,
-.student-welcome p {
-
-    color: var(--muted);
-
-    font-size: 17px;
-}
-
-
-/* =========================================================
-   15. QUICK ACTIONS
-   ========================================================= */
-
-.quick-actions,
-.student-actions,
-.dashboard-actions {
-
-    width: 100%;
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(190px, 1fr));
-
-    gap: 14px;
-
-    margin: 25px 0 35px;
-}
-
-.quick-card,
-.action-card,
-.dashboard-card {
-
-    min-height: 95px;
-
-    padding: 18px;
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
-
-    box-shadow: var(--shadow-sm);
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    transition:
-        transform var(--transition),
-        box-shadow var(--transition),
-        border-color var(--transition);
-}
-
-.quick-card:hover,
-.action-card:hover,
-.dashboard-card:hover {
-
-    transform: translateY(-3px);
-
-    box-shadow: var(--shadow);
-
-    border-color: #b8c8df;
-}
-
-.quick-card .icon,
-.action-card .icon,
-.dashboard-card .icon {
-
-    font-size: 28px;
-
-    flex: 0 0 auto;
-}
-
-.quick-card h3,
-.action-card h3,
-.dashboard-card h3 {
-
-    color: var(--primary);
-
-    font-size: 17px;
-
-    margin-bottom: 2px;
-}
-
-.quick-card p,
-.action-card p,
-.dashboard-card p {
-
-    color: var(--muted);
-
-    font-size: 13px;
-}
-
-
-/* =========================================================
-   16. SECTION
-   ========================================================= */
-
-section {
-
-    width: 100%;
-
-    margin: 30px auto;
-
-    scroll-margin-top: 100px;
-}
-
-.section-header {
-    margin-bottom: 20px;
-}
-
-.section-header h2,
-section > h2 {
-
-    color: var(--text);
-
-    font-size: clamp(24px, 2.5vw, 32px);
-
-    font-weight: 800;
-
-    margin-bottom: 5px;
-}
-
-.section-header p,
-section > p {
-
-    color: var(--muted);
-
-    font-size: 16px;
-}
-
-
-/* =========================================================
-   17. PERFORMANCE / STATS
-   ========================================================= */
-
-.performance-section {
-
-    width: 100%;
-
-    margin: 30px 0;
-}
-
-.performance-grid,
-.stats-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-    gap: 18px;
-
-    margin-top: 18px;
-}
-
-.stat-card,
-.performance-card {
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
-
-    padding: 22px;
-
-    box-shadow: var(--shadow-sm);
-}
-
-.stat-card .number,
-.performance-card .number {
-
-    font-size: 30px;
-
-    font-weight: 800;
-
-    color: var(--primary);
-
-    line-height: 1.2;
-
-    margin-bottom: 5px;
-}
-
-.stat-card .label,
-.performance-card .label {
-
-    color: var(--muted);
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   18. TEST CATEGORIES
-   ========================================================= */
-
-.test-categories,
-.exam-grid,
-.tests-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(220px, 1fr));
-
-    gap: 18px;
-
-    margin-top: 20px;
-}
-
-.exam-card,
-.test-category-card {
-
-    background: var(--white);
-
-    border: 1px solid #d9e5f5;
-
-    border-radius: var(--radius);
-
-    padding: 22px;
-
-    min-height: 145px;
-
-    box-shadow: var(--shadow-sm);
-
-    transition: all var(--transition);
-}
-
-.exam-card:hover,
-.test-category-card:hover {
-
-    transform: translateY(-3px);
-
-    box-shadow: var(--shadow);
-
-    border-color: #9bb8e8;
-}
-
-.exam-card h3,
-.test-category-card h3 {
-
-    color: var(--primary);
-
-    font-size: 20px;
-
-    margin-bottom: 6px;
-}
-
-.exam-card p,
-.test-category-card p {
-
-    color: var(--muted);
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   19. TEST LIST
-   ========================================================= */
-
-.test-list {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(280px, 1fr));
-
-    gap: 18px;
-}
-
-.test-card {
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
-
-    padding: 20px;
-
-    box-shadow: var(--shadow-sm);
-
-    transition: all var(--transition);
-}
-
-.test-card:hover {
-
-    transform: translateY(-3px);
-
-    box-shadow: var(--shadow);
-}
-
-.test-card h3 {
-
-    color: var(--primary);
-
-    margin-bottom: 8px;
-
-    font-size: 19px;
-}
-
-.test-card p {
-
-    color: var(--muted);
-
-    font-size: 14px;
-
-    margin-bottom: 5px;
-}
-
-
-/* =========================================================
-   20. TEST SCREEN
-   ========================================================= */
-
-.test-container {
-
-    width: 100%;
-
-    max-width: var(--content-width);
-
-    margin: 25px auto;
-}
-
-.test-header {
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
-
-    padding: 18px 20px;
-
-    box-shadow: var(--shadow-sm);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 15px;
-
-    flex-wrap: wrap;
-}
-
-
-/* =========================================================
-   21. TIMER
-   ========================================================= */
-
-.timer {
-
-    min-width: 130px;
-
-    padding: 10px 15px;
-
-    border-radius: 10px;
-
-    background: #fff7ed;
-
-    color: #c2410c;
-
-    font-size: 20px;
-
-    font-weight: 800;
-
-    text-align: center;
-
-    border: 1px solid #fed7aa;
-}
-
-.timer.warning {
-
-    background: var(--warning-light);
-
-    color: var(--warning);
-}
-
-.timer.danger {
-
-    background: var(--danger-light);
-
-    color: var(--danger);
-
-    animation: timerPulse 1s infinite;
-}
-
-@keyframes timerPulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.65;
-    }
-}
-
-
-/* =========================================================
-   22. QUESTION CARD
-   ========================================================= */
-
-.question-card {
-
-    margin-top: 18px;
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
-
-    padding: 25px;
-
-    box-shadow: var(--shadow);
-}
-
-.question-number {
-
-    color: var(--primary);
-
-    font-weight: 800;
-
-    margin-bottom: 10px;
-}
-
-.question-text {
-
-    font-size: 20px;
-
-    font-weight: 700;
-
-    line-height: 1.7;
-
-    margin-bottom: 20px;
-
-    overflow-wrap: anywhere;
-}
-
-
-/* =========================================================
-   23. OPTIONS
-   ========================================================= */
-
-.options {
-
-    display: grid;
-
-    gap: 12px;
-}
-
-.option,
-.option label {
-
-    width: 100%;
-}
-
-.option {
-
-    padding: 14px 16px;
-
-    background: #f8fafc;
-
-    border: 1px solid #dbe3ef;
-
-    border-radius: 10px;
-
-    cursor: pointer;
-
-    transition: all var(--transition);
-
-    overflow-wrap: anywhere;
-}
-
-.option:hover {
-
-    border-color: #93b4e7;
-
-    background: #eff6ff;
-}
-
-.option.selected {
-
-    border-color: var(--primary-light);
-
-    background: #eff6ff;
-
-    box-shadow:
-        0 0 0 2px
-        rgba(37, 99, 235, 0.08);
-}
-
-.option input {
-
-    margin-right: 8px;
-}
-
-
-/* =========================================================
-   24. QUESTION PALETTE
-   ========================================================= */
-
-.question-palette {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fill, minmax(42px, 1fr));
-
-    gap: 8px;
-
-    margin-top: 20px;
-}
-
-.question-palette button {
-
-    min-height: 42px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 8px;
-
-    background: var(--white);
-
-    color: var(--text);
-
-    font-weight: 700;
-
-    transition: all var(--transition);
-}
-
-.question-palette button:hover {
-
-    transform: translateY(-1px);
-
-    box-shadow: var(--shadow-sm);
-}
-
-.question-palette button.current {
-
-    background: var(--primary);
-
-    color: var(--white);
-
-    border-color: var(--primary);
-}
-
-.question-palette button.answered {
-
-    background: var(--success-light);
-
-    color: #166534;
-
-    border-color: #86efac;
-}
-
-.question-palette button.unanswered {
-
-    background: var(--danger-light);
-
-    color: #991b1b;
-
-    border-color: #fecaca;
-}
-
-.question-palette button.skipped {
-
-    background: #fff7ed;
-
-    color: #9a3412;
-
-    border-color: #fed7aa;
-}
-
-
-/* =========================================================
-   25. TEST NAVIGATION
-   ========================================================= */
-
-.test-navigation {
-
-    display: flex;
-
-    justify-content: space-between;
-
     gap: 10px;
-
-    flex-wrap: wrap;
-
-    margin-top: 20px;
+    border-bottom: 2px solid var(--border-color);
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
 }
 
-.test-navigation button {
-
-    min-height: 46px;
-
-    padding: 10px 18px;
-
-    border: 0;
-
-    border-radius: 9px;
-
-    background: var(--primary);
-
-    color: var(--white);
-
-    font-weight: 700;
-
-    transition: all var(--transition);
-}
-
-.test-navigation button:hover {
-
-    background: var(--primary-dark);
-
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   26. RESULT
-   ========================================================= */
-
-.result-card {
-
-    width: 100%;
-
-    max-width: 900px;
-
-    margin: 30px auto;
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-lg);
-
-    padding: 30px;
-
-    box-shadow: var(--shadow-lg);
-}
-
-.result-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-    gap: 15px;
-
-    margin-top: 20px;
-}
-
-.result-item {
-
-    padding: 18px;
-
-    background: #f8fafc;
-
-    border-radius: 10px;
-
-    border: 1px solid var(--border);
-}
-
-.result-item strong {
-
-    display: block;
-
-    color: var(--primary);
-
-    font-size: 24px;
-}
-
-.result-item span {
-
-    color: var(--muted);
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   27. EXPLANATION
-   ========================================================= */
-
-.explanation {
-
-    margin-top: 15px;
-
-    padding: 16px;
-
-    background: #f8fafc;
-
-    border-left: 4px solid var(--primary);
-
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #718096;
+    cursor: pointer;
     border-radius: 6px;
-
-    color: var(--text);
-
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    transition: all 0.2s;
 }
 
-
-/* =========================================================
-   28. ADMIN DASHBOARD
-   ========================================================= */
-
-.admin-dashboard {
-
-    width: 100%;
-
-    max-width: var(--container);
-
-    margin: 0 auto;
-
-    padding: 35px 0;
+.tab-btn.active, .tab-btn:hover {
+    background: var(--primary-color);
+    color: white;
 }
 
-.admin-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(210px, 1fr));
-
-    gap: 18px;
-
-    margin-top: 20px;
+.tab-content {
+    display: none;
 }
 
-.admin-card {
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
-
-    padding: 22px;
-
-    box-shadow: var(--shadow-sm);
-
-    transition: all var(--transition);
-}
-
-.admin-card:hover {
-
-    transform: translateY(-3px);
-
-    box-shadow: var(--shadow);
-}
-
-.admin-card h3 {
-
-    color: var(--primary);
-
-    font-size: 18px;
-
-    margin-bottom: 6px;
-}
-
-.admin-card p {
-
-    color: var(--muted);
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   29. FORMS
-   ========================================================= */
-
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-
+.tab-content.active {
     display: block;
-
-    margin-bottom: 6px;
-
-    color: var(--text);
-
-    font-weight: 700;
 }
 
-input,
-select,
-textarea {
-
-    width: 100%;
-
-    min-height: 44px;
-
-    padding: 10px 12px;
-
-    border: 1px solid #cbd5e1;
-
-    border-radius: 8px;
-
-    background: var(--white);
-
-    color: var(--text);
-
-    outline: none;
-
-    transition:
-        border-color var(--transition),
-        box-shadow var(--transition);
-}
-
-textarea {
-
-    min-height: 120px;
-
-    resize: vertical;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-
-    border-color: var(--primary-light);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(37, 99, 235, 0.12);
-}
-
-
-/* =========================================================
-   30. LOGIN
-   ========================================================= */
-
-.login-page {
-
-    min-height: calc(100vh - 100px);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 30px 15px;
-}
-
-.login-card {
-
-    width: 100%;
-
-    max-width: 450px;
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-lg);
-
-    padding: 32px;
-
-    box-shadow: var(--shadow-lg);
-}
-
-.login-card h1 {
-
-    color: var(--primary);
-
-    text-align: center;
-
-    margin-bottom: 8px;
-}
-
-.login-card p {
-
-    color: var(--muted);
-
-    text-align: center;
-
+/* ================= DASHBOARD & CARDS ================= */
+.welcome-banner {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 24px;
+    border-radius: 10px;
     margin-bottom: 25px;
 }
 
-
-/* =========================================================
-   31. COURSES / NOTES / LIVE CLASSES
-   ========================================================= */
-
-.content-grid,
-.course-grid,
-.notes-grid,
-.live-grid {
-
+.grid-dashboard {
     display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(250px, 1fr));
-
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
 }
 
-.content-card,
-.course-card,
-.note-card,
-.live-card {
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
-
-    overflow: hidden;
-
-    box-shadow: var(--shadow-sm);
-
-    transition: all var(--transition);
-}
-
-.content-card:hover,
-.course-card:hover,
-.note-card:hover,
-.live-card:hover {
-
-    transform: translateY(-3px);
-
-    box-shadow: var(--shadow);
-}
-
-.content-card-body,
-.course-card-body,
-.note-card-body,
-.live-card-body {
-
-    padding: 18px;
-}
-
-.content-card h3,
-.course-card h3,
-.note-card h3,
-.live-card h3 {
-
-    color: var(--primary);
-
-    margin-bottom: 7px;
-}
-
-.content-card p,
-.course-card p,
-.note-card p,
-.live-card p {
-
-    color: var(--muted);
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   32. NOTIFICATIONS
-   ========================================================= */
-
-.notification {
-
-    padding: 15px 18px;
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: 10px;
-
-    margin-bottom: 10px;
-
-    box-shadow: var(--shadow-sm);
-}
-
-.notification.unread {
-
-    border-left: 4px solid var(--primary);
-
-    background: #eff6ff;
-}
-
-.notification-title {
-
-    font-weight: 800;
-
-    color: var(--text);
-}
-
-.notification-time {
-
-    font-size: 12px;
-
-    color: var(--muted);
-}
-
-
-/* =========================================================
-   33. PROFILE
-   ========================================================= */
-
-.profile-card {
-
-    max-width: 800px;
-
-    margin: 20px auto;
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-lg);
-
-    padding: 30px;
-
-    box-shadow: var(--shadow);
-}
-
-.profile-photo {
-
-    width: 100px;
-    height: 100px;
-
-    margin: 0 auto 15px;
-
-    border-radius: 50%;
-
-    object-fit: cover;
-
-    border: 4px solid #dbeafe;
-}
-
-
-/* =========================================================
-   34. FOOTER
-   ========================================================= */
-
-footer {
-
-    width: 100%;
-
-    margin-top: 50px;
-
-    padding: 35px 20px;
-
-    background: #0f172a;
-
-    color: var(--white);
-
-    text-align: center;
-}
-
-footer .footer-container {
-
-    width: 100%;
-
-    max-width: var(--container);
-
-    margin: auto;
-}
-
-footer h3 {
-
-    font-size: 20px;
-
-    margin-bottom: 5px;
-}
-
-footer p {
-
-    color: #cbd5e1;
-
-    font-size: 14px;
-}
-
-.footer-links {
-
-    display: flex;
-
-    justify-content: center;
-
-    flex-wrap: wrap;
-
-    gap: 18px;
-
-    margin: 15px 0;
-}
-
-.footer-links a {
-
-    color: #dbeafe;
-
-    font-size: 14px;
-}
-
-.footer-links a:hover {
-
-    color: var(--white);
-
-    text-decoration: underline;
-}
-
-
-/* =========================================================
-   35. MODAL
-   ========================================================= */
-
-.modal {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 9999;
-
-    display: none;
-
-    align-items: center;
-
-    justify-content: center;
-
+.dash-card {
+    background: var(--card-bg);
     padding: 20px;
-
-    background:
-        rgba(15, 23, 42, 0.65);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
-.modal.active,
-.modal.show {
+.dash-card:hover {
+    transform: translateY(-4px);
+}
 
+.card-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+/* ================= FILTER CHIPS & TEST CARDS ================= */
+.category-filter {
     display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 15px 0 25px 0;
 }
 
-.modal-content {
+.cat-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
 
-    width: 100%;
+.cat-chip.active {
+    background: var(--accent-color);
+    color: #000;
+    border-color: var(--accent-color);
+}
 
-    max-width: 650px;
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
 
-    max-height: 90vh;
+.test-card {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
-    overflow-y: auto;
+.test-card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
 
-    background: var(--white);
+.badge {
+    background: #e2e8f0;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
 
-    border-radius: var(--radius);
+/* ================= TEST ENGINE & PALETTE ================= */
+.test-engine-view {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
 
+.test-header-bar {
+    background: #edf2f7;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.timer-box {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #c53030;
+    background: #fff5f5;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #feb2b2;
+}
+
+.test-body-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    min-height: 500px;
+}
+
+.question-container {
     padding: 25px;
-
-    box-shadow: var(--shadow-lg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
 }
 
-
-/* =========================================================
-   36. LOADING / EMPTY / ERROR STATES
-   ========================================================= */
-
-.loading,
-.loader-container,
-.empty-state,
-.error-state {
-
-    width: 100%;
-
-    padding: 30px;
-
-    text-align: center;
-
-    color: var(--muted);
-
-    background: var(--white);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius);
+.q-meta-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #718096;
+    margin-bottom: 15px;
 }
 
-.loading::before {
-
-    content: "⏳";
-
-    display: block;
-
-    font-size: 28px;
-
-    margin-bottom: 8px;
+.q-text-box {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    line-height: 1.5;
 }
 
-.error-state {
-
-    color: var(--danger);
-
-    background: var(--danger-light);
-
-    border-color: #fecaca;
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
 }
 
-.empty-state {
+.option-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
 
-    color: var(--muted);
+.option-item:hover {
+    background: #f7fafc;
+}
 
+.option-item input {
+    margin-right: 12px;
+}
+
+.test-navigation-controls {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Question Palette */
+.palette-sidebar {
+    padding: 20px;
     background: #f8fafc;
 }
 
-
-/* =========================================================
-   37. SCALABLE DATA / TEST METADATA
-   ========================================================= */
-
-.test-meta,
-.exam-meta,
-.course-meta {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
+.palette-legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
-
-    margin: 10px 0;
+    font-size: 0.75rem;
+    margin: 15px 0;
 }
 
-.test-meta span,
-.exam-meta span,
-.course-meta span {
+.legend-item { display: flex; align-items: center; gap: 5px; }
 
-    display: inline-flex;
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.current { background: var(--status-current); }
+.dot.answered { background: var(--status-answered); }
+.dot.skipped { background: var(--status-skipped); }
+.dot.unanswered { background: var(--status-unanswered); }
 
-    align-items: center;
-
-    padding: 5px 9px;
-
-    border-radius: 999px;
-
-    background: #eff6ff;
-
-    color: var(--primary);
-
-    border: 1px solid #dbeafe;
-
-    font-size: 12px;
-
-    font-weight: 700;
+.palette-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    max-height: 380px;
+    overflow-y: auto;
 }
 
-
-/* =========================================================
-   38. BADGES
-   ========================================================= */
-
-.badge {
-
-    display: inline-flex;
-
+.p-num {
+    aspect-ratio: 1;
+    display: flex;
     align-items: center;
-
     justify-content: center;
-
-    min-height: 26px;
-
-    padding: 4px 9px;
-
-    border-radius: 999px;
-
-    font-size: 12px;
-
-    font-weight: 800;
+    background: var(--status-unanswered);
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
 }
 
-.badge-primary {
+.p-num.current { background: var(--status-current); }
+.p-num.answered { background: var(--status-answered); }
+.p-num.skipped { background: var(--status-skipped); }
 
-    background: #dbeafe;
-    color: #1d4ed8;
+/* ================= RESULT VIEW ================= */
+.result-card {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
 }
 
-.badge-success {
-
-    background: var(--success-light);
-    color: #166534;
+.result-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
 }
 
-.badge-danger {
-
-    background: var(--danger-light);
-    color: #991b1b;
-}
-
-.badge-warning {
-
-    background: var(--warning-light);
-    color: #92400e;
-}
-
-
-/* =========================================================
-   39. UTILITY
-   ========================================================= */
-
-.text-center {
+.stat-box {
+    background: #f7fafc;
+    padding: 15px;
+    border-radius: 6px;
     text-align: center;
+    border: 1px solid var(--border-color);
 }
 
-.text-left {
-    text-align: left;
+.stat-label { font-size: 0.8rem; color: #718096; display: block; }
+.stat-value { font-size: 1.4rem; font-weight: bold; margin-top: 5px; display: block; }
+
+/* ================= ADMIN INTERFACE ================= */
+.admin-wrapper {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 20px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    min-height: 600px;
 }
 
-.text-right {
-    text-align: right;
+.admin-sidebar {
+    background: #2d3748;
+    color: white;
+    padding: 20px;
 }
 
-.hidden {
-    display: none !important;
+.admin-profile {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #4a5568;
+    margin-bottom: 20px;
 }
 
-.active {
-    display: block;
+.admin-menu { list-style: none; }
+.admin-menu li {
+    padding: 12px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
 }
 
-.mt-1 {
-    margin-top: 8px;
+.admin-menu li.active, .admin-menu li:hover {
+    background: var(--primary-color);
 }
 
-.mt-2 {
-    margin-top: 16px;
+.admin-content { padding: 25px; }
+
+.admin-tab { display: none; }
+.admin-tab.active { display: block; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
 }
 
-.mt-3 {
-    margin-top: 24px;
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 0.85rem; font-weight: 600; }
+.form-group input, .form-group select {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
 }
 
-.mb-1 {
-    margin-bottom: 8px;
-}
-
-.mb-2 {
-    margin-bottom: 16px;
-}
-
-.mb-3 {
-    margin-bottom: 24px;
-}
-
-.w-full {
+.data-table {
     width: 100%;
-}
-
-.no-scroll {
-    overflow: hidden !important;
-}
-
-
-/* =========================================================
-   40. MOBILE NAVIGATION
-   ========================================================= */
-
-@media (max-width: 1100px) {
-
-    .header-container,
-    .header-inner {
-
-        min-height: auto;
-
-        padding: 20px;
-
-        align-items: flex-start;
-    }
-
-    .logo,
-    .brand,
-    .site-brand {
-
-        min-width: auto;
-    }
-
-    .logo-text h1,
-    .brand h1,
-    .site-title {
-
-        font-size: 28px;
-    }
-
-    nav {
-
-        width: 100%;
-
-        overflow: hidden;
-    }
-
-    .nav-menu,
-    .nav-links,
-    .navigation {
-
-        justify-content: flex-start;
-
-        overflow-x: auto;
-    }
-
-    .performance-grid,
-    .stats-grid {
-
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr));
-    }
-}
-
-
-/* =========================================================
-   41. TABLET
-   ========================================================= */
-
-@media (max-width: 800px) {
-
-    .header-container,
-    .header-inner {
-
-        flex-direction: column;
-
-        align-items: stretch;
-
-        gap: 15px;
-    }
-
-    .logo,
-    .brand,
-    .site-brand {
-
-        justify-content: center;
-
-        text-align: center;
-    }
-
-    nav {
-        width: 100%;
-    }
-
-    .nav-menu,
-    .nav-links,
-    .navigation {
-
-        justify-content: flex-start;
-
-        padding-bottom: 8px;
-    }
-
-    .nav-menu a,
-    .nav-links a,
-    .navigation a,
-    nav a {
-
-        min-height: 44px;
-
-        padding: 9px 12px;
-
-        font-size: 14px;
-    }
-
-    main {
-
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    .hero,
-    .hero-section {
-
-        padding-top: 35px;
-    }
-
-    .performance-grid,
-    .stats-grid,
-    .result-grid {
-
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-    .welcome-card,
-    .student-welcome {
-
-        padding: 25px 18px;
-    }
-}
-
-
-/* =========================================================
-   42. MOBILE
-   ========================================================= */
-
-@media (max-width: 600px) {
-
-    body {
-        font-size: 15px;
-    }
-
-    .header-container,
-    .header-inner {
-
-        padding: 16px 12px;
-    }
-
-    .logo,
-    .brand,
-    .site-brand {
-
-        justify-content: flex-start;
-
-        text-align: left;
-
-        gap: 10px;
-    }
-
-    .logo-icon {
-
-        width: 52px;
-        height: 52px;
-
-        font-size: 26px;
-
-        border-radius: 12px;
-    }
-
-    .logo img,
-    .brand img,
-    .site-logo {
-
-        width: 52px;
-        height: 52px;
-    }
-
-    .logo-text h1,
-    .brand h1,
-    .site-title {
-
-        font-size: 24px;
-    }
-
-    .logo-text p,
-    .brand p,
-    .site-tagline {
-
-        font-size: 12px;
-
-        margin-top: 4px;
-    }
-
-    .tenx-think,
-    .ten-x-think,
-    .tenXThink,
-    .tenx-brand {
-
-        font-size: 10px;
-
-        padding: 5px 9px;
-    }
-
-    .nav-menu,
-    .nav-links,
-    .navigation {
-
-        gap: 5px;
-
-        width: 100%;
-
-        justify-content: flex-start;
-
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .nav-menu a,
-    .nav-links a,
-    .navigation a,
-    nav a {
-
-        font-size: 13px;
-
-        min-height: 42px;
-
-        padding: 8px 11px;
-    }
-
-    main {
-
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    .hero,
-    .hero-section {
-
-        padding: 30px 0 20px;
-    }
-
-    .hero-eyebrow {
-        font-size: 15px;
-    }
-
-    .hero h1,
-    .hero-title {
-        font-size: 27px;
-    }
-
-    .hero h2 {
-        font-size: 21px;
-    }
-
-    .hero p,
-    .exam-list {
-        font-size: 15px;
-    }
-
-    .hero-buttons,
-    .action-buttons {
-
-        flex-direction: column;
-
-        align-items: stretch;
-    }
-
-    .btn,
-    .primary-btn,
-    .secondary-btn {
-
-        width: 100%;
-    }
-
-    .welcome-card,
-    .student-welcome,
-    #welcomeCard {
-
-        margin-top: 15px;
-
-        padding: 22px 15px;
-
-        border-radius: 15px;
-    }
-
-    .welcome-card h2,
-    .student-welcome h2 {
-        font-size: 21px;
-    }
-
-    .welcome-card p,
-    .student-welcome p {
-        font-size: 15px;
-    }
-
-    .quick-actions,
-    .student-actions,
-    .dashboard-actions {
-
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
-        gap: 10px;
-    }
-
-    .quick-card,
-    .action-card,
-    .dashboard-card {
-
-        min-height: 85px;
-
-        padding: 13px;
-
-        flex-direction: column;
-
-        align-items: flex-start;
-
-        gap: 5px;
-    }
-
-    .quick-card .icon,
-    .action-card .icon,
-    .dashboard-card .icon {
-
-        font-size: 23px;
-    }
-
-    .quick-card h3,
-    .action-card h3,
-    .dashboard-card h3 {
-
-        font-size: 15px;
-    }
-
-    .quick-card p,
-    .action-card p,
-    .dashboard-card p {
-
-        font-size: 12px;
-    }
-
-    .performance-grid,
-    .stats-grid,
-    .result-grid {
-
-        grid-template-columns: 1fr;
-    }
-
-    .test-categories,
-    .exam-grid,
-    .tests-grid,
-    .content-grid,
-    .course-grid,
-    .notes-grid,
-    .live-grid {
-
-        grid-template-columns: 1fr;
-    }
-
-    .test-header {
-
-        align-items: stretch;
-
-        flex-direction: column;
-    }
-
-    .timer {
-
-        width: 100%;
-    }
-
-    .question-card {
-
-        padding: 18px 14px;
-    }
-
-    .question-text {
-
-        font-size: 17px;
-    }
-
-    .test-navigation {
-
-        display: grid;
-
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-    .test-navigation button {
-
-        width: 100%;
-    }
-
-    .question-palette {
-
-        grid-template-columns:
-            repeat(6, minmax(0, 1fr));
-    }
-
-    .result-card {
-
-        padding: 20px 15px;
-    }
-
-    .profile-card,
-    .login-card {
-
-        padding: 22px 16px;
-    }
-
-    footer {
-
-        padding: 28px 15px;
-    }
-}
-
-
-/* =========================================================
-   43. VERY SMALL MOBILE
-   ========================================================= */
-
-@media (max-width: 380px) {
-
-    .logo-text h1,
-    .brand h1,
-    .site-title {
-
-        font-size: 21px;
-    }
-
-    .quick-actions,
-    .student-actions,
-    .dashboard-actions {
-
-        grid-template-columns: 1fr;
-    }
-
-    .question-palette {
-
-        grid-template-columns:
-            repeat(5, minmax(0, 1fr));
-    }
-
-    .test-navigation {
-
-        grid-template-columns: 1fr;
-    }
-}
-
-
-/* =========================================================
-   44. ACCESSIBILITY
-   ========================================================= */
-
-:focus-visible {
-
-    outline:
-        3px solid
-        rgba(37, 99, 235, 0.45);
-
-    outline-offset: 2px;
-}
-
-
-/* =========================================================
-   45. REDUCE MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-
-        transition: none !important;
-
-        animation: none !important;
-    }
-}
-
-
-/* =========================================================
-   46. PRINT
-   ========================================================= */
-
-@media print {
-
-    header,
-    nav,
-    footer,
-    .hero-buttons,
-    .action-buttons,
-    .test-navigation,
-    .question-palette {
-
-        display: none !important;
-    }
-
-    body {
-
-        background: var(--white);
-
-        color: #000000;
-    }
-
-    main {
-
-        max-width: 100%;
-
-        padding: 0;
-    }
-
-    .question-card,
-    .result-card {
-
-        box-shadow: none;
-
-        border: 1px solid #999;
-    }
-}
-
-
-/* =========================================================
-   47. SAFE FALLBACK
-   ========================================================= */
-
-* {
-    max-width: 100%;
-}
-
-button,
-a,
-input,
-select,
-textarea {
-    -webkit-tap-highlight-color: transparent;
-}
-
-pre,
-code {
-    max-width: 100%;
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    max-width: 100%;
     border-collapse: collapse;
+    margin-top: 15px;
 }
 
+.data-table th, .data-table td {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+    font-size: 0.85rem;
+}
 
-/* =========================================================
-   48. END
-   =========================================================
+/* UTILITY BUTTONS & CLASSES */
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-primary { background: var(--primary-color); color: white; }
+.btn-secondary { background: #718096; color: white; }
+.btn-success { background: #38a169; color: white; }
+.btn-warning { background: #dd6b20; color: white; }
+.btn-outline { background: transparent; border: 1px solid white; color: white; }
 
-   GS JUNCTION PRAYAGRAJ
-   POWERED BY LIVE STUDY ALLAHABAD
+.hidden { display: none !important; }
+.pull-right { margin-left: auto; }
+.text-danger { color: #e53e3e; }
+.text-primary { color: var(--primary-color); }
+.text-success { color: #38a169; }
 
-   10X THINK
-   COMPLETE + SAFE + SCALABLE
+.app-footer {
+    background: #1a202c;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    font-size: 0.85rem;
+    margin-top: auto;
+}
 
-   ========================================================= */
+.powered-by {
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .test-body-layout { grid-template-columns: 1fr; }
+    .admin-wrapper { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+}
