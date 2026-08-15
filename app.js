@@ -56,6 +56,11 @@ let currentSubject = "";
 let appInitialized = false;
 let testSubmitted = false;
 
+
+/* =========================================================
+   DEFAULT SETTINGS
+========================================================= */
+
 const SECONDS_PER_QUESTION = 45;
 
 const TEST_INDEX_URL = "tests/index.json";
@@ -370,11 +375,6 @@ async function startTestDirect(test) {
     currentTest =
         normalizeTest(test);
 
-    /*
-     * यदि questions पहले से मौजूद नहीं हैं
-     * तो file से TXT load करें।
-     */
-
     if (
         !Array.isArray(currentTest.questions) ||
         !currentTest.questions.length
@@ -426,11 +426,6 @@ async function startTestDirect(test) {
             return;
         }
     }
-
-    /*
-     * Question count metadata से अधिक
-     * questions होने पर actual questions ही लें।
-     */
 
     if (
         !Array.isArray(
@@ -502,6 +497,7 @@ function showLoadingMessage() {
 
     testArea.innerHTML = `
         <div class="loading-state">
+
             <div class="loader"></div>
 
             <h3>
@@ -511,6 +507,7 @@ function showLoadingMessage() {
             <p>
                 कृपया कुछ सेकंड प्रतीक्षा करें।
             </p>
+
         </div>
     `;
 
@@ -525,20 +522,11 @@ function showLoadingMessage() {
 async function loadQuestionsFromFile(filePath) {
 
     if (!filePath) {
-
         return [];
     }
 
-    /*
-     * GitHub Pages compatible path
-     */
-
     let url =
         String(filePath).trim();
-
-    /*
-     * अगर path ./ से शुरू है तो ठीक करें
-     */
 
     url =
         url.replace(/^\.\/+/, "");
@@ -573,32 +561,6 @@ async function loadQuestionsFromFile(filePath) {
 
 /* =========================================================
    PARSE TXT QUESTIONS
-   ---------------------------------------------------------
-   Supported formats:
-
-   1.
-   1. Question?
-   (A) Option
-   (B) Option
-   (C) Option
-   (D) Option
-   उत्तर: C
-
-   2.
-   Question?
-   A. Option
-   B. Option
-   C. Option
-   D. Option
-   Answer: C
-
-   3.
-   Question?
-   A) Option
-   B) Option
-   C) Option
-   D) Option
-   Correct: C
 ========================================================= */
 
 function parseTXTQuestions(text) {
@@ -616,10 +578,6 @@ function parseTXTQuestions(text) {
             .replace(/\r\n/g, "\n")
             .replace(/\r/g, "\n")
             .replace(/\uFEFF/g, "");
-
-    /*
-     * अलग-अलग प्रश्नों को identify करने की कोशिश
-     */
 
     const lines =
         cleanText
@@ -667,9 +625,7 @@ function parseTXTQuestions(text) {
 
     lines.forEach(line => {
 
-        /*
-         * Answer line
-         */
+        /* Answer */
 
         if (
             /^(उत्तर|उत्तर है|सही उत्तर|answer|ans|correct|correct answer)\s*[:\-–]\s*/i
@@ -677,9 +633,7 @@ function parseTXTQuestions(text) {
         ) {
 
             if (!current) {
-
-                current =
-                    createQuestion();
+                current = createQuestion();
             }
 
             current.answer =
@@ -692,9 +646,7 @@ function parseTXTQuestions(text) {
         }
 
 
-        /*
-         * Option line
-         */
+        /* Option */
 
         const optionMatch =
             line.match(
@@ -704,9 +656,7 @@ function parseTXTQuestions(text) {
         if (optionMatch) {
 
             if (!current) {
-
-                current =
-                    createQuestion();
+                current = createQuestion();
             }
 
             current.options.push(
@@ -717,13 +667,7 @@ function parseTXTQuestions(text) {
         }
 
 
-        /*
-         * Numbered question
-         *
-         * 1. Question
-         * 1) Question
-         * Q1. Question
-         */
+        /* Numbered Question */
 
         const questionMatch =
             line.match(
@@ -732,23 +676,15 @@ function parseTXTQuestions(text) {
 
         if (questionMatch) {
 
-            /*
-             * अगर current question में options हैं
-             * तो नया question शुरू करें।
-             */
-
             if (
                 current &&
                 current.options.length
             ) {
-
                 pushCurrent();
             }
 
             if (!current) {
-
-                current =
-                    createQuestion();
+                current = createQuestion();
             }
 
             current.question =
@@ -758,9 +694,7 @@ function parseTXTQuestions(text) {
         }
 
 
-        /*
-         * "प्रश्न 1."
-         */
+        /* Hindi Question */
 
         const hindiQuestionMatch =
             line.match(
@@ -773,14 +707,11 @@ function parseTXTQuestions(text) {
                 current &&
                 current.options.length
             ) {
-
                 pushCurrent();
             }
 
             if (!current) {
-
-                current =
-                    createQuestion();
+                current = createQuestion();
             }
 
             if (hindiQuestionMatch[2]) {
@@ -793,20 +724,11 @@ function parseTXTQuestions(text) {
         }
 
 
-        /*
-         * सामान्य text
-         */
+        /* Normal Text */
 
         if (!current) {
-
-            current =
-                createQuestion();
+            current = createQuestion();
         }
-
-        /*
-         * अगर options शुरू नहीं हुए हैं,
-         * तो line question का हिस्सा है।
-         */
 
         if (
             current.options.length === 0
@@ -822,11 +744,6 @@ function parseTXTQuestions(text) {
 
         } else {
 
-            /*
-             * Option के बाद आने वाला text
-             * उसी option में जोड़ें।
-             */
-
             const last =
                 current.options.length - 1;
 
@@ -838,11 +755,6 @@ function parseTXTQuestions(text) {
     });
 
     pushCurrent();
-
-    /*
-     * अगर parser ने प्रश्न नहीं निकाले,
-     * तो blank-line based fallback parser चलाएँ।
-     */
 
     if (!questions.length) {
 
@@ -906,7 +818,7 @@ function parseTXTQuestionsFallback(text) {
 
                 answer =
                     line.replace(
-                        /^(उत्तर|उत्तर है|सही उत्तर|answer|ans|correct|correct answer)\s*[:\-–]\s*/i,
+                        /^(उत्तर|उत्तर है|सही उत्तर|answer|ans|correct|correct answer)\s*[:\-–\s]*/i,
                         ""
                     ).trim();
 
@@ -935,7 +847,6 @@ function parseTXTQuestionsFallback(text) {
                 })
             );
         }
-
     });
 
     return questions;
@@ -1017,11 +928,9 @@ function populateExamSelector() {
         const option =
             document.createElement("option");
 
-        option.value =
-            exam;
+        option.value = exam;
 
-        option.textContent =
-            exam;
+        option.textContent = exam;
 
         select.appendChild(option);
     });
@@ -1039,8 +948,7 @@ function updateCategorySelector() {
             "examSelect"
         )?.value || "";
 
-    currentExam =
-        exam;
+    currentExam = exam;
 
     const select =
         document.getElementById(
@@ -1052,8 +960,7 @@ function updateCategorySelector() {
     select.innerHTML =
         `<option value="">सभी Categories</option>`;
 
-    let tests =
-        testData;
+    let tests = testData;
 
     if (exam) {
 
@@ -1076,11 +983,9 @@ function updateCategorySelector() {
         const option =
             document.createElement("option");
 
-        option.value =
-            category;
+        option.value = category;
 
-        option.textContent =
-            category;
+        option.textContent = category;
 
         select.appendChild(option);
     });
@@ -1105,11 +1010,9 @@ function updateSubjectSelector() {
             "categorySelect"
         )?.value || "";
 
-    currentExam =
-        exam;
+    currentExam = exam;
 
-    currentCategory =
-        category;
+    currentCategory = category;
 
     const select =
         document.getElementById(
@@ -1121,8 +1024,7 @@ function updateSubjectSelector() {
     select.innerHTML =
         `<option value="">सभी Subjects</option>`;
 
-    let tests =
-        testData;
+    let tests = testData;
 
     if (exam) {
 
@@ -1154,11 +1056,9 @@ function updateSubjectSelector() {
         const option =
             document.createElement("option");
 
-        option.value =
-            subject;
+        option.value = subject;
 
-        option.textContent =
-            subject;
+        option.textContent = subject;
 
         select.appendChild(option);
     });
@@ -1188,14 +1088,11 @@ function updateTestSelector() {
             "subjectSelect"
         )?.value || "";
 
-    currentExam =
-        exam;
+    currentExam = exam;
 
-    currentCategory =
-        category;
+    currentCategory = category;
 
-    currentSubject =
-        subject;
+    currentSubject = subject;
 
     const select =
         document.getElementById(
@@ -1207,8 +1104,7 @@ function updateTestSelector() {
     select.innerHTML =
         `<option value="">Test चुनें</option>`;
 
-    let tests =
-        testData;
+    let tests = testData;
 
     if (exam) {
 
@@ -1286,7 +1182,7 @@ function showSelectedTestInfo() {
     ) {
 
         info.innerHTML =
-            "Exam → Category → Subject → Test Select करें।";
+            "Exam → Category → Subject → Test Select करें.";
 
         return;
     }
@@ -1351,9 +1247,11 @@ function showSelectedTestInfo() {
         <br>
 
         कुल समय:
-        ${questionCount
-            ? formatTime(totalTime)
-            : "Questions के अनुसार"}
+        ${
+            questionCount
+                ? formatTime(totalTime)
+                : "Questions के अनुसार"
+        }
 
         ${
             negative > 0
@@ -1406,15 +1304,8 @@ async function startTest() {
         return;
     }
 
-    /*
-     * पहले पूरा test load होगा।
-     * फिर optional question count लागू होगा।
-     */
-
     const loadedTest =
-        normalizeTest(
-            test
-        );
+        normalizeTest(test);
 
     if (
         !loadedTest.questions.length &&
@@ -1469,8 +1360,7 @@ async function startTest() {
         questionCount > total
     ) {
 
-        questionCount =
-            total;
+        questionCount = total;
     }
 
     const clonedTest =
@@ -1511,8 +1401,7 @@ function getTestQuestionCount(test) {
     const declared =
         Number(
             test?.questionCount ||
-            test?.totalQuestions ||
-            test?.questions
+            test?.totalQuestions
         );
 
     if (
@@ -1542,7 +1431,6 @@ function renderTestArea() {
         !area ||
         !currentTest
     ) {
-
         return;
     }
 
@@ -2625,7 +2513,6 @@ function showResults() {
                 .join("")}
 
         </div>
-
     `;
 
     showPage("results");
@@ -3127,11 +3014,6 @@ function normalizeTestData(data) {
             });
     }
 
-    /*
-     * केवल published !== false वाले tests
-     * student को दिखेंगे।
-     */
-
     return tests
         .filter(test =>
             test &&
@@ -3430,6 +3312,10 @@ function getCorrectAnswer(question) {
 
 /* =========================================================
    NORMALIZE ANSWER
+   ---------------------------------------------------------
+   A/B/C/D
+   1/2/3/4
+   0/1/2/3
 ========================================================= */
 
 function normalizeAnswer(answer) {
@@ -3438,7 +3324,6 @@ function normalizeAnswer(answer) {
         answer === null ||
         answer === undefined
     ) {
-
         return "";
     }
 
@@ -3449,80 +3334,44 @@ function normalizeAnswer(answer) {
 
     value =
         value
-            .replace(
-                /^[\(\[]/,
-                ""
-            )
-            .replace(
-                /[\)\].:]$/,
-                ""
-            )
+            .replace(/^[\(\[]/, "")
+            .replace(/[\)\].:]$/, "")
             .trim();
 
-    if (
-        [
-            "A",
-            "B",
-            "C",
-            "D"
-        ].includes(value)
-    ) {
+    /* A, B, C, D */
 
+    if (
+        ["A", "B", "C", "D"].includes(value)
+    ) {
         return value;
     }
 
-    /*
-     * 0 / 1 / 2 / 3
-     */
+    /* 1, 2, 3, 4 */
 
-    if (
-        /^\d+$/.test(value)
-    ) {
+    if (/^[1-4]$/.test(value)) {
 
-        const num =
-            Number(value);
-
-        if (
-            num >= 0 &&
-            num <= 3
-        ) {
-
-            return String.fromCharCode(
-                65 + num
-            );
-        }
-
-        /*
-         * 1 / 2 / 3 / 4
-         */
-
-        if (
-            num >= 1 &&
-            num <= 4
-        ) {
-
-            return String.fromCharCode(
-                64 + num
-            );
-        }
+        return String.fromCharCode(
+            64 + Number(value)
+        );
     }
 
-    /*
-     * अगर answer "C)" या "C. xxx"
-     */
+    /* 0, 1, 2, 3 */
+
+    if (/^[0-3]$/.test(value)) {
+
+        return String.fromCharCode(
+            65 + Number(value)
+        );
+    }
+
+    /* C) / C. / C: */
 
     const first =
         value.charAt(0);
 
     if (
-        [
-            "A",
-            "B",
-            "C",
-            "D"
-        ].includes(first)
+        ["A", "B", "C", "D"].includes(first)
     ) {
-
         return first;
     }
 
@@ -3819,7 +3668,6 @@ function formatDate(date) {
 function getMaximumQuestionCount() {
 
     if (!testData.length) {
-
         return 0;
     }
 
@@ -3906,7 +3754,6 @@ document.addEventListener(
     function() {
 
         if (appInitialized) {
-
             return;
         }
 
@@ -4023,7 +3870,6 @@ document.addEventListener(
             !currentTest ||
             testSubmitted
         ) {
-
             return;
         }
 
@@ -4035,7 +3881,6 @@ document.addEventListener(
             tag === "TEXTAREA" ||
             tag === "SELECT"
         ) {
-
             return;
         }
 
@@ -4085,7 +3930,6 @@ document.addEventListener(
                     );
 
                 if (input) {
-
                     input.checked = true;
                 }
             }
