@@ -650,7 +650,7 @@ function parseTXTQuestions(text) {
 
         const optionMatch =
             line.match(
-                /^\s*(?:\(?([A-Da-d])\)?)[\.\:\-\–\)]\s*(.+)$/u
+                /^\s*(?:\(?([A-Da-d])\)?)[.:\-–)]\s*(.+)$/u
             );
 
         if (optionMatch) {
@@ -799,7 +799,7 @@ function parseTXTQuestionsFallback(text) {
 
             const optionMatch =
                 line.match(
-                    /^\s*(?:\(?([A-Da-d])\)?)[\.\:\-\–\)]\s*(.+)$/u
+                    /^\s*(?:\(?([A-Da-d])\)?)[.:\-–)]\s*(.+)$/u
                 );
 
             if (optionMatch) {
