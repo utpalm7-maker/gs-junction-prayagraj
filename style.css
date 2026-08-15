@@ -1,9 +1,9 @@
 /* =========================================================
    GS JUNCTION PRAYAGRAJ
-   MASTER STYLE.CSS
-   Professional Education + Test Platform
-   10X THINK — SAFE + SCALABLE UI LAYER
    POWERED BY LIVE STUDY ALLAHABAD
+
+   10X THINK — COMPLETE + SAFE + SCALABLE MASTER STYLE
+   Education + Test + Student + Admin Platform
    ========================================================= */
 
 
@@ -35,9 +35,13 @@ body {
         Arial,
         sans-serif;
 
-    background: #f4f7fb;
-    color: #172033;
+    background: var(--bg);
+    color: var(--text);
+
     line-height: 1.6;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
 
@@ -46,6 +50,8 @@ body {
    ========================================================= */
 
 :root {
+
+    /* ---------- BRAND ---------- */
 
     --primary: #123f91;
     --primary-dark: #0b2d68;
@@ -56,24 +62,38 @@ body {
     --accent: #f59e0b;
     --accent-light: #fbbf24;
 
+    /* ---------- STATUS ---------- */
+
     --success: #16a34a;
+    --success-light: #dcfce7;
+
     --danger: #dc2626;
+    --danger-light: #fee2e2;
+
     --warning: #d97706;
+    --warning-light: #fef3c7;
+
+    --info: #0284c7;
+    --info-light: #e0f2fe;
+
+    /* ---------- BASIC ---------- */
 
     --white: #ffffff;
     --black: #111827;
 
     --bg: #f4f7fb;
     --card: #ffffff;
+
     --border: #dbe3ef;
+    --border-light: #e8eef6;
 
     --text: #172033;
     --muted: #64748b;
 
-    --think-primary: #7c3aed;
-    --think-secondary: #4f46e5;
-    --think-accent: #f59e0b;
-    --think-dark: #312e81;
+    /* ---------- SHADOW ---------- */
+
+    --shadow-xs:
+        0 1px 4px rgba(15, 23, 42, 0.05);
 
     --shadow-sm:
         0 2px 8px rgba(15, 23, 42, 0.06);
@@ -84,17 +104,27 @@ body {
     --shadow-lg:
         0 15px 40px rgba(15, 23, 42, 0.12);
 
-    --think-shadow:
-        0 12px 35px rgba(79, 70, 229, 0.18);
+    --shadow-xl:
+        0 20px 60px rgba(15, 23, 42, 0.16);
 
+    /* ---------- RADIUS ---------- */
+
+    --radius-xs: 6px;
     --radius-sm: 8px;
     --radius: 14px;
     --radius-lg: 20px;
+    --radius-xl: 28px;
+
+    /* ---------- LAYOUT ---------- */
 
     --container: 1320px;
+    --content-width: 1100px;
 
-    --transition:
-        all 0.2s ease;
+    /* ---------- TRANSITION ---------- */
+
+    --transition-fast: 0.15s ease;
+    --transition: 0.2s ease;
+    --transition-slow: 0.35s ease;
 }
 
 
@@ -119,6 +149,11 @@ button {
     cursor: pointer;
 }
 
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 a {
     color: inherit;
     text-decoration: none;
@@ -138,20 +173,9 @@ div {
     max-width: 100%;
 }
 
-.hidden {
-    display: none !important;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-left {
-    text-align: left;
-}
-
-.text-right {
-    text-align: right;
+hr {
+    border: 0;
+    border-top: 1px solid var(--border);
 }
 
 
@@ -184,13 +208,12 @@ header {
             #0b2d68 100%
         );
 
-    color: #ffffff;
+    color: var(--white);
 
     box-shadow:
         0 5px 20px rgba(15, 23, 42, 0.15);
 
     position: relative;
-
     z-index: 1000;
 }
 
@@ -203,7 +226,6 @@ header {
 .header-inner {
 
     width: 100%;
-
     max-width: var(--container);
 
     margin: 0 auto;
@@ -215,7 +237,6 @@ header {
     display: flex;
 
     align-items: center;
-
     justify-content: space-between;
 
     gap: 30px;
@@ -246,7 +267,6 @@ header {
 .site-logo {
 
     width: 68px;
-
     height: 68px;
 
     object-fit: contain;
@@ -257,18 +277,16 @@ header {
 .logo-icon {
 
     width: 68px;
-
     height: 68px;
 
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
-    background: #fbbf24;
+    background: var(--accent-light);
 
-    color: #172033;
+    color: var(--text);
 
     border-radius: 16px;
 
@@ -282,8 +300,7 @@ header {
 .brand h1,
 .site-title {
 
-    font-size:
-        clamp(24px, 2.3vw, 40px);
+    font-size: clamp(24px, 2.3vw, 40px);
 
     font-weight: 800;
 
@@ -291,7 +308,7 @@ header {
 
     letter-spacing: 0.3px;
 
-    color: #ffffff;
+    color: var(--white);
 }
 
 .logo-text p,
@@ -312,114 +329,59 @@ header {
 
 /* =========================================================
    8. 10X THINK BRANDING
+   Safe: Does not modify existing HTML structure
    ========================================================= */
 
 .tenx-think,
-.tenx-brand,
-.think-brand,
-.tenx-think-brand {
+.ten-x-think,
+.tenXThink,
+.tenx-brand {
 
     display: inline-flex;
 
     align-items: center;
-
     justify-content: center;
 
-    gap: 8px;
+    gap: 6px;
 
-    padding: 7px 13px;
+    padding: 6px 12px;
 
     border-radius: 999px;
 
     background:
         linear-gradient(
             135deg,
-            var(--think-primary),
-            var(--think-secondary)
+            rgba(245, 158, 11, 0.18),
+            rgba(251, 191, 36, 0.10)
         );
 
-    color: #ffffff;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+
+    color: #fbbf24;
+
+    font-size: 12px;
 
     font-weight: 800;
 
-    font-size: 13px;
+    letter-spacing: 0.7px;
 
-    letter-spacing: 0.5px;
-
-    box-shadow:
-        0 5px 15px rgba(79, 70, 229, 0.20);
+    white-space: nowrap;
 }
 
 .tenx-think strong,
-.tenx-brand strong,
-.think-brand strong {
-
-    font-weight: 900;
-
+.ten-x-think strong,
+.tenXThink strong,
+.tenx-brand strong {
     color: #ffffff;
-}
-
-.tenx-think small,
-.tenx-brand small,
-.think-brand small {
-
-    font-size: 10px;
-
-    opacity: 0.85;
 }
 
 
 /* =========================================================
-   9. 10X THINK HEADER BADGE
-   ========================================================= */
-
-.tenx-header-badge {
-
-    position: absolute;
-
-    top: 12px;
-
-    right: 20px;
-
-    z-index: 20;
-}
-
-.tenx-header-badge span {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 6px;
-
-    padding: 5px 10px;
-
-    background:
-        rgba(255, 255, 255, 0.12);
-
-    border:
-        1px solid rgba(255, 255, 255, 0.20);
-
-    color: #ffffff;
-
-    border-radius: 999px;
-
-    font-size: 11px;
-
-    font-weight: 800;
-
-    backdrop-filter: blur(8px);
-}
-
-
-/* =========================================================
-   10. NAVIGATION
+   9. NAVIGATION
    ========================================================= */
 
 nav {
-
     flex: 1;
-
     min-width: 0;
 }
 
@@ -438,7 +400,6 @@ nav {
     flex-wrap: nowrap;
 
     overflow-x: auto;
-
     overflow-y: hidden;
 
     scrollbar-width: thin;
@@ -449,7 +410,6 @@ nav {
 .nav-menu::-webkit-scrollbar,
 .nav-links::-webkit-scrollbar,
 .navigation::-webkit-scrollbar {
-
     height: 5px;
 }
 
@@ -471,7 +431,6 @@ nav a {
     display: inline-flex;
 
     align-items: center;
-
     justify-content: center;
 
     gap: 7px;
@@ -482,7 +441,7 @@ nav a {
 
     border-radius: 10px;
 
-    color: #ffffff;
+    color: var(--white);
 
     font-size: 15px;
 
@@ -490,7 +449,10 @@ nav a {
 
     white-space: nowrap;
 
-    transition: var(--transition);
+    transition:
+        background var(--transition),
+        transform var(--transition),
+        color var(--transition);
 }
 
 .nav-menu a:hover,
@@ -518,7 +480,7 @@ nav a:hover {
 
 
 /* =========================================================
-   11. MENU BUTTON
+   10. MENU BUTTON
    ========================================================= */
 
 .menu-toggle,
@@ -528,7 +490,6 @@ nav a:hover {
     display: none;
 
     width: 44px;
-
     height: 44px;
 
     border: 0;
@@ -538,29 +499,26 @@ nav a:hover {
     background:
         rgba(255, 255, 255, 0.14);
 
-    color: #ffffff;
+    color: var(--white);
 
     font-size: 24px;
 
     align-items: center;
-
     justify-content: center;
 }
 
 
 /* =========================================================
-   12. MAIN
+   11. MAIN AREA
    ========================================================= */
 
 main {
-
-    padding:
-        0 20px 50px;
+    padding: 0 20px 50px;
 }
 
 
 /* =========================================================
-   13. HERO
+   12. HERO
    ========================================================= */
 
 .hero,
@@ -572,14 +530,12 @@ main {
 
     margin: 0 auto;
 
-    padding:
-        52px 4px 30px;
+    padding: 52px 4px 30px;
 
     position: relative;
 }
 
 .hero-content {
-
     max-width: 850px;
 }
 
@@ -591,14 +547,13 @@ main {
 
     margin-bottom: 8px;
 
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .hero h1,
 .hero-title {
 
-    font-size:
-        clamp(28px, 3vw, 42px);
+    font-size: clamp(28px, 3vw, 42px);
 
     line-height: 1.2;
 
@@ -611,8 +566,7 @@ main {
 
 .hero h2 {
 
-    font-size:
-        clamp(21px, 2.2vw, 30px);
+    font-size: clamp(21px, 2.2vw, 30px);
 
     color: var(--text);
 
@@ -645,135 +599,7 @@ main {
 
 
 /* =========================================================
-   14. 10X THINK HERO
-   ========================================================= */
-
-.tenx-hero {
-
-    width: 100%;
-
-    margin: 25px auto;
-
-    padding: 30px;
-
-    border-radius: var(--radius-lg);
-
-    background:
-        linear-gradient(
-            135deg,
-            #312e81,
-            #4f46e5,
-            #7c3aed
-        );
-
-    color: #ffffff;
-
-    position: relative;
-
-    overflow: hidden;
-
-    box-shadow:
-        0 18px 45px rgba(79, 70, 229, 0.22);
-}
-
-.tenx-hero::before {
-
-    content: "";
-
-    position: absolute;
-
-    width: 180px;
-
-    height: 180px;
-
-    right: -60px;
-
-    top: -70px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(255, 255, 255, 0.08);
-}
-
-.tenx-hero::after {
-
-    content: "";
-
-    position: absolute;
-
-    width: 120px;
-
-    height: 120px;
-
-    left: -50px;
-
-    bottom: -50px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(255, 255, 255, 0.06);
-}
-
-.tenx-hero-content {
-
-    position: relative;
-
-    z-index: 2;
-
-    max-width: 850px;
-}
-
-.tenx-hero h1 {
-
-    font-size:
-        clamp(28px, 4vw, 48px);
-
-    line-height: 1.15;
-
-    font-weight: 900;
-
-    margin-bottom: 8px;
-}
-
-.tenx-hero p {
-
-    font-size: 17px;
-
-    color: #ede9fe;
-
-    max-width: 700px;
-}
-
-.tenx-badge {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    margin-bottom: 12px;
-
-    padding: 7px 13px;
-
-    background:
-        rgba(255, 255, 255, 0.15);
-
-    border:
-        1px solid rgba(255, 255, 255, 0.20);
-
-    border-radius: 999px;
-
-    font-size: 12px;
-
-    font-weight: 800;
-}
-
-
-/* =========================================================
-   15. BUTTONS
+   13. HERO BUTTONS
    ========================================================= */
 
 .hero-buttons,
@@ -796,7 +622,6 @@ button.btn,
     display: inline-flex;
 
     align-items: center;
-
     justify-content: center;
 
     gap: 8px;
@@ -813,7 +638,10 @@ button.btn,
 
     font-weight: 700;
 
-    transition: var(--transition);
+    transition:
+        transform var(--transition),
+        box-shadow var(--transition),
+        background var(--transition);
 }
 
 .btn-primary,
@@ -826,7 +654,7 @@ button.btn,
             #123f91
         );
 
-    color: #ffffff;
+    color: var(--white);
 
     box-shadow:
         0 5px 14px
@@ -836,12 +664,11 @@ button.btn,
 .btn-secondary,
 .secondary-btn {
 
-    background: #ffffff;
+    background: var(--white);
 
     color: var(--primary);
 
-    border:
-        1px solid #cbd5e1;
+    border: 1px solid #cbd5e1;
 }
 
 .btn:hover,
@@ -857,63 +684,7 @@ button.btn,
 
 
 /* =========================================================
-   16. 10X THINK BUTTON
-   ========================================================= */
-
-.btn-tenx,
-.tenx-btn,
-.think-btn {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 8px;
-
-    min-height: 48px;
-
-    padding: 11px 20px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #7c3aed,
-            #4f46e5
-        );
-
-    color: #ffffff;
-
-    font-size: 16px;
-
-    font-weight: 800;
-
-    box-shadow:
-        0 7px 18px
-        rgba(79, 70, 229, 0.25);
-
-    transition: var(--transition);
-}
-
-.btn-tenx:hover,
-.tenx-btn:hover,
-.think-btn:hover {
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 12px 25px
-        rgba(79, 70, 229, 0.32);
-}
-
-
-/* =========================================================
-   17. WELCOME CARD
+   14. WELCOME CARD
    ========================================================= */
 
 .welcome-card,
@@ -928,10 +699,9 @@ button.btn,
 
     padding: 30px 25px;
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius-lg);
 
@@ -968,7 +738,7 @@ button.btn,
 
 
 /* =========================================================
-   18. QUICK ACTIONS
+   15. QUICK ACTIONS
    ========================================================= */
 
 .quick-actions,
@@ -995,10 +765,9 @@ button.btn,
 
     padding: 18px;
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius);
 
@@ -1010,7 +779,10 @@ button.btn,
 
     gap: 12px;
 
-    transition: var(--transition);
+    transition:
+        transform var(--transition),
+        box-shadow var(--transition),
+        border-color var(--transition);
 }
 
 .quick-card:hover,
@@ -1055,100 +827,7 @@ button.btn,
 
 
 /* =========================================================
-   19. 10X THINK CARDS
-   ========================================================= */
-
-.tenx-grid,
-.think-grid {
-
-    width: 100%;
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(220px, 1fr));
-
-    gap: 18px;
-
-    margin: 20px 0;
-}
-
-.tenx-card,
-.think-card {
-
-    position: relative;
-
-    background: #ffffff;
-
-    border:
-        1px solid #ddd6fe;
-
-    border-radius: var(--radius);
-
-    padding: 22px;
-
-    box-shadow: var(--shadow-sm);
-
-    overflow: hidden;
-
-    transition: var(--transition);
-}
-
-.tenx-card::before,
-.think-card::before {
-
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-
-    top: 0;
-
-    width: 100%;
-
-    height: 4px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #7c3aed,
-            #4f46e5,
-            #2563eb
-        );
-}
-
-.tenx-card:hover,
-.think-card:hover {
-
-    transform: translateY(-4px);
-
-    box-shadow: var(--think-shadow);
-
-    border-color: #c4b5fd;
-}
-
-.tenx-card h3,
-.think-card h3 {
-
-    color: var(--think-dark);
-
-    font-size: 19px;
-
-    margin-bottom: 6px;
-}
-
-.tenx-card p,
-.think-card p {
-
-    color: var(--muted);
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   20. SECTION
+   16. SECTION
    ========================================================= */
 
 section {
@@ -1161,7 +840,6 @@ section {
 }
 
 .section-header {
-
     margin-bottom: 20px;
 }
 
@@ -1170,8 +848,7 @@ section > h2 {
 
     color: var(--text);
 
-    font-size:
-        clamp(24px, 2.5vw, 32px);
+    font-size: clamp(24px, 2.5vw, 32px);
 
     font-weight: 800;
 
@@ -1188,7 +865,7 @@ section > p {
 
 
 /* =========================================================
-   21. PERFORMANCE
+   17. PERFORMANCE / STATS
    ========================================================= */
 
 .performance-section {
@@ -1214,10 +891,9 @@ section > p {
 .stat-card,
 .performance-card {
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius);
 
@@ -1250,7 +926,7 @@ section > p {
 
 
 /* =========================================================
-   22. TEST CATEGORIES
+   18. TEST CATEGORIES
    ========================================================= */
 
 .test-categories,
@@ -1270,10 +946,9 @@ section > p {
 .exam-card,
 .test-category-card {
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid #d9e5f5;
+    border: 1px solid #d9e5f5;
 
     border-radius: var(--radius);
 
@@ -1283,7 +958,7 @@ section > p {
 
     box-shadow: var(--shadow-sm);
 
-    transition: var(--transition);
+    transition: all var(--transition);
 }
 
 .exam-card:hover,
@@ -1316,7 +991,7 @@ section > p {
 
 
 /* =========================================================
-   23. TEST LIST
+   19. TEST LIST
    ========================================================= */
 
 .test-list {
@@ -1331,16 +1006,24 @@ section > p {
 
 .test-card {
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius);
 
     padding: 20px;
 
     box-shadow: var(--shadow-sm);
+
+    transition: all var(--transition);
+}
+
+.test-card:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow: var(--shadow);
 }
 
 .test-card h3 {
@@ -1363,24 +1046,23 @@ section > p {
 
 
 /* =========================================================
-   24. TEST SCREEN
+   20. TEST SCREEN
    ========================================================= */
 
 .test-container {
 
     width: 100%;
 
-    max-width: 1100px;
+    max-width: var(--content-width);
 
     margin: 25px auto;
 }
 
 .test-header {
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius);
 
@@ -1399,6 +1081,11 @@ section > p {
     flex-wrap: wrap;
 }
 
+
+/* =========================================================
+   21. TIMER
+   ========================================================= */
+
 .timer {
 
     min-width: 130px;
@@ -1416,20 +1103,22 @@ section > p {
     font-weight: 800;
 
     text-align: center;
+
+    border: 1px solid #fed7aa;
 }
 
 .timer.warning {
 
-    background: #fef3c7;
+    background: var(--warning-light);
 
-    color: #92400e;
+    color: var(--warning);
 }
 
 .timer.danger {
 
-    background: #fee2e2;
+    background: var(--danger-light);
 
-    color: #991b1b;
+    color: var(--danger);
 
     animation: timerPulse 1s infinite;
 }
@@ -1438,27 +1127,26 @@ section > p {
 
     0%,
     100% {
-        transform: scale(1);
+        opacity: 1;
     }
 
     50% {
-        transform: scale(1.03);
+        opacity: 0.65;
     }
 }
 
 
 /* =========================================================
-   25. QUESTION CARD
+   22. QUESTION CARD
    ========================================================= */
 
 .question-card {
 
     margin-top: 18px;
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius);
 
@@ -1485,11 +1173,13 @@ section > p {
     line-height: 1.7;
 
     margin-bottom: 20px;
+
+    overflow-wrap: anywhere;
 }
 
 
 /* =========================================================
-   26. OPTIONS
+   23. OPTIONS
    ========================================================= */
 
 .options {
@@ -1511,14 +1201,15 @@ section > p {
 
     background: #f8fafc;
 
-    border:
-        1px solid #dbe3ef;
+    border: 1px solid #dbe3ef;
 
     border-radius: 10px;
 
     cursor: pointer;
 
-    transition: var(--transition);
+    transition: all var(--transition);
+
+    overflow-wrap: anywhere;
 }
 
 .option:hover {
@@ -1546,7 +1237,7 @@ section > p {
 
 
 /* =========================================================
-   27. QUESTION PALETTE
+   24. QUESTION PALETTE
    ========================================================= */
 
 .question-palette {
@@ -1565,18 +1256,17 @@ section > p {
 
     min-height: 42px;
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: 8px;
 
-    background: #ffffff;
+    background: var(--white);
 
     color: var(--text);
 
     font-weight: 700;
 
-    transition: var(--transition);
+    transition: all var(--transition);
 }
 
 .question-palette button:hover {
@@ -1590,14 +1280,14 @@ section > p {
 
     background: var(--primary);
 
-    color: #ffffff;
+    color: var(--white);
 
     border-color: var(--primary);
 }
 
 .question-palette button.answered {
 
-    background: #dcfce7;
+    background: var(--success-light);
 
     color: #166534;
 
@@ -1606,7 +1296,7 @@ section > p {
 
 .question-palette button.unanswered {
 
-    background: #fef2f2;
+    background: var(--danger-light);
 
     color: #991b1b;
 
@@ -1624,7 +1314,7 @@ section > p {
 
 
 /* =========================================================
-   28. TEST NAVIGATION
+   25. TEST NAVIGATION
    ========================================================= */
 
 .test-navigation {
@@ -1652,19 +1342,23 @@ section > p {
 
     background: var(--primary);
 
-    color: #ffffff;
+    color: var(--white);
 
     font-weight: 700;
+
+    transition: all var(--transition);
 }
 
 .test-navigation button:hover {
 
     background: var(--primary-dark);
+
+    transform: translateY(-1px);
 }
 
 
 /* =========================================================
-   29. RESULT
+   26. RESULT
    ========================================================= */
 
 .result-card {
@@ -1675,10 +1369,9 @@ section > p {
 
     margin: 30px auto;
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius-lg);
 
@@ -1705,10 +1398,9 @@ section > p {
 
     background: #f8fafc;
 
-    border:
-        1px solid var(--border);
-
     border-radius: 10px;
+
+    border: 1px solid var(--border);
 }
 
 .result-item strong {
@@ -1729,7 +1421,7 @@ section > p {
 
 
 /* =========================================================
-   30. EXPLANATION
+   27. EXPLANATION
    ========================================================= */
 
 .explanation {
@@ -1740,63 +1432,18 @@ section > p {
 
     background: #f8fafc;
 
-    border-left:
-        4px solid var(--primary);
+    border-left: 4px solid var(--primary);
 
     border-radius: 6px;
 
     color: var(--text);
+
+    overflow-wrap: anywhere;
 }
 
 
 /* =========================================================
-   31. 10X THINK RESULT
-   ========================================================= */
-
-.tenx-result {
-
-    width: 100%;
-
-    max-width: 900px;
-
-    margin: 30px auto;
-
-    padding: 30px;
-
-    border-radius: var(--radius-lg);
-
-    background:
-        linear-gradient(
-            135deg,
-            #312e81,
-            #4f46e5
-        );
-
-    color: #ffffff;
-
-    box-shadow: var(--think-shadow);
-
-    text-align: center;
-}
-
-.tenx-result h2 {
-
-    font-size:
-        clamp(25px, 4vw, 38px);
-
-    font-weight: 900;
-
-    margin-bottom: 8px;
-}
-
-.tenx-result p {
-
-    color: #e0e7ff;
-}
-
-
-/* =========================================================
-   32. ADMIN DASHBOARD
+   28. ADMIN DASHBOARD
    ========================================================= */
 
 .admin-dashboard {
@@ -1824,10 +1471,9 @@ section > p {
 
 .admin-card {
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius);
 
@@ -1835,7 +1481,7 @@ section > p {
 
     box-shadow: var(--shadow-sm);
 
-    transition: var(--transition);
+    transition: all var(--transition);
 }
 
 .admin-card:hover {
@@ -1863,54 +1509,10 @@ section > p {
 
 
 /* =========================================================
-   33. ADMIN 10X THINK PANEL
-   ========================================================= */
-
-.tenx-admin-panel {
-
-    background:
-        linear-gradient(
-            135deg,
-            #1e1b4b,
-            #312e81
-        );
-
-    color: #ffffff;
-
-    padding: 25px;
-
-    border-radius: var(--radius-lg);
-
-    margin: 25px 0;
-
-    box-shadow:
-        0 15px 35px
-        rgba(49, 46, 129, 0.20);
-}
-
-.tenx-admin-panel h2 {
-
-    font-size: 25px;
-
-    font-weight: 900;
-
-    margin-bottom: 8px;
-}
-
-.tenx-admin-panel p {
-
-    color: #ddd6fe;
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   34. FORMS
+   29. FORMS
    ========================================================= */
 
 .form-group {
-
     margin-bottom: 16px;
 }
 
@@ -1935,20 +1537,19 @@ textarea {
 
     padding: 10px 12px;
 
-    border:
-        1px solid #cbd5e1;
+    border: 1px solid #cbd5e1;
 
     border-radius: 8px;
 
-    background: #ffffff;
+    background: var(--white);
 
     color: var(--text);
 
     outline: none;
 
     transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        border-color var(--transition),
+        box-shadow var(--transition);
 }
 
 textarea {
@@ -1971,13 +1572,12 @@ textarea:focus {
 
 
 /* =========================================================
-   35. LOGIN
+   30. LOGIN
    ========================================================= */
 
 .login-page {
 
-    min-height:
-        calc(100vh - 100px);
+    min-height: calc(100vh - 100px);
 
     display: flex;
 
@@ -1994,10 +1594,9 @@ textarea:focus {
 
     max-width: 450px;
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius-lg);
 
@@ -2026,7 +1625,7 @@ textarea:focus {
 
 
 /* =========================================================
-   36. NOTES / COURSES / LIVE CLASSES
+   31. COURSES / NOTES / LIVE CLASSES
    ========================================================= */
 
 .content-grid,
@@ -2047,10 +1646,9 @@ textarea:focus {
 .note-card,
 .live-card {
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius);
 
@@ -2058,7 +1656,7 @@ textarea:focus {
 
     box-shadow: var(--shadow-sm);
 
-    transition: var(--transition);
+    transition: all var(--transition);
 }
 
 .content-card:hover,
@@ -2101,17 +1699,16 @@ textarea:focus {
 
 
 /* =========================================================
-   37. NOTIFICATIONS
+   32. NOTIFICATIONS
    ========================================================= */
 
 .notification {
 
     padding: 15px 18px;
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: 10px;
 
@@ -2122,8 +1719,7 @@ textarea:focus {
 
 .notification.unread {
 
-    border-left:
-        4px solid var(--primary);
+    border-left: 4px solid var(--primary);
 
     background: #eff6ff;
 }
@@ -2144,7 +1740,7 @@ textarea:focus {
 
 
 /* =========================================================
-   38. PROFILE
+   33. PROFILE
    ========================================================= */
 
 .profile-card {
@@ -2153,10 +1749,9 @@ textarea:focus {
 
     margin: 20px auto;
 
-    background: #ffffff;
+    background: var(--white);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: var(--radius-lg);
 
@@ -2168,7 +1763,6 @@ textarea:focus {
 .profile-photo {
 
     width: 100px;
-
     height: 100px;
 
     margin: 0 auto 15px;
@@ -2177,13 +1771,12 @@ textarea:focus {
 
     object-fit: cover;
 
-    border:
-        4px solid #dbeafe;
+    border: 4px solid #dbeafe;
 }
 
 
 /* =========================================================
-   39. FOOTER
+   34. FOOTER
    ========================================================= */
 
 footer {
@@ -2196,7 +1789,7 @@ footer {
 
     background: #0f172a;
 
-    color: #ffffff;
+    color: var(--white);
 
     text-align: center;
 }
@@ -2246,46 +1839,14 @@ footer p {
 
 .footer-links a:hover {
 
-    color: #ffffff;
+    color: var(--white);
 
     text-decoration: underline;
 }
 
 
 /* =========================================================
-   40. 10X THINK FOOTER
-   ========================================================= */
-
-.tenx-footer {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    margin-top: 12px;
-
-    padding: 7px 13px;
-
-    border-radius: 999px;
-
-    background:
-        rgba(124, 58, 237, 0.20);
-
-    border:
-        1px solid rgba(167, 139, 250, 0.30);
-
-    color: #ddd6fe;
-
-    font-size: 12px;
-
-    font-weight: 800;
-}
-
-
-/* =========================================================
-   41. MODAL
+   35. MODAL
    ========================================================= */
 
 .modal {
@@ -2324,7 +1885,7 @@ footer p {
 
     overflow-y: auto;
 
-    background: #ffffff;
+    background: var(--white);
 
     border-radius: var(--radius);
 
@@ -2335,8 +1896,169 @@ footer p {
 
 
 /* =========================================================
-   42. UTILITY
+   36. LOADING / EMPTY / ERROR STATES
    ========================================================= */
+
+.loading,
+.loader-container,
+.empty-state,
+.error-state {
+
+    width: 100%;
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: var(--muted);
+
+    background: var(--white);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+}
+
+.loading::before {
+
+    content: "⏳";
+
+    display: block;
+
+    font-size: 28px;
+
+    margin-bottom: 8px;
+}
+
+.error-state {
+
+    color: var(--danger);
+
+    background: var(--danger-light);
+
+    border-color: #fecaca;
+}
+
+.empty-state {
+
+    color: var(--muted);
+
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   37. SCALABLE DATA / TEST METADATA
+   ========================================================= */
+
+.test-meta,
+.exam-meta,
+.course-meta {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin: 10px 0;
+}
+
+.test-meta span,
+.exam-meta span,
+.course-meta span {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    background: #eff6ff;
+
+    color: var(--primary);
+
+    border: 1px solid #dbeafe;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   38. BADGES
+   ========================================================= */
+
+.badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 26px;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+.badge-primary {
+
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-success {
+
+    background: var(--success-light);
+    color: #166534;
+}
+
+.badge-danger {
+
+    background: var(--danger-light);
+    color: #991b1b;
+}
+
+.badge-warning {
+
+    background: var(--warning-light);
+    color: #92400e;
+}
+
+
+/* =========================================================
+   39. UTILITY
+   ========================================================= */
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.active {
+    display: block;
+}
 
 .mt-1 {
     margin-top: 8px;
@@ -2362,9 +2084,17 @@ footer p {
     margin-bottom: 24px;
 }
 
+.w-full {
+    width: 100%;
+}
+
+.no-scroll {
+    overflow: hidden !important;
+}
+
 
 /* =========================================================
-   43. MOBILE NAVIGATION / TABLET
+   40. MOBILE NAVIGATION
    ========================================================= */
 
 @media (max-width: 1100px) {
@@ -2415,18 +2145,11 @@ footer p {
         grid-template-columns:
             repeat(3, minmax(0, 1fr));
     }
-
-    .tenx-header-badge {
-
-        top: 8px;
-
-        right: 12px;
-    }
 }
 
 
 /* =========================================================
-   44. TABLET
+   41. TABLET
    ========================================================= */
 
 @media (max-width: 800px) {
@@ -2451,7 +2174,6 @@ footer p {
     }
 
     nav {
-
         width: 100%;
     }
 
@@ -2479,7 +2201,6 @@ footer p {
     main {
 
         padding-left: 15px;
-
         padding-right: 15px;
     }
 
@@ -2502,22 +2223,16 @@ footer p {
 
         padding: 25px 18px;
     }
-
-    .tenx-hero {
-
-        padding: 25px 20px;
-    }
 }
 
 
 /* =========================================================
-   45. MOBILE
+   42. MOBILE
    ========================================================= */
 
 @media (max-width: 600px) {
 
     body {
-
         font-size: 15px;
     }
 
@@ -2541,7 +2256,6 @@ footer p {
     .logo-icon {
 
         width: 52px;
-
         height: 52px;
 
         font-size: 26px;
@@ -2554,7 +2268,6 @@ footer p {
     .site-logo {
 
         width: 52px;
-
         height: 52px;
     }
 
@@ -2574,13 +2287,14 @@ footer p {
         margin-top: 4px;
     }
 
-    .tenx-header-badge {
+    .tenx-think,
+    .ten-x-think,
+    .tenXThink,
+    .tenx-brand {
 
-        position: static;
+        font-size: 10px;
 
-        margin-top: 5px;
-
-        text-align: left;
+        padding: 5px 9px;
     }
 
     .nav-menu,
@@ -2611,36 +2325,30 @@ footer p {
     main {
 
         padding-left: 12px;
-
         padding-right: 12px;
     }
 
     .hero,
     .hero-section {
 
-        padding:
-            30px 0 20px;
+        padding: 30px 0 20px;
     }
 
     .hero-eyebrow {
-
         font-size: 15px;
     }
 
     .hero h1,
     .hero-title {
-
         font-size: 27px;
     }
 
     .hero h2 {
-
         font-size: 21px;
     }
 
     .hero p,
     .exam-list {
-
         font-size: 15px;
     }
 
@@ -2654,29 +2362,9 @@ footer p {
 
     .btn,
     .primary-btn,
-    .secondary-btn,
-    .btn-tenx,
-    .tenx-btn,
-    .think-btn {
+    .secondary-btn {
 
         width: 100%;
-    }
-
-    .tenx-hero {
-
-        padding: 22px 16px;
-
-        border-radius: 16px;
-    }
-
-    .tenx-hero h1 {
-
-        font-size: 29px;
-    }
-
-    .tenx-hero p {
-
-        font-size: 14px;
     }
 
     .welcome-card,
@@ -2692,13 +2380,11 @@ footer p {
 
     .welcome-card h2,
     .student-welcome h2 {
-
         font-size: 21px;
     }
 
     .welcome-card p,
     .student-welcome p {
-
         font-size: 15px;
     }
 
@@ -2761,9 +2447,7 @@ footer p {
     .content-grid,
     .course-grid,
     .notes-grid,
-    .live-grid,
-    .tenx-grid,
-    .think-grid {
+    .live-grid {
 
         grid-template-columns: 1fr;
     }
@@ -2828,7 +2512,7 @@ footer p {
 
 
 /* =========================================================
-   46. VERY SMALL MOBILE
+   43. VERY SMALL MOBILE
    ========================================================= */
 
 @media (max-width: 380px) {
@@ -2857,16 +2541,11 @@ footer p {
 
         grid-template-columns: 1fr;
     }
-
-    .tenx-hero h1 {
-
-        font-size: 25px;
-    }
 }
 
 
 /* =========================================================
-   47. ACCESSIBILITY
+   44. ACCESSIBILITY
    ========================================================= */
 
 :focus-visible {
@@ -2880,13 +2559,12 @@ footer p {
 
 
 /* =========================================================
-   48. REDUCE MOTION
+   45. REDUCE MOTION
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
 
     html {
-
         scroll-behavior: auto;
     }
 
@@ -2902,7 +2580,7 @@ footer p {
 
 
 /* =========================================================
-   49. PRINT
+   46. PRINT
    ========================================================= */
 
 @media print {
@@ -2913,15 +2591,14 @@ footer p {
     .hero-buttons,
     .action-buttons,
     .test-navigation,
-    .question-palette,
-    .tenx-header-badge {
+    .question-palette {
 
         display: none !important;
     }
 
     body {
 
-        background: #ffffff;
+        background: var(--white);
 
         color: #000000;
     }
@@ -2934,272 +2611,52 @@ footer p {
     }
 
     .question-card,
-    .result-card,
-    .tenx-result {
+    .result-card {
 
         box-shadow: none;
 
-        border:
-            1px solid #999;
+        border: 1px solid #999;
     }
 }
 
 
 /* =========================================================
-   50. SAFE SCALING HELPERS
+   47. SAFE FALLBACK
    ========================================================= */
 
-.w-full {
+* {
+    max-width: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+    -webkit-tap-highlight-color: transparent;
+}
+
+pre,
+code {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+table {
     width: 100%;
-}
-
-.max-width {
-    max-width: var(--container);
-
-    margin-left: auto;
-
-    margin-right: auto;
-}
-
-.flex {
-    display: flex;
-}
-
-.grid {
-    display: grid;
-}
-
-.items-center {
-    align-items: center;
-}
-
-.justify-center {
-    justify-content: center;
-}
-
-.justify-between {
-    justify-content: space-between;
-}
-
-.gap-1 {
-    gap: 8px;
-}
-
-.gap-2 {
-    gap: 16px;
-}
-
-.gap-3 {
-    gap: 24px;
+    max-width: 100%;
+    border-collapse: collapse;
 }
 
 
 /* =========================================================
-   51. STATUS BADGES
-   ========================================================= */
-
-.badge {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    min-height: 28px;
-
-    padding: 4px 10px;
-
-    border-radius: 999px;
-
-    font-size: 12px;
-
-    font-weight: 800;
-}
-
-.badge-success {
-
-    background: #dcfce7;
-
-    color: #166534;
-}
-
-.badge-danger {
-
-    background: #fee2e2;
-
-    color: #991b1b;
-}
-
-.badge-warning {
-
-    background: #fef3c7;
-
-    color: #92400e;
-}
-
-.badge-info {
-
-    background: #dbeafe;
-
-    color: #1e40af;
-}
-
-.badge-tenx {
-
-    background: #ede9fe;
-
-    color: #5b21b6;
-}
-
-
-/* =========================================================
-   52. LOADING STATE
-   ========================================================= */
-
-.loading {
-
-    pointer-events: none;
-
-    opacity: 0.65;
-}
-
-.loading::after {
-
-    content: "";
-
-    display: inline-block;
-
-    width: 14px;
-
-    height: 14px;
-
-    margin-left: 8px;
-
-    border:
-        2px solid currentColor;
-
-    border-right-color: transparent;
-
-    border-radius: 50%;
-
-    animation:
-        spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-
-/* =========================================================
-   53. EMPTY STATE
-   ========================================================= */
-
-.empty-state {
-
-    width: 100%;
-
-    padding: 40px 20px;
-
-    text-align: center;
-
-    background: #ffffff;
-
-    border:
-        1px dashed #cbd5e1;
-
-    border-radius: var(--radius);
-
-    color: var(--muted);
-}
-
-.empty-state h3 {
-
-    color: var(--text);
-
-    margin-bottom: 5px;
-}
-
-
-/* =========================================================
-   54. ERROR STATE
-   ========================================================= */
-
-.error-message {
-
-    padding: 12px 15px;
-
-    background: #fef2f2;
-
-    color: #991b1b;
-
-    border:
-        1px solid #fecaca;
-
-    border-radius: 8px;
-
-    margin: 10px 0;
-}
-
-
-/* =========================================================
-   55. SUCCESS STATE
-   ========================================================= */
-
-.success-message {
-
-    padding: 12px 15px;
-
-    background: #f0fdf4;
-
-    color: #166534;
-
-    border:
-        1px solid #bbf7d0;
-
-    border-radius: 8px;
-
-    margin: 10px 0;
-}
-
-
-/* =========================================================
-   56. SCROLLBAR
-   ========================================================= */
-
-::-webkit-scrollbar {
-
-    width: 8px;
-
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-
-    background: #eef2f7;
-}
-
-::-webkit-scrollbar-thumb {
-
-    background: #94a3b8;
-
-    border-radius: 20px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-
-    background: #64748b;
-}
-
-
-/* =========================================================
-   57. END
+   48. END
    =========================================================
+
    GS JUNCTION PRAYAGRAJ
-   10X THINK — COMPLETE + SAFE + SCALABLE
    POWERED BY LIVE STUDY ALLAHABAD
+
+   10X THINK
+   COMPLETE + SAFE + SCALABLE
+
    ========================================================= */
