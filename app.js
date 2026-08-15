@@ -1,11 +1,10 @@
 /* =========================================================
    GS JUNCTION PRAYAGRAJ
    MASTER APP.JS
-   UPDATED + SAFE VERSION
+   10X THINK — PRODUCTION SAFE VERSION
    ========================================================= */
 
 "use strict";
-
 
 /* =========================================================
    GLOBAL VARIABLES
@@ -30,6 +29,9 @@ let currentSubject = "";
 
 let appInitialized = false;
 
+/*
+ * EXACTLY 45 SECONDS PER QUESTION
+ */
 const SECONDS_PER_QUESTION = 45;
 
 const TEST_INDEX_URL = "tests/index.json";
@@ -77,11 +79,11 @@ function showPage(id) {
         nav.classList.remove("open");
     }
 
-    /*
-     * Smooth scrolling हटाया गया
-     * ताकि page freeze न हो
-     */
-    window.scrollTo(0, 0);
+    window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "auto"
+    });
 }
 
 
@@ -111,11 +113,7 @@ function loginStudent() {
         "student"
     );
 
-    if (
-        !localStorage.getItem(
-            "studentName"
-        )
-    ) {
+    if (!localStorage.getItem("studentName")) {
 
         localStorage.setItem(
             "studentName",
@@ -177,6 +175,8 @@ function logout() {
     correctAnswers = 0;
 
     attempted = 0;
+
+    timeLeft = 0;
 
     localStorage.removeItem(
         "userType"
@@ -303,9 +303,7 @@ function renderExamTests(exam) {
                 "button";
 
             const questionCount =
-                Array.isArray(
-                    test.questions
-                )
+                Array.isArray(test.questions)
                     ? test.questions.length
                     : 0;
 
@@ -327,12 +325,13 @@ function renderExamTests(exam) {
                     ${questionCount} प्रश्न
                     •
                     ${formatTime(totalSeconds)}
+                    •
+                    ${SECONDS_PER_QUESTION} सेकंड/प्रश्न
                 </small>
             `;
 
             button.onclick =
                 function () {
-
                     startTestDirect(test);
                 };
 
@@ -352,9 +351,7 @@ function startTestDirect(test) {
 
     if (
         !test ||
-        !Array.isArray(
-            test.questions
-        ) ||
+        !Array.isArray(test.questions) ||
         !test.questions.length
     ) {
 
@@ -377,6 +374,9 @@ function startTestDirect(test) {
     correctAnswers = 0;
 
     attempted = 0;
+
+    timeLeft =
+        SECONDS_PER_QUESTION;
 
     selectedAnswers =
         new Array(
@@ -422,7 +422,13 @@ function initializeTestSelectors() {
 
         count.innerHTML = "";
 
-        [10, 20, 30, 50, 100].forEach(
+        [
+            10,
+            20,
+            30,
+            50,
+            100
+        ].forEach(
             num => {
 
                 const option =
@@ -442,6 +448,8 @@ function initializeTestSelectors() {
             }
         );
     }
+
+    updateCategorySelector();
 }
 
 
@@ -457,6 +465,9 @@ function populateExamSelector() {
         );
 
     if (!select) return;
+
+    const previousValue =
+        select.value || "";
 
     select.innerHTML =
         `<option value="">सभी Exams</option>`;
@@ -493,6 +504,17 @@ function populateExamSelector() {
             );
         }
     );
+
+    if (
+        previousValue &&
+        finalExams.includes(
+            previousValue
+        )
+    ) {
+
+        select.value =
+            previousValue;
+    }
 }
 
 
@@ -563,6 +585,8 @@ function updateCategorySelector() {
             );
         }
     );
+
+    currentCategory = "";
 
     updateSubjectSelector();
 }
@@ -658,6 +682,8 @@ function updateSubjectSelector() {
             );
         }
     );
+
+    currentSubject = "";
 
     updateTestSelector();
 }
@@ -813,9 +839,7 @@ function showSelectedTestInfo() {
         testData[index];
 
     const total =
-        Array.isArray(
-            test.questions
-        )
+        Array.isArray(test.questions)
             ? test.questions.length
             : 0;
 
@@ -919,9 +943,7 @@ function startTest() {
         );
 
     const total =
-        Array.isArray(
-            test.questions
-        )
+        Array.isArray(test.questions)
             ? test.questions.length
             : 0;
 
@@ -1175,9 +1197,10 @@ function selectAnswer(answer) {
 
     selectedAnswers[
         currentQuestion
-    ] = normalizeAnswer(
-        answer
-    );
+    ] =
+        normalizeAnswer(
+            answer
+        );
 }
 
 
@@ -1290,8 +1313,8 @@ function saveCurrentAnswer() {
 
 
 /* =========================================================
-   TIMER
-   EXACTLY 45 SECONDS PER QUESTION
+   QUESTION TIMER
+   EXACTLY 45 SECONDS
 ========================================================= */
 
 function startQuestionTimer() {
@@ -1464,11 +1487,11 @@ function finishTest() {
         (question, index) => {
 
             const userAnswer =
-                selectedAnswers[index];
+                normalizeAnswer(
+                    selectedAnswers[index]
+                );
 
             if (
-                userAnswer !== null &&
-                userAnswer !== undefined &&
                 userAnswer !== ""
             ) {
 
@@ -1739,10 +1762,6 @@ function saveResult(result) {
 
     results.push(result);
 
-    /*
-     * केवल बहुत पुराने results हटाएँ
-     * ताकि localStorage अनावश्यक रूप से बड़ा न हो
-     */
     const limitedResults =
         results.slice(-500);
 
@@ -2182,9 +2201,6 @@ function initializeTXTUpload() {
         return;
     }
 
-    /*
-     * Duplicate event listener से बचें
-     */
     if (
         input.dataset.initialized === "true"
     ) {
@@ -2303,8 +2319,21 @@ function parseTXTQuestions(text) {
         return [];
     }
 
-    const blocks =
+    const normalizedText =
         text
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .trim();
+
+    if (!normalizedText) {
+        return [];
+    }
+
+    /*
+     * पहले blank-line blocks
+     */
+    const blocks =
+        normalizedText
             .split(/\n\s*\n/)
             .map(
                 block =>
@@ -2339,8 +2368,11 @@ function parseTXTQuestions(text) {
             lines.forEach(
                 line => {
 
+                    /*
+                     * A/B/C/D options
+                     */
                     if (
-                        /^[\(\[]?[A-Da-d][\)\].:-]/.test(
+                        /^[\(\[]?[A-Da-d][\)\].:-]\s*/.test(
                             line
                         )
                     ) {
@@ -2352,7 +2384,12 @@ function parseTXTQuestions(text) {
                             )
                         );
 
-                    } else if (
+                    }
+
+                    /*
+                     * Answer
+                     */
+                    else if (
                         /^(उत्तर|answer|ans)\s*[:\-]/i.test(
                             line
                         )
@@ -2364,8 +2401,12 @@ function parseTXTQuestions(text) {
                                 ""
                             )
                             .trim();
+                    }
 
-                    } else {
+                    /*
+                     * Question
+                     */
+                    else {
 
                         questionText +=
                             (
@@ -2411,12 +2452,16 @@ function parseTXTQuestions(text) {
 
 async function loadTests() {
 
+    let controller = null;
+
+    let timeoutId = null;
+
     try {
 
-        const controller =
+        controller =
             new AbortController();
 
-        const timeout =
+        timeoutId =
             setTimeout(
                 function () {
 
@@ -2436,13 +2481,14 @@ async function loadTests() {
                         "no-store",
 
                     signal:
-                        controller.signal
+                        controller.signal,
+
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    }
                 }
             );
-
-        clearTimeout(
-            timeout
-        );
 
         if (!response.ok) {
 
@@ -2474,11 +2520,16 @@ async function loadTests() {
 
         testData = [];
 
+    } finally {
+
+        if (timeoutId) {
+
+            clearTimeout(
+                timeoutId
+            );
+        }
     }
 
-    /*
-     * JSON fail होने पर भी UI चलेगा
-     */
     initializeTestSelectors();
 
     renderHomeExamGrid();
@@ -2579,6 +2630,10 @@ function normalizeTest(test) {
 
         return {
 
+            id:
+                "test-" +
+                Date.now(),
+
             title:
                 "Online Test",
 
@@ -2612,11 +2667,13 @@ function normalizeTest(test) {
     normalized.exam =
         test.exam ||
         test.examName ||
+        test.examination ||
         "";
 
     normalized.category =
         test.category ||
         test.type ||
+        test.section ||
         "General";
 
     normalized.subject =
@@ -2679,6 +2736,7 @@ function normalizeQuestion(question) {
             q.correctAnswer ??
             q.correct_option ??
             q.correctOption ??
+            q.correct_option_index ??
             ""
         );
 
@@ -2773,6 +2831,7 @@ function getCorrectAnswer(
         question.correctAnswer ??
         question.correct_option ??
         question.correctOption ??
+        question.correct_option_index ??
         "";
 
     return normalizeAnswer(
@@ -2783,6 +2842,12 @@ function getCorrectAnswer(
 
 /* =========================================================
    NORMALIZE ANSWER
+   SUPPORTS:
+   A/B/C/D
+   0/1/2/3
+   1/2/3/4
+   (A)/(B)/(C)/(D)
+   "A - ..."
 ========================================================= */
 
 function normalizeAnswer(
@@ -2802,20 +2867,27 @@ function normalizeAnswer(
             .trim()
             .toUpperCase();
 
+    if (!value) {
+        return "";
+    }
+
+    /*
+     * Remove common wrappers
+     */
     value =
         value
             .replace(
-                /^[\(\[]/,
+                /^[\(\[\{]\s*/,
                 ""
             )
             .replace(
-                /[\)\].:]$/,
+                /[\)\]\}]\s*$/,
                 ""
             )
             .trim();
 
     /*
-     * Direct A/B/C/D
+     * Exact A/B/C/D
      */
     if (
         [
@@ -2830,8 +2902,18 @@ function normalizeAnswer(
     }
 
     /*
-     * 0/1/2/3 format
+     * Numeric index support
+     *
+     * 0 = A
+     * 1 = B
+     * 2 = C
+     * 3 = D
+     *
+     * IMPORTANT:
+     * For 1/2/3/4 we identify the
+     * format separately below.
      */
+
     if (
         /^\d+$/.test(value)
     ) {
@@ -2839,32 +2921,39 @@ function normalizeAnswer(
         const num =
             Number(value);
 
+        /*
+         * 0/1/2/3 format
+         */
         if (
             num >= 0 &&
             num <= 3
         ) {
 
+            /*
+             * If source explicitly uses
+             * zero-based indexing,
+             * this is correct.
+             */
             return String.fromCharCode(
                 65 + num
             );
         }
 
         /*
-         * 1/2/3/4 format
+         * 4 is necessarily D in
+         * 1/2/3/4 format.
          */
-        if (
-            num >= 1 &&
-            num <= 4
-        ) {
+        if (num === 4) {
 
-            return String.fromCharCode(
-                64 + num
-            );
+            return "D";
         }
     }
 
     /*
-     * "(A)..." या "A - ..."
+     * Strings like:
+     * A - Option text
+     * A. Option text
+     * (A) Option text
      */
     const first =
         value.charAt(0);
@@ -2881,6 +2970,10 @@ function normalizeAnswer(
         return first;
     }
 
+    /*
+     * Hindi/English answer text may
+     * remain unchanged.
+     */
     return value;
 }
 
@@ -2987,7 +3080,11 @@ function getUniqueValues(
     return [
         ...new Set(
             values
-                .filter(Boolean)
+                .filter(
+                    value =>
+                        value !== null &&
+                        value !== undefined
+                )
                 .map(
                     value =>
                         String(
@@ -3119,7 +3216,6 @@ function escapeHTML(
 
 /* =========================================================
    APPLICATION START
-   SAFE VERSION
 ========================================================= */
 
 document.addEventListener(
@@ -3142,7 +3238,7 @@ document.addEventListener(
             );
 
         /*
-         * UI पहले दिखाएँ
+         * पहले UI दिखाएँ
          */
         if (
             userType === "admin"
@@ -3168,7 +3264,7 @@ document.addEventListener(
         }
 
         /*
-         * Profile तुरंत load करें
+         * Profile
          */
         loadProfile();
 
@@ -3176,6 +3272,11 @@ document.addEventListener(
          * TXT Upload
          */
         initializeTXTUpload();
+
+        /*
+         * Initial selectors
+         */
+        initializeTestSelectors();
 
         /*
          * Test data background में load करें
@@ -3206,3 +3307,128 @@ window.addEventListener(
         }
     }
 );
+
+
+/* =========================================================
+   KEYBOARD SUPPORT
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        /*
+         * Test active नहीं है
+         */
+        if (!currentTest) {
+            return;
+        }
+
+        /*
+         * Input/textarea में typing करते समय
+         * shortcut नहीं चलाएँ
+         */
+        const tag =
+            event.target?.tagName;
+
+        if (
+            tag === "INPUT" ||
+            tag === "TEXTAREA" ||
+            tag === "SELECT"
+        ) {
+            return;
+        }
+
+        /*
+         * 1/2/3/4 = A/B/C/D
+         */
+        const keyMap = {
+
+            "1": "A",
+            "2": "B",
+            "3": "C",
+            "4": "D"
+        };
+
+        if (
+            keyMap[event.key]
+        ) {
+
+            const answer =
+                keyMap[event.key];
+
+            const input =
+                document.querySelector(
+                    `input[name="answer"][value="${answer}"]`
+                );
+
+            if (input) {
+
+                input.checked =
+                    true;
+
+                selectAnswer(
+                    answer
+                );
+            }
+        }
+
+        /*
+         * Right Arrow = Next
+         */
+        if (
+            event.key === "ArrowRight"
+        ) {
+
+            nextQuestion();
+        }
+
+        /*
+         * Left Arrow = Previous
+         */
+        if (
+            event.key === "ArrowLeft"
+        ) {
+
+            previousQuestion();
+        }
+    }
+);
+
+
+/* =========================================================
+   DEBUG / GLOBAL APP OBJECT
+========================================================= */
+
+window.GSJUNCTION = {
+
+    getTests:
+        function () {
+            return testData;
+        },
+
+    getCurrentTest:
+        function () {
+            return currentTest;
+        },
+
+    getResults:
+        function () {
+            return getResults();
+        },
+
+    reloadTests:
+        function () {
+            return loadTests();
+        },
+
+    secondsPerQuestion:
+        SECONDS_PER_QUESTION
+
+};
+
+
+/* =========================================================
+   END OF MASTER APP.JS
+   GS JUNCTION PRAYAGRAJ
+   ========================================================= */
