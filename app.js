@@ -1,30 +1,28 @@
 /* =========================================================
    GS JUNCTION PRAYAGRAJ
    MASTER APP.JS
-   10X THINK — COMPLETE + SAFE + SCALABLE VERSION
-
-   BRAND:
-   GS JUNCTION PRAYAGRAJ
    POWERED BY LIVE STUDY ALLAHABAD
 
-   FEATURES:
+   COMPLETE TXT + INDEX.JSON TEST ENGINE
+
+   FEATURES
    ---------------------------------------------------------
    • Dynamic Exam → Category → Subject → Test
    • tests/index.json support
+   • TXT file based questions
    • 45 seconds per question
    • Automatic next question
    • Previous / Next navigation
    • Answer restore
    • Result calculation
-   • Negative marking support
+   • Negative marking
    • LocalStorage result history
-   • TXT question upload
-   • Multiple JSON structures supported
-   • TGT / PGT / LT GRADE / GS etc. scalable
+   • Multiple TXT formats
+   • TGT / PGT / LT GRADE / PCS / GS etc.
+   • Published test filtering
    • Safe HTML rendering
    • Mobile navigation
-   • Admin / Student login
-   • Cache-busting JSON loading
+   • Student / Admin login
    • GitHub Pages compatible
 ========================================================= */
 
@@ -94,27 +92,21 @@ function showPage(id) {
     document
         .querySelectorAll(".page")
         .forEach(page => {
-
             page.classList.remove("active");
-
         });
 
     const page =
         document.getElementById(id);
 
     if (page) {
-
         page.classList.add("active");
-
     }
 
     const nav =
         document.getElementById("nav");
 
     if (nav) {
-
         nav.classList.remove("open");
-
     }
 
     window.scrollTo(0, 0);
@@ -131,9 +123,7 @@ function toggleNav() {
         document.getElementById("nav");
 
     if (nav) {
-
         nav.classList.toggle("open");
-
     }
 }
 
@@ -149,17 +139,12 @@ function loginStudent() {
         "student"
     );
 
-    if (
-        !localStorage.getItem(
-            STUDENT_NAME_KEY
-        )
-    ) {
+    if (!localStorage.getItem(STUDENT_NAME_KEY)) {
 
         localStorage.setItem(
             STUDENT_NAME_KEY,
             "Student"
         );
-
     }
 
     showPage("home");
@@ -175,9 +160,7 @@ function loginStudent() {
 function loginAdmin() {
 
     const password =
-        prompt(
-            "Admin Password दर्ज करें:"
-        );
+        prompt("Admin Password दर्ज करें:");
 
     if (password === "admin123") {
 
@@ -190,10 +173,7 @@ function loginAdmin() {
 
     } else {
 
-        alert(
-            "गलत Admin Password।"
-        );
-
+        alert("गलत Admin Password।");
     }
 }
 
@@ -206,23 +186,7 @@ function logout() {
 
     stopTimer();
 
-    currentTest = null;
-
-    selectedAnswers = [];
-
-    currentQuestion = 0;
-
-    score = 0;
-
-    correctAnswers = 0;
-
-    attempted = 0;
-
-    wrongAnswers = 0;
-
-    unanswered = 0;
-
-    testSubmitted = false;
+    resetCurrentTest();
 
     localStorage.removeItem(
         USER_TYPE_KEY
@@ -267,20 +231,15 @@ function openExam(exam) {
     currentExam = exam;
 
     const title =
-        document.getElementById(
-            "examTitle"
-        );
+        document.getElementById("examTitle");
 
     const description =
-        document.getElementById(
-            "examDescription"
-        );
+        document.getElementById("examDescription");
 
     if (title) {
 
         title.textContent =
             exam + " — Test Series";
-
     }
 
     if (description) {
@@ -288,7 +247,6 @@ function openExam(exam) {
         description.textContent =
             exam +
             " के लिए उपलब्ध सभी Tests";
-
     }
 
     renderExamTests(exam);
@@ -303,10 +261,9 @@ function openExam(exam) {
 
 function getTestsByExam(exam) {
 
-    return testData.filter(
-        test =>
-            normalizeText(test.exam) ===
-            normalizeText(exam)
+    return testData.filter(test =>
+        normalizeText(test.exam) ===
+        normalizeText(exam)
     );
 }
 
@@ -318,9 +275,7 @@ function getTestsByExam(exam) {
 function renderExamTests(exam) {
 
     const container =
-        document.getElementById(
-            "examTests"
-        );
+        document.getElementById("examTests");
 
     if (!container) return;
 
@@ -333,7 +288,6 @@ function renderExamTests(exam) {
 
         container.innerHTML = `
             <div class="empty-state">
-
                 <span>📝</span>
 
                 <h3>
@@ -343,65 +297,54 @@ function renderExamTests(exam) {
                 <p>
                     इस परीक्षा के लिए Test जल्द उपलब्ध कराया जाएगा।
                 </p>
-
             </div>
         `;
 
         return;
     }
 
-    filtered.forEach(
-        (test, index) => {
+    filtered.forEach((test, index) => {
 
-            const button =
-                document.createElement(
-                    "button"
-                );
+        const button =
+            document.createElement("button");
 
-            button.className =
-                "dashboard-card";
+        button.className =
+            "dashboard-card";
 
-            button.type =
-                "button";
+        button.type = "button";
 
-            const questionCount =
-                Array.isArray(test.questions)
-                    ? test.questions.length
-                    : 0;
+        const questionCount =
+            getTestQuestionCount(test);
 
-            const totalSeconds =
-                questionCount *
-                getSecondsPerQuestion(test);
+        const totalSeconds =
+            questionCount *
+            getSecondsPerQuestion(test);
 
-            button.innerHTML = `
-                <span>📝</span>
+        button.innerHTML = `
+            <span>📝</span>
 
-                <strong>
-                    ${escapeHTML(
-                        test.title ||
-                        `Test - ${index + 1}`
-                    )}
-                </strong>
+            <strong>
+                ${escapeHTML(
+                    test.title ||
+                    test.name ||
+                    `Test - ${index + 1}`
+                )}
+            </strong>
 
-                <small>
-                    ${questionCount} प्रश्न
-                    •
-                    ${formatTime(totalSeconds)}
-                </small>
-            `;
+            <small>
+                ${questionCount || "—"} प्रश्न
+                •
+                ${formatTime(totalSeconds)}
+            </small>
+        `;
 
-            button.onclick =
-                function () {
+        button.onclick = function () {
 
-                    startTestDirect(test);
+            startTestDirect(test);
+        };
 
-                };
-
-            container.appendChild(
-                button
-            );
-        }
-    );
+        container.appendChild(button);
+    });
 }
 
 
@@ -409,16 +352,12 @@ function renderExamTests(exam) {
    START TEST DIRECTLY
 ========================================================= */
 
-function startTestDirect(test) {
+async function startTestDirect(test) {
 
-    if (
-        !test ||
-        !Array.isArray(test.questions) ||
-        !test.questions.length
-    ) {
+    if (!test) {
 
         alert(
-            "इस Test में अभी कोई प्रश्न उपलब्ध नहीं है।"
+            "Test उपलब्ध नहीं है।"
         );
 
         return;
@@ -426,22 +365,94 @@ function startTestDirect(test) {
 
     stopTimer();
 
+    testSubmitted = false;
+
     currentTest =
         normalizeTest(test);
+
+    /*
+     * यदि questions पहले से मौजूद नहीं हैं
+     * तो file से TXT load करें।
+     */
+
+    if (
+        !Array.isArray(currentTest.questions) ||
+        !currentTest.questions.length
+    ) {
+
+        if (!currentTest.file) {
+
+            alert(
+                "इस Test की question file उपलब्ध नहीं है।"
+            );
+
+            return;
+        }
+
+        showLoadingMessage();
+
+        try {
+
+            const questions =
+                await loadQuestionsFromFile(
+                    currentTest.file
+                );
+
+            if (!questions.length) {
+
+                alert(
+                    "इस Test की TXT file में कोई प्रश्न नहीं मिला।"
+                );
+
+                return;
+            }
+
+            currentTest.questions =
+                questions.map(
+                    normalizeQuestion
+                );
+
+        } catch (error) {
+
+            console.error(
+                "Question file loading error:",
+                error
+            );
+
+            alert(
+                "Questions load नहीं हो सके। कृपया TXT file और path check करें।"
+            );
+
+            return;
+        }
+    }
+
+    /*
+     * Question count metadata से अधिक
+     * questions होने पर actual questions ही लें।
+     */
+
+    if (
+        !Array.isArray(
+            currentTest.questions
+        ) ||
+        !currentTest.questions.length
+    ) {
+
+        alert(
+            "इस Test में प्रश्न उपलब्ध नहीं हैं।"
+        );
+
+        return;
+    }
 
     currentQuestion = 0;
 
     score = 0;
-
     correctAnswers = 0;
-
     attempted = 0;
-
     wrongAnswers = 0;
-
     unanswered = 0;
-
-    testSubmitted = false;
 
     selectedAnswers =
         new Array(
@@ -455,25 +466,17 @@ function startTestDirect(test) {
 
     if (resultArea) {
 
-        resultArea.classList.add(
-            "hidden"
-        );
+        resultArea.classList.add("hidden");
 
         resultArea.innerHTML = "";
-
     }
 
     const testArea =
-        document.getElementById(
-            "testArea"
-        );
+        document.getElementById("testArea");
 
     if (testArea) {
 
-        testArea.classList.remove(
-            "hidden"
-        );
-
+        testArea.classList.remove("hidden");
     }
 
     showPage("tests");
@@ -481,6 +484,461 @@ function startTestDirect(test) {
     renderTestArea();
 
     startQuestionTimer();
+}
+
+
+/* =========================================================
+   LOADING MESSAGE
+========================================================= */
+
+function showLoadingMessage() {
+
+    const testArea =
+        document.getElementById("testArea");
+
+    if (!testArea) return;
+
+    testArea.classList.remove("hidden");
+
+    testArea.innerHTML = `
+        <div class="loading-state">
+            <div class="loader"></div>
+
+            <h3>
+                📝 Questions Loading...
+            </h3>
+
+            <p>
+                कृपया कुछ सेकंड प्रतीक्षा करें।
+            </p>
+        </div>
+    `;
+
+    showPage("tests");
+}
+
+
+/* =========================================================
+   LOAD QUESTIONS FROM TXT
+========================================================= */
+
+async function loadQuestionsFromFile(filePath) {
+
+    if (!filePath) {
+
+        return [];
+    }
+
+    /*
+     * GitHub Pages compatible path
+     */
+
+    let url =
+        String(filePath).trim();
+
+    /*
+     * अगर path ./ से शुरू है तो ठीक करें
+     */
+
+    url =
+        url.replace(/^\.\/+/, "");
+
+    const response =
+        await fetch(
+            url +
+            (url.includes("?") ? "&" : "?") +
+            "v=" +
+            Date.now(),
+            {
+                cache: "no-store"
+            }
+        );
+
+    if (!response.ok) {
+
+        throw new Error(
+            "TXT file not found: " +
+            response.status +
+            " - " +
+            url
+        );
+    }
+
+    const text =
+        await response.text();
+
+    return parseTXTQuestions(text);
+}
+
+
+/* =========================================================
+   PARSE TXT QUESTIONS
+   ---------------------------------------------------------
+   Supported formats:
+
+   1.
+   1. Question?
+   (A) Option
+   (B) Option
+   (C) Option
+   (D) Option
+   उत्तर: C
+
+   2.
+   Question?
+   A. Option
+   B. Option
+   C. Option
+   D. Option
+   Answer: C
+
+   3.
+   Question?
+   A) Option
+   B) Option
+   C) Option
+   D) Option
+   Correct: C
+========================================================= */
+
+function parseTXTQuestions(text) {
+
+    if (
+        !text ||
+        typeof text !== "string"
+    ) {
+
+        return [];
+    }
+
+    let cleanText =
+        text
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .replace(/\uFEFF/g, "");
+
+    /*
+     * अलग-अलग प्रश्नों को identify करने की कोशिश
+     */
+
+    const lines =
+        cleanText
+            .split("\n")
+            .map(line => line.trim())
+            .filter(line => line !== "");
+
+    const questions = [];
+
+    let current = null;
+
+    function createQuestion() {
+
+        return {
+            question: "",
+            options: [],
+            answer: ""
+        };
+    }
+
+    function pushCurrent() {
+
+        if (!current) return;
+
+        current.question =
+            current.question.trim();
+
+        if (
+            current.question &&
+            current.options.length >= 2
+        ) {
+
+            current.answer =
+                normalizeAnswer(
+                    current.answer
+                );
+
+            questions.push(
+                normalizeQuestion(current)
+            );
+        }
+
+        current = null;
+    }
+
+    lines.forEach(line => {
+
+        /*
+         * Answer line
+         */
+
+        if (
+            /^(उत्तर|उत्तर है|सही उत्तर|answer|ans|correct|correct answer)\s*[:\-–]\s*/i
+                .test(line)
+        ) {
+
+            if (!current) {
+
+                current =
+                    createQuestion();
+            }
+
+            current.answer =
+                line.replace(
+                    /^(उत्तर|उत्तर है|सही उत्तर|answer|ans|correct|correct answer)\s*[:\-–]\s*/i,
+                    ""
+                ).trim();
+
+            return;
+        }
+
+
+        /*
+         * Option line
+         */
+
+        const optionMatch =
+            line.match(
+                /^\s*(?:\(?([A-Da-d])\)?)[\.\:\-\–\)]\s*(.+)$/u
+            );
+
+        if (optionMatch) {
+
+            if (!current) {
+
+                current =
+                    createQuestion();
+            }
+
+            current.options.push(
+                optionMatch[2].trim()
+            );
+
+            return;
+        }
+
+
+        /*
+         * Numbered question
+         *
+         * 1. Question
+         * 1) Question
+         * Q1. Question
+         */
+
+        const questionMatch =
+            line.match(
+                /^\s*(?:Q(?:uestion)?\s*)?(\d+)\s*[\.\):\-]\s*(.+)$/iu
+            );
+
+        if (questionMatch) {
+
+            /*
+             * अगर current question में options हैं
+             * तो नया question शुरू करें।
+             */
+
+            if (
+                current &&
+                current.options.length
+            ) {
+
+                pushCurrent();
+            }
+
+            if (!current) {
+
+                current =
+                    createQuestion();
+            }
+
+            current.question =
+                questionMatch[2].trim();
+
+            return;
+        }
+
+
+        /*
+         * "प्रश्न 1."
+         */
+
+        const hindiQuestionMatch =
+            line.match(
+                /^\s*प्रश्न\s*(\d+)\s*[\.\):\-]?\s*(.*)$/u
+            );
+
+        if (hindiQuestionMatch) {
+
+            if (
+                current &&
+                current.options.length
+            ) {
+
+                pushCurrent();
+            }
+
+            if (!current) {
+
+                current =
+                    createQuestion();
+            }
+
+            if (hindiQuestionMatch[2]) {
+
+                current.question =
+                    hindiQuestionMatch[2].trim();
+            }
+
+            return;
+        }
+
+
+        /*
+         * सामान्य text
+         */
+
+        if (!current) {
+
+            current =
+                createQuestion();
+        }
+
+        /*
+         * अगर options शुरू नहीं हुए हैं,
+         * तो line question का हिस्सा है।
+         */
+
+        if (
+            current.options.length === 0
+        ) {
+
+            current.question +=
+                (
+                    current.question
+                        ? " "
+                        : ""
+                ) +
+                line;
+
+        } else {
+
+            /*
+             * Option के बाद आने वाला text
+             * उसी option में जोड़ें।
+             */
+
+            const last =
+                current.options.length - 1;
+
+            current.options[last] +=
+                " " +
+                line;
+        }
+
+    });
+
+    pushCurrent();
+
+    /*
+     * अगर parser ने प्रश्न नहीं निकाले,
+     * तो blank-line based fallback parser चलाएँ।
+     */
+
+    if (!questions.length) {
+
+        return parseTXTQuestionsFallback(
+            cleanText
+        );
+    }
+
+    return questions;
+}
+
+
+/* =========================================================
+   TXT FALLBACK PARSER
+========================================================= */
+
+function parseTXTQuestionsFallback(text) {
+
+    const blocks =
+        text
+            .split(/\n\s*\n+/)
+            .map(block => block.trim())
+            .filter(Boolean);
+
+    const questions = [];
+
+    blocks.forEach(block => {
+
+        const lines =
+            block
+                .split("\n")
+                .map(line => line.trim())
+                .filter(Boolean);
+
+        if (!lines.length) return;
+
+        let questionText = "";
+        const options = [];
+        let answer = "";
+
+        lines.forEach(line => {
+
+            const optionMatch =
+                line.match(
+                    /^\s*(?:\(?([A-Da-d])\)?)[\.\:\-\–\)]\s*(.+)$/u
+                );
+
+            if (optionMatch) {
+
+                options.push(
+                    optionMatch[2].trim()
+                );
+
+                return;
+            }
+
+            if (
+                /^(उत्तर|उत्तर है|सही उत्तर|answer|ans|correct|correct answer)\s*[:\-–]/i
+                    .test(line)
+            ) {
+
+                answer =
+                    line.replace(
+                        /^(उत्तर|उत्तर है|सही उत्तर|answer|ans|correct|correct answer)\s*[:\-–]\s*/i,
+                        ""
+                    ).trim();
+
+                return;
+            }
+
+            questionText +=
+                (
+                    questionText
+                        ? " "
+                        : ""
+                ) +
+                line;
+        });
+
+        if (
+            questionText &&
+            options.length >= 2
+        ) {
+
+            questions.push(
+                normalizeQuestion({
+                    question: questionText,
+                    options: options,
+                    answer: answer
+                })
+            );
+        }
+
+    });
+
+    return questions;
 }
 
 
@@ -493,46 +951,35 @@ function initializeTestSelectors() {
     populateExamSelector();
 
     const count =
-        document.getElementById(
-            "count"
-        );
+        document.getElementById("count");
 
-    if (count) {
+    if (!count) return;
 
-        count.innerHTML = "";
+    count.innerHTML = "";
 
-        [10, 20, 30, 50, 100].forEach(
-            num => {
+    [10, 20, 30, 50, 100, 150].forEach(num => {
 
-                const option =
-                    document.createElement(
-                        "option"
-                    );
+        const option =
+            document.createElement("option");
 
-                option.value =
-                    String(num);
+        option.value =
+            String(num);
 
-                option.textContent =
-                    `${num} Questions`;
+        option.textContent =
+            `${num} Questions`;
 
-                count.appendChild(
-                    option
-                );
+        count.appendChild(option);
+    });
 
-            }
-        );
+    if (getMaximumQuestionCount() > 0) {
 
-        if (testData.length) {
-
-            count.value =
-                String(
-                    Math.min(
-                        10,
-                        getMaximumQuestionCount()
-                    )
-                );
-
-        }
+        count.value =
+            String(
+                Math.min(
+                    10,
+                    getMaximumQuestionCount()
+                )
+            );
     }
 }
 
@@ -565,26 +1012,19 @@ function populateExamSelector() {
             ? exams
             : DEFAULT_EXAMS;
 
-    finalExams.forEach(
-        exam => {
+    finalExams.forEach(exam => {
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+        const option =
+            document.createElement("option");
 
-            option.value =
-                exam;
+        option.value =
+            exam;
 
-            option.textContent =
-                exam;
+        option.textContent =
+            exam;
 
-            select.appendChild(
-                option
-            );
-
-        }
-    );
+        select.appendChild(option);
+    });
 }
 
 
@@ -599,7 +1039,8 @@ function updateCategorySelector() {
             "examSelect"
         )?.value || "";
 
-    currentExam = exam;
+    currentExam =
+        exam;
 
     const select =
         document.getElementById(
@@ -617,16 +1058,10 @@ function updateCategorySelector() {
     if (exam) {
 
         tests =
-            tests.filter(
-                test =>
-                    normalizeText(
-                        test.exam
-                    ) ===
-                    normalizeText(
-                        exam
-                    )
+            tests.filter(test =>
+                normalizeText(test.exam) ===
+                normalizeText(exam)
             );
-
     }
 
     const categories =
@@ -636,26 +1071,19 @@ function updateCategorySelector() {
             )
         );
 
-    categories.forEach(
-        category => {
+    categories.forEach(category => {
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+        const option =
+            document.createElement("option");
 
-            option.value =
-                category;
+        option.value =
+            category;
 
-            option.textContent =
-                category;
+        option.textContent =
+            category;
 
-            select.appendChild(
-                option
-            );
-
-        }
-    );
+        select.appendChild(option);
+    });
 
     updateSubjectSelector();
 }
@@ -699,31 +1127,19 @@ function updateSubjectSelector() {
     if (exam) {
 
         tests =
-            tests.filter(
-                test =>
-                    normalizeText(
-                        test.exam
-                    ) ===
-                    normalizeText(
-                        exam
-                    )
+            tests.filter(test =>
+                normalizeText(test.exam) ===
+                normalizeText(exam)
             );
-
     }
 
     if (category) {
 
         tests =
-            tests.filter(
-                test =>
-                    normalizeText(
-                        test.category
-                    ) ===
-                    normalizeText(
-                        category
-                    )
+            tests.filter(test =>
+                normalizeText(test.category) ===
+                normalizeText(category)
             );
-
     }
 
     const subjects =
@@ -733,26 +1149,19 @@ function updateSubjectSelector() {
             )
         );
 
-    subjects.forEach(
-        subject => {
+    subjects.forEach(subject => {
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+        const option =
+            document.createElement("option");
 
-            option.value =
-                subject;
+        option.value =
+            subject;
 
-            option.textContent =
-                subject;
+        option.textContent =
+            subject;
 
-            select.appendChild(
-                option
-            );
-
-        }
-    );
+        select.appendChild(option);
+    });
 
     updateTestSelector();
 }
@@ -804,73 +1213,47 @@ function updateTestSelector() {
     if (exam) {
 
         tests =
-            tests.filter(
-                test =>
-                    normalizeText(
-                        test.exam
-                    ) ===
-                    normalizeText(
-                        exam
-                    )
+            tests.filter(test =>
+                normalizeText(test.exam) ===
+                normalizeText(exam)
             );
-
     }
 
     if (category) {
 
         tests =
-            tests.filter(
-                test =>
-                    normalizeText(
-                        test.category
-                    ) ===
-                    normalizeText(
-                        category
-                    )
+            tests.filter(test =>
+                normalizeText(test.category) ===
+                normalizeText(category)
             );
-
     }
 
     if (subject) {
 
         tests =
-            tests.filter(
-                test =>
-                    normalizeText(
-                        test.subject
-                    ) ===
-                    normalizeText(
-                        subject
-                    )
+            tests.filter(test =>
+                normalizeText(test.subject) ===
+                normalizeText(subject)
             );
-
     }
 
-    tests.forEach(
-        (test, index) => {
+    tests.forEach((test, index) => {
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+        const option =
+            document.createElement("option");
 
-            option.value =
-                String(
-                    testData.indexOf(
-                        test
-                    )
-                );
-
-            option.textContent =
-                test.title ||
-                `Test ${index + 1}`;
-
-            select.appendChild(
-                option
+        option.value =
+            String(
+                testData.indexOf(test)
             );
 
-        }
-    );
+        option.textContent =
+            test.title ||
+            test.name ||
+            `Test ${index + 1}`;
+
+        select.appendChild(option);
+    });
 
     showSelectedTestInfo();
 }
@@ -913,14 +1296,14 @@ function showSelectedTestInfo() {
             testData[index]
         );
 
-    const total =
-        test.questions.length;
+    const questionCount =
+        getTestQuestionCount(test);
 
     const secondsPerQuestion =
         getSecondsPerQuestion(test);
 
     const totalTime =
-        total *
+        questionCount *
         secondsPerQuestion;
 
     const negative =
@@ -958,7 +1341,7 @@ function showSelectedTestInfo() {
         <br>
 
         प्रश्न:
-        ${total}
+        ${questionCount || "TXT से Load होंगे"}
 
         <br>
 
@@ -968,7 +1351,9 @@ function showSelectedTestInfo() {
         <br>
 
         कुल समय:
-        ${formatTime(totalTime)}
+        ${questionCount
+            ? formatTime(totalTime)
+            : "Questions के अनुसार"}
 
         ${
             negative > 0
@@ -987,7 +1372,7 @@ function showSelectedTestInfo() {
    START SELECTED TEST
 ========================================================= */
 
-function startTest() {
+async function startTest() {
 
     const select =
         document.getElementById(
@@ -1021,10 +1406,55 @@ function startTest() {
         return;
     }
 
-    const countSelect =
-        document.getElementById(
-            "count"
+    /*
+     * पहले पूरा test load होगा।
+     * फिर optional question count लागू होगा।
+     */
+
+    const loadedTest =
+        normalizeTest(
+            test
         );
+
+    if (
+        !loadedTest.questions.length &&
+        loadedTest.file
+    ) {
+
+        showLoadingMessage();
+
+        try {
+
+            loadedTest.questions =
+                await loadQuestionsFromFile(
+                    loadedTest.file
+                );
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "TXT Questions load नहीं हो सके।"
+            );
+
+            return;
+        }
+    }
+
+    if (
+        !loadedTest.questions.length
+    ) {
+
+        alert(
+            "इस Test में कोई Question नहीं मिला।"
+        );
+
+        return;
+    }
+
+    const countSelect =
+        document.getElementById("count");
 
     let questionCount =
         Number(
@@ -1032,9 +1462,7 @@ function startTest() {
         );
 
     const total =
-        Array.isArray(test.questions)
-            ? test.questions.length
-            : 0;
+        loadedTest.questions.length;
 
     if (
         !questionCount ||
@@ -1043,12 +1471,13 @@ function startTest() {
 
         questionCount =
             total;
-
     }
 
     const clonedTest =
         JSON.parse(
-            JSON.stringify(test)
+            JSON.stringify(
+                loadedTest
+            )
         );
 
     clonedTest.questions =
@@ -1057,9 +1486,44 @@ function startTest() {
             questionCount
         );
 
-    startTestDirect(
+    await startTestDirect(
         clonedTest
     );
+}
+
+
+/* =========================================================
+   GET TEST QUESTION COUNT
+========================================================= */
+
+function getTestQuestionCount(test) {
+
+    if (
+        Array.isArray(
+            test?.questions
+        ) &&
+        test.questions.length
+    ) {
+
+        return test.questions.length;
+    }
+
+    const declared =
+        Number(
+            test?.questionCount ||
+            test?.totalQuestions ||
+            test?.questions
+        );
+
+    if (
+        Number.isFinite(declared) &&
+        declared > 0
+    ) {
+
+        return declared;
+    }
+
+    return 0;
 }
 
 
@@ -1082,9 +1546,7 @@ function renderTestArea() {
         return;
     }
 
-    area.classList.remove(
-        "hidden"
-    );
+    area.classList.remove("hidden");
 
     const q =
         currentTest.questions[
@@ -1157,8 +1619,10 @@ function renderTestArea() {
         <div class="question-card">
 
             <div class="question-number">
+
                 प्रश्न
                 ${currentQuestion + 1}
+
             </div>
 
 
@@ -1226,18 +1690,20 @@ function renderTestArea() {
             <div class="test-progress">
 
                 <span>
-                    प्रश्न ${currentQuestion + 1}
-                    / ${total}
+                    प्रश्न
+                    ${currentQuestion + 1}
+                    /
+                    ${total}
                 </span>
 
                 <span>
-                    ${secondsPerQuestion} सेकंड/प्रश्न
+                    ${secondsPerQuestion}
+                    सेकंड/प्रश्न
                 </span>
 
             </div>
 
         </div>
-
     `;
 
     restoreSelectedAnswer();
@@ -1253,9 +1719,7 @@ function renderTestArea() {
 function renderOptions(question) {
 
     const options =
-        getQuestionOptions(
-            question
-        );
+        getQuestionOptions(question);
 
     if (!options.length) {
 
@@ -1267,42 +1731,40 @@ function renderOptions(question) {
     }
 
     return options
-        .map(
-            (option, index) => {
+        .map((option, index) => {
 
-                const letter =
-                    String.fromCharCode(
-                        65 + index
-                    );
+            const letter =
+                String.fromCharCode(
+                    65 + index
+                );
 
-                return `
+            return `
 
-                    <label class="option">
+                <label class="option">
 
-                        <input
-                            type="radio"
-                            name="answer"
-                            value="${letter}"
-                            onchange="selectAnswer('${letter}')">
+                    <input
+                        type="radio"
+                        name="answer"
+                        value="${letter}"
+                        onchange="selectAnswer('${letter}')">
 
-                        <span>
+                    <span>
 
-                            <strong>
-                                (${letter})
-                            </strong>
+                        <strong>
+                            (${letter})
+                        </strong>
 
-                            ${escapeHTML(
-                                String(option)
-                            )}
+                        ${escapeHTML(
+                            String(option)
+                        )}
 
-                        </span>
+                    </span>
 
-                    </label>
+                </label>
 
-                `;
+            `;
 
-            }
-        )
+        })
         .join("");
 }
 
@@ -1324,9 +1786,7 @@ function selectAnswer(answer) {
     selectedAnswers[
         currentQuestion
     ] =
-        normalizeAnswer(
-            answer
-        );
+        normalizeAnswer(answer);
 
     updateTestProgress();
 }
@@ -1343,10 +1803,7 @@ function restoreSelectedAnswer() {
             currentQuestion
         ];
 
-    if (!answer) {
-
-        return;
-    }
+    if (!answer) return;
 
     const input =
         document.querySelector(
@@ -1355,8 +1812,7 @@ function restoreSelectedAnswer() {
 
     if (input) {
 
-        input.checked =
-            true;
+        input.checked = true;
     }
 }
 
@@ -1375,7 +1831,8 @@ function updateTestProgress() {
     if (!progress) return;
 
     const total =
-        currentTest?.questions?.length || 0;
+        currentTest?.questions?.length ||
+        0;
 
     const attemptedNow =
         selectedAnswers.filter(
@@ -1386,15 +1843,19 @@ function updateTestProgress() {
         ).length;
 
     progress.innerHTML = `
+
         <span>
-            प्रश्न ${currentQuestion + 1}
-            / ${total}
+            प्रश्न
+            ${currentQuestion + 1}
+            /
+            ${total}
         </span>
 
         <span>
             Attempted:
             ${attemptedNow}/${total}
         </span>
+
     `;
 }
 
@@ -1405,10 +1866,7 @@ function updateTestProgress() {
 
 function nextQuestion() {
 
-    if (!currentTest) {
-
-        return;
-    }
+    if (!currentTest) return;
 
     saveCurrentAnswer();
 
@@ -1426,7 +1884,6 @@ function nextQuestion() {
     } else {
 
         finishTest();
-
     }
 }
 
@@ -1437,10 +1894,7 @@ function nextQuestion() {
 
 function previousQuestion() {
 
-    if (!currentTest) {
-
-        return;
-    }
+    if (!currentTest) return;
 
     saveCurrentAnswer();
 
@@ -1451,7 +1905,6 @@ function previousQuestion() {
         resetQuestionTimer();
 
         renderTestArea();
-
     }
 }
 
@@ -1462,10 +1915,7 @@ function previousQuestion() {
 
 function saveCurrentAnswer() {
 
-    if (!currentTest) {
-
-        return;
-    }
+    if (!currentTest) return;
 
     const selected =
         document.querySelector(
@@ -1480,7 +1930,6 @@ function saveCurrentAnswer() {
             normalizeAnswer(
                 selected.value
             );
-
     }
 }
 
@@ -1494,10 +1943,7 @@ function startQuestionTimer() {
 
     stopTimer();
 
-    if (!currentTest) {
-
-        return;
-    }
+    if (!currentTest) return;
 
     timeLeft =
         getSecondsPerQuestion(
@@ -1507,26 +1953,22 @@ function startQuestionTimer() {
     updateTimerDisplay();
 
     timerId =
-        setInterval(
-            function () {
+        setInterval(() => {
 
-                timeLeft--;
+            timeLeft--;
 
-                updateTimerDisplay();
+            updateTimerDisplay();
 
-                if (
-                    timeLeft <= 0
-                ) {
+            if (
+                timeLeft <= 0
+            ) {
 
-                    stopTimer();
+                stopTimer();
 
-                    autoNextQuestion();
+                autoNextQuestion();
+            }
 
-                }
-
-            },
-            1000
-        );
+        }, 1000);
 }
 
 
@@ -1559,9 +2001,7 @@ function stopTimer() {
         timerId !== null
     ) {
 
-        clearInterval(
-            timerId
-        );
+        clearInterval(timerId);
 
         timerId = null;
     }
@@ -1575,19 +2015,12 @@ function stopTimer() {
 function updateTimerDisplay() {
 
     const timer =
-        document.getElementById(
-            "timer"
-        );
+        document.getElementById("timer");
 
-    if (!timer) {
-
-        return;
-    }
+    if (!timer) return;
 
     timer.textContent =
-        formatTime(
-            timeLeft
-        );
+        formatTime(timeLeft);
 
     timer.classList.remove(
         "warning",
@@ -1598,18 +2031,13 @@ function updateTimerDisplay() {
         timeLeft <= 10
     ) {
 
-        timer.classList.add(
-            "danger"
-        );
+        timer.classList.add("danger");
 
     } else if (
         timeLeft <= 20
     ) {
 
-        timer.classList.add(
-            "warning"
-        );
-
+        timer.classList.add("warning");
     }
 }
 
@@ -1620,10 +2048,7 @@ function updateTimerDisplay() {
 
 function autoNextQuestion() {
 
-    if (!currentTest) {
-
-        return;
-    }
+    if (!currentTest) return;
 
     saveCurrentAnswer();
 
@@ -1646,7 +2071,6 @@ function autoNextQuestion() {
     } else {
 
         finishTest();
-
     }
 }
 
@@ -1657,19 +2081,13 @@ function autoNextQuestion() {
 
 function finishTest() {
 
-    if (testSubmitted) {
-
-        return;
-    }
+    if (testSubmitted) return;
 
     stopTimer();
 
     saveCurrentAnswer();
 
-    if (!currentTest) {
-
-        return;
-    }
+    if (!currentTest) return;
 
     testSubmitted = true;
 
@@ -1677,13 +2095,9 @@ function finishTest() {
         currentTest.questions || [];
 
     let correct = 0;
-
     let attemptedCount = 0;
-
     let wrong = 0;
-
     let unansweredCount = 0;
-
     let marks = 0;
 
     const positiveMark =
@@ -1729,15 +2143,12 @@ function finishTest() {
 
                     marks -=
                         negativeMark;
-
                 }
 
             } else {
 
                 unansweredCount++;
-
             }
-
         }
     );
 
@@ -1809,7 +2220,6 @@ function finishTest() {
 
         date:
             new Date().toISOString()
-
     };
 
     saveResult(result);
@@ -1833,10 +2243,7 @@ function showResult(result) {
 
     if (area) {
 
-        area.classList.add(
-            "hidden"
-        );
-
+        area.classList.add("hidden");
     }
 
     const resultArea =
@@ -1844,27 +2251,25 @@ function showResult(result) {
             "#tests #resultArea"
         );
 
-    if (!resultArea) {
+    if (!resultArea) return;
 
-        return;
-    }
-
-    resultArea.classList.remove(
-        "hidden"
-    );
+    resultArea.classList.remove("hidden");
 
     const negativeText =
         Number(result.negativeMark || 0) > 0
             ? `
                 <div>
+
                     <strong>
                         ${Number(
                             result.negativeMark
                         )}
                     </strong>
+
                     <span>
                         Negative Mark
                     </span>
+
                 </div>
             `
             : "";
@@ -1973,7 +2378,9 @@ function showResult(result) {
 
                 <strong>
                     Score:
-                    ${formatMarks(result.marks)}
+                    ${formatMarks(
+                        result.marks
+                    )}
                 </strong>
 
             </div>
@@ -2001,7 +2408,6 @@ function showResult(result) {
             </div>
 
         </div>
-
     `;
 
     showPage("tests");
@@ -2037,7 +2443,6 @@ function saveResult(result) {
             "Result save नहीं हुआ:",
             error
         );
-
     }
 }
 
@@ -2079,10 +2484,7 @@ function showResults() {
             "#results #resultArea"
         );
 
-    if (!area) {
-
-        return;
-    }
+    if (!area) return;
 
     const results =
         getResults();
@@ -2119,8 +2521,7 @@ function showResults() {
             ${results
                 .slice()
                 .reverse()
-                .map(
-                    result => `
+                .map(result => `
 
                     <div class="result-item">
 
@@ -2220,8 +2621,7 @@ function showResults() {
 
                     </div>
 
-                `
-                )
+                `)
                 .join("")}
 
         </div>
@@ -2258,7 +2658,6 @@ function loadProfile() {
 
         studentName.textContent =
             name;
-
     }
 
     if (nameInput) {
@@ -2267,7 +2666,6 @@ function loadProfile() {
             name === "Student"
                 ? ""
                 : name;
-
     }
 
     const results =
@@ -2277,34 +2675,29 @@ function loadProfile() {
         results.length;
 
     let bestScore = 0;
-
     let totalQuestions = 0;
-
     let totalCorrect = 0;
 
-    results.forEach(
-        result => {
+    results.forEach(result => {
 
-            bestScore =
-                Math.max(
-                    bestScore,
-                    Number(
-                        result.percentage || 0
-                    )
-                );
-
-            totalQuestions +=
+        bestScore =
+            Math.max(
+                bestScore,
                 Number(
-                    result.total || 0
-                );
+                    result.percentage || 0
+                )
+            );
 
-            totalCorrect +=
-                Number(
-                    result.correct || 0
-                );
+        totalQuestions +=
+            Number(
+                result.total || 0
+            );
 
-        }
-    );
+        totalCorrect +=
+            Number(
+                result.correct || 0
+            );
+    });
 
     const accuracy =
         totalQuestions > 0
@@ -2335,21 +2728,18 @@ function loadProfile() {
 
         totalTestsElement.textContent =
             totalTests;
-
     }
 
     if (bestScoreElement) {
 
         bestScoreElement.textContent =
             bestScore + "%";
-
     }
 
     if (accuracyElement) {
 
         accuracyElement.textContent =
             accuracy + "%";
-
     }
 }
 
@@ -2361,19 +2751,12 @@ function loadProfile() {
 function saveName() {
 
     const input =
-        document.getElementById(
-            "name"
-        );
+        document.getElementById("name");
 
     const msg =
-        document.getElementById(
-            "msg"
-        );
+        document.getElementById("msg");
 
-    if (!input) {
-
-        return;
-    }
+    if (!input) return;
 
     const name =
         input.value.trim();
@@ -2384,7 +2767,6 @@ function saveName() {
 
             msg.textContent =
                 "कृपया अपना नाम लिखें।";
-
         }
 
         return;
@@ -2404,14 +2786,12 @@ function saveName() {
 
         studentName.textContent =
             name;
-
     }
 
     if (msg) {
 
         msg.textContent =
             "✅ नाम सुरक्षित हो गया।";
-
     }
 }
 
@@ -2447,7 +2827,6 @@ function adminAction(type) {
 
         settings:
             "App Settings module जल्द activate किया जाएगा।"
-
     };
 
     const message =
@@ -2472,9 +2851,7 @@ function adminAction(type) {
             </h3>
 
             <p>
-                ${escapeHTML(
-                    message
-                )}
+                ${escapeHTML(message)}
             </p>
 
         `;
@@ -2482,7 +2859,6 @@ function adminAction(type) {
     } else {
 
         alert(message);
-
     }
 }
 
@@ -2498,13 +2874,11 @@ function initializeTXTUpload() {
             "txtFile"
         );
 
-    if (!input) {
-
-        return;
-    }
+    if (!input) return;
 
     if (
-        input.dataset.initialized === "true"
+        input.dataset.initialized ===
+        "true"
     ) {
 
         return;
@@ -2520,10 +2894,7 @@ function initializeTXTUpload() {
             const file =
                 event.target.files[0];
 
-            if (!file) {
-
-                return;
-            }
+            if (!file) return;
 
             const reader =
                 new FileReader();
@@ -2570,14 +2941,20 @@ function initializeTXTUpload() {
                             "General Studies",
 
                         questions:
-                            questions
+                            questions,
 
+                        timePerQuestion:
+                            45,
+
+                        marksPerQuestion:
+                            1,
+
+                        negativeMarking:
+                            0
                     };
 
                     testData.push(
-                        normalizeTest(
-                            test
-                        )
+                        normalizeTest(test)
                     );
 
                     alert(
@@ -2594,7 +2971,6 @@ function initializeTXTUpload() {
                     renderExamTests(
                         "TXT Test"
                     );
-
                 };
 
             reader.onerror =
@@ -2603,143 +2979,14 @@ function initializeTXTUpload() {
                     alert(
                         "TXT file पढ़ने में समस्या हुई।"
                     );
-
                 };
 
             reader.readAsText(
                 file,
                 "UTF-8"
             );
-
         }
     );
-}
-
-
-/* =========================================================
-   PARSE TXT QUESTIONS
-========================================================= */
-
-function parseTXTQuestions(text) {
-
-    if (
-        !text ||
-        typeof text !== "string"
-    ) {
-
-        return [];
-    }
-
-    const normalizedText =
-        text.replace(
-            /\r\n/g,
-            "\n"
-        );
-
-    const blocks =
-        normalizedText
-            .split(/\n\s*\n/)
-            .map(
-                block =>
-                    block.trim()
-            )
-            .filter(Boolean);
-
-    const questions = [];
-
-    blocks.forEach(
-        block => {
-
-            const lines =
-                block
-                    .split("\n")
-                    .map(
-                        line =>
-                            line.trim()
-                    )
-                    .filter(Boolean);
-
-            if (!lines.length) {
-
-                return;
-            }
-
-            let questionText = "";
-
-            const options = [];
-
-            let answer = "";
-
-            lines.forEach(
-                line => {
-
-                    if (
-                        /^[\(\[]?[A-Da-d][\)\].:-]\s*/.test(
-                            line
-                        )
-                    ) {
-
-                        options.push(
-                            line.replace(
-                                /^[\(\[]?[A-Da-d][\)\].:-]\s*/,
-                                ""
-                            ).trim()
-                        );
-
-                    } else if (
-                        /^(उत्तर|answer|ans|correct)\s*[:\-]/i.test(
-                            line
-                        )
-                    ) {
-
-                        answer =
-                            line.replace(
-                                /^(उत्तर|answer|ans|correct)\s*[:\-]\s*/i,
-                                ""
-                            )
-                            .trim();
-
-                    } else {
-
-                        questionText +=
-                            (
-                                questionText
-                                    ? " "
-                                    : ""
-                            ) +
-                            line;
-
-                    }
-
-                }
-            );
-
-            if (
-                questionText &&
-                options.length >= 2
-            ) {
-
-                questions.push({
-
-                    question:
-                        questionText,
-
-                    options:
-                        options,
-
-                    answer:
-                        normalizeAnswer(
-                            answer
-                        )
-
-                });
-
-            }
-
-        }
-    );
-
-    return questions;
 }
 
 
@@ -2756,10 +3003,8 @@ async function loadTests() {
 
         const timeout =
             setTimeout(
-                function() {
-
+                () => {
                     controller.abort();
-
                 },
                 8000
             );
@@ -2770,17 +3015,12 @@ async function loadTests() {
                 "?v=" +
                 Date.now(),
                 {
-                    cache:
-                        "no-store",
-
-                    signal:
-                        controller.signal
+                    cache: "no-store",
+                    signal: controller.signal
                 }
             );
 
-        clearTimeout(
-            timeout
-        );
+        clearTimeout(timeout);
 
         if (!response.ok) {
 
@@ -2788,16 +3028,13 @@ async function loadTests() {
                 "Index file not found: " +
                 response.status
             );
-
         }
 
         const data =
             await response.json();
 
         testData =
-            normalizeTestData(
-                data
-            );
+            normalizeTestData(data);
 
         console.log(
             "✅ Tests Loaded:",
@@ -2812,7 +3049,6 @@ async function loadTests() {
         );
 
         testData = [];
-
     }
 
     initializeTestSelectors();
@@ -2833,32 +3069,28 @@ function normalizeTestData(data) {
 
     if (Array.isArray(data)) {
 
-        tests =
-            data;
+        tests = data;
 
     } else if (
         data &&
         Array.isArray(data.tests)
     ) {
 
-        tests =
-            data.tests;
+        tests = data.tests;
 
     } else if (
         data &&
         Array.isArray(data.data)
     ) {
 
-        tests =
-            data.data;
+        tests = data.data;
 
     } else if (
         data &&
         Array.isArray(data.testData)
     ) {
 
-        tests =
-            data.testData;
+        tests = data.testData;
 
     } else if (
         data &&
@@ -2866,47 +3098,46 @@ function normalizeTestData(data) {
     ) {
 
         Object.keys(data)
-            .forEach(
-                key => {
+            .forEach(key => {
 
-                    if (
-                        Array.isArray(
-                            data[key]
-                        )
-                    ) {
+                if (
+                    Array.isArray(
+                        data[key]
+                    )
+                ) {
 
-                        data[key].forEach(
-                            test => {
+                    data[key].forEach(test => {
 
-                                if (
-                                    test &&
-                                    typeof test === "object"
-                                ) {
+                        if (
+                            test &&
+                            typeof test === "object"
+                        ) {
 
-                                    tests.push({
+                            tests.push({
 
-                                        ...test,
+                                ...test,
 
-                                        exam:
-                                            test.exam ||
-                                            key
-
-                                    });
-
-                                }
-
-                            }
-                        );
-
-                    }
-
+                                exam:
+                                    test.exam ||
+                                    key
+                            });
+                        }
+                    });
                 }
-            );
+            });
     }
 
-    return tests.map(
-        normalizeTest
-    );
+    /*
+     * केवल published !== false वाले tests
+     * student को दिखेंगे।
+     */
+
+    return tests
+        .filter(test =>
+            test &&
+            test.published !== false
+        )
+        .map(normalizeTest);
 }
 
 
@@ -2939,6 +3170,9 @@ function normalizeTest(test) {
             subject:
                 "General Studies",
 
+            file:
+                "",
+
             questions:
                 [],
 
@@ -2950,7 +3184,6 @@ function normalizeTest(test) {
 
             negativeMarking:
                 0
-
         };
     }
 
@@ -2968,6 +3201,21 @@ function normalizeTest(test) {
                 .toString(36)
                 .slice(2)
         );
+
+    normalized.title =
+        test.title ||
+        test.name ||
+        "Online Test";
+
+    normalized.name =
+        test.name ||
+        normalized.title;
+
+    normalized.file =
+        test.file ||
+        test.path ||
+        test.url ||
+        "";
 
     normalized.questions =
         Array.isArray(
@@ -2992,11 +3240,6 @@ function normalizeTest(test) {
         test.subject ||
         test.subjectName ||
         "General Studies";
-
-    normalized.title =
-        test.title ||
-        test.name ||
-        "Online Test";
 
     normalized.timePerQuestion =
         getNumberFromObject(
@@ -3051,15 +3294,11 @@ function normalizeQuestion(question) {
 
         return {
 
-            question:
-                "",
+            question: "",
 
-            options:
-                [],
+            options: [],
 
-            answer:
-                ""
-
+            answer: ""
         };
     }
 
@@ -3075,9 +3314,7 @@ function normalizeQuestion(question) {
         "";
 
     q.options =
-        getQuestionOptions(
-            q
-        );
+        getQuestionOptions(q);
 
     q.answer =
         normalizeAnswer(
@@ -3098,9 +3335,7 @@ function normalizeQuestion(question) {
    GET QUESTION OPTIONS
 ========================================================= */
 
-function getQuestionOptions(
-    question
-) {
+function getQuestionOptions(question) {
 
     if (
         !question ||
@@ -3144,29 +3379,23 @@ function getQuestionOptions(
         "B",
         "C",
         "D"
-    ].forEach(
-        letter => {
+    ].forEach(letter => {
 
-            const value =
-                question[
-                    "option" +
-                    letter
-                ];
+        const value =
+            question[
+                "option" +
+                letter
+            ];
 
-            if (
-                value !== undefined &&
-                value !== null &&
-                value !== ""
-            ) {
+        if (
+            value !== undefined &&
+            value !== null &&
+            value !== ""
+        ) {
 
-                options.push(
-                    value
-                );
-
-            }
-
+            options.push(value);
         }
-    );
+    });
 
     return options;
 }
@@ -3176,9 +3405,7 @@ function getQuestionOptions(
    GET CORRECT ANSWER
 ========================================================= */
 
-function getCorrectAnswer(
-    question
-) {
+function getCorrectAnswer(question) {
 
     if (
         !question ||
@@ -3197,9 +3424,7 @@ function getCorrectAnswer(
         question.key ??
         "";
 
-    return normalizeAnswer(
-        answer
-    );
+    return normalizeAnswer(answer);
 }
 
 
@@ -3207,9 +3432,7 @@ function getCorrectAnswer(
    NORMALIZE ANSWER
 ========================================================= */
 
-function normalizeAnswer(
-    answer
-) {
+function normalizeAnswer(answer) {
 
     if (
         answer === null ||
@@ -3251,6 +3474,7 @@ function normalizeAnswer(
     /*
      * 0 / 1 / 2 / 3
      */
+
     if (
         /^\d+$/.test(value)
     ) {
@@ -3271,6 +3495,7 @@ function normalizeAnswer(
         /*
          * 1 / 2 / 3 / 4
          */
+
         if (
             num >= 1 &&
             num <= 4
@@ -3280,8 +3505,11 @@ function normalizeAnswer(
                 64 + num
             );
         }
-
     }
+
+    /*
+     * अगर answer "C)" या "C. xxx"
+     */
 
     const first =
         value.charAt(0);
@@ -3410,7 +3638,6 @@ function getNumberFromObject(
 
                 return value;
             }
-
         }
     }
 
@@ -3429,10 +3656,7 @@ function renderHomeExamGrid() {
             "homeExamGrid"
         );
 
-    if (!grid) {
-
-        return;
-    }
+    if (!grid) return;
 
     grid.innerHTML = "";
 
@@ -3448,46 +3672,34 @@ function renderHomeExamGrid() {
             ? exams
             : DEFAULT_EXAMS;
 
-    finalExams.forEach(
-        exam => {
+    finalExams.forEach(exam => {
 
-            const button =
-                document.createElement(
-                    "button"
-                );
+        const button =
+            document.createElement("button");
 
-            button.type =
-                "button";
+        button.type =
+            "button";
 
-            button.innerHTML = `
+        button.innerHTML = `
 
-                <strong>
-                    ${escapeHTML(
-                        exam
-                    )}
-                </strong>
+            <strong>
+                ${escapeHTML(exam)}
+            </strong>
 
-                <span>
-                    Test Series
-                </span>
+            <span>
+                Test Series
+            </span>
 
-            `;
+        `;
 
-            button.onclick =
-                function() {
+        button.onclick =
+            function() {
 
-                    openExam(
-                        exam
-                    );
+                openExam(exam);
+            };
 
-                };
-
-            grid.appendChild(
-                button
-            );
-
-        }
-    );
+        grid.appendChild(button);
+    });
 }
 
 
@@ -3495,9 +3707,7 @@ function renderHomeExamGrid() {
    UNIQUE VALUES
 ========================================================= */
 
-function getUniqueValues(
-    values
-) {
+function getUniqueValues(values) {
 
     return [
         ...new Set(
@@ -3505,9 +3715,7 @@ function getUniqueValues(
                 .filter(Boolean)
                 .map(
                     value =>
-                        String(
-                            value
-                        ).trim()
+                        String(value).trim()
                 )
                 .filter(Boolean)
         )
@@ -3519,9 +3727,7 @@ function getUniqueValues(
    NORMALIZE TEXT
 ========================================================= */
 
-function normalizeText(
-    value
-) {
+function normalizeText(value) {
 
     return String(
         value || ""
@@ -3535,9 +3741,7 @@ function normalizeText(
    FORMAT TIME
 ========================================================= */
 
-function formatTime(
-    seconds
-) {
+function formatTime(seconds) {
 
     seconds =
         Math.max(
@@ -3554,19 +3758,11 @@ function formatTime(
         seconds % 60;
 
     return (
-        String(
-            minutes
-        ).padStart(
-            2,
-            "0"
-        ) +
+        String(minutes)
+            .padStart(2, "0") +
         ":" +
-        String(
-            secs
-        ).padStart(
-            2,
-            "0"
-        )
+        String(secs)
+            .padStart(2, "0")
     );
 }
 
@@ -3575,9 +3771,7 @@ function formatTime(
    FORMAT MARKS
 ========================================================= */
 
-function formatMarks(
-    marks
-) {
+function formatMarks(marks) {
 
     const number =
         Number(marks);
@@ -3599,14 +3793,9 @@ function formatMarks(
    FORMAT DATE
 ========================================================= */
 
-function formatDate(
-    date
-) {
+function formatDate(date) {
 
-    if (!date) {
-
-        return "";
-    }
+    if (!date) return "";
 
     try {
 
@@ -3634,15 +3823,14 @@ function getMaximumQuestionCount() {
         return 0;
     }
 
+    const counts =
+        testData.map(test =>
+            getTestQuestionCount(test)
+        );
+
     return Math.max(
-        ...testData.map(
-            test =>
-                Array.isArray(
-                    test.questions
-                )
-                    ? test.questions.length
-                    : 0
-        )
+        0,
+        ...counts
     );
 }
 
@@ -3651,9 +3839,7 @@ function getMaximumQuestionCount() {
    ESCAPE HTML
 ========================================================= */
 
-function escapeHTML(
-    value
-) {
+function escapeHTML(value) {
 
     return String(
         value ?? ""
@@ -3724,8 +3910,7 @@ document.addEventListener(
             return;
         }
 
-        appInitialized =
-            true;
+        appInitialized = true;
 
         const userType =
             localStorage.getItem(
@@ -3736,24 +3921,17 @@ document.addEventListener(
             userType === "admin"
         ) {
 
-            showPage(
-                "adminPanel"
-            );
+            showPage("adminPanel");
 
         } else if (
             userType === "student"
         ) {
 
-            showPage(
-                "home"
-            );
+            showPage("home");
 
         } else {
 
-            showPage(
-                "loginPage"
-            );
-
+            showPage("loginPage");
         }
 
         loadProfile();
@@ -3761,14 +3939,12 @@ document.addEventListener(
         initializeTXTUpload();
 
         loadTests();
-
     }
 );
 
 
 /* =========================================================
    SELECTOR EVENT FALLBACK
-   HTML में onchange न हो तो भी काम करेगा
 ========================================================= */
 
 document.addEventListener(
@@ -3783,7 +3959,6 @@ document.addEventListener(
         ) {
 
             updateCategorySelector();
-
         }
 
         if (
@@ -3791,7 +3966,6 @@ document.addEventListener(
         ) {
 
             updateSubjectSelector();
-
         }
 
         if (
@@ -3799,7 +3973,6 @@ document.addEventListener(
         ) {
 
             updateTestSelector();
-
         }
 
         if (
@@ -3807,16 +3980,13 @@ document.addEventListener(
         ) {
 
             showSelectedTestInfo();
-
         }
-
     }
 );
 
 
 /* =========================================================
    PREVENT ACCIDENTAL PAGE REFRESH
-   DURING ACTIVE TEST
 ========================================================= */
 
 window.addEventListener(
@@ -3832,9 +4002,7 @@ window.addEventListener(
             event.preventDefault();
 
             event.returnValue = "";
-
         }
-
     }
 );
 
@@ -3876,7 +4044,6 @@ document.addEventListener(
         ) {
 
             nextQuestion();
-
         }
 
         if (
@@ -3884,13 +4051,10 @@ document.addEventListener(
         ) {
 
             previousQuestion();
-
         }
 
         const number =
-            Number(
-                event.key
-            );
+            Number(event.key);
 
         if (
             number >= 1 &&
@@ -3913,9 +4077,7 @@ document.addEventListener(
                 options.length >= number
             ) {
 
-                selectAnswer(
-                    answer
-                );
+                selectAnswer(answer);
 
                 const input =
                     document.querySelector(
@@ -3924,14 +4086,10 @@ document.addEventListener(
 
                 if (input) {
 
-                    input.checked =
-                        true;
+                    input.checked = true;
                 }
-
             }
-
         }
-
     }
 );
 
@@ -3946,9 +4104,9 @@ window.addEventListener(
 
         console.warn(
             "GS Junction App Error:",
-            event.error || event.message
+            event.error ||
+            event.message
         );
-
     }
 );
 
