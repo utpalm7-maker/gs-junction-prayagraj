@@ -2,1870 +2,352 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#0f172a"
-    >
-
-    <meta
-        name="description"
-        content="GS JUNCTION PRAYAGRAJ - सभी प्रतियोगी परीक्षाओं हेतु गुणवत्तापूर्ण अध्ययन एवं टेस्ट प्लेटफॉर्म"
-    >
-
-    <title>
-        GS JUNCTION PRAYAGRAJ
-    </title>
-
-    <!-- PWA -->
-    <link
-        rel="manifest"
-        href="manifest.json"
-    >
-
-    <!-- Favicon -->
-    <link
-        rel="icon"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E"
-    >
-
-    <!-- Main CSS -->
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GS JUNCTION PRAYAGRAJ - Powered by LIVE STUDY ALLAHABAD</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" opacity="1" content="#1a365d">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
-
 <body>
 
-<!-- =========================================================
-     APP HEADER
-========================================================= -->
-
-<header class="site-header">
-
-    <div class="header-inner">
-
-        <!-- BRAND -->
-        <div class="brand">
-
-            <div class="brand-logo">
-                🎓
+    <!-- APP HEADER -->
+    <header class="app-header" id="appHeader">
+        <div class="header-container">
+            <div class="brand-info">
+                <div class="logo-wrapper" id="headerLogo">
+                    <i class="fa-solid fa-graduation-cap brand-icon"></i>
+                </div>
+                <div>
+                    <h1 class="brand-title" id="brandTitleText">GS JUNCTION PRAYAGRAJ</h1>
+                    <p class="brand-subtext">PCS | UPSSSC | TGT | PGT | LT GRADE | UGC NET | TET | CTET</p>
+                </div>
             </div>
-
-            <div class="brand-text">
-
-                <h1>
-                    GS JUNCTION PRAYAGRAJ
-                </h1>
-
-                <p>
-                    POWERED BY LIVE STUDY ALLAHABAD
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <!-- MOBILE MENU BUTTON -->
-        <button
-            type="button"
-            class="menu-toggle"
-            onclick="toggleNav()"
-            aria-label="Menu"
-        >
-            ☰
-        </button>
-
-    </div>
-
-
-    <!-- NAVIGATION -->
-
-    <nav
-        id="nav"
-        class="main-nav"
-    >
-
-        <button
-            type="button"
-            onclick="showPage('home')"
-        >
-            🏠 Home
-        </button>
-
-        <button
-            type="button"
-            onclick="showPage('liveClasses')"
-        >
-            🎥 Live Classes
-        </button>
-
-        <button
-            type="button"
-            onclick="showPage('courses')"
-        >
-            📚 Courses
-        </button>
-
-        <button
-            type="button"
-            onclick="showPage('tests')"
-        >
-            📝 Tests
-        </button>
-
-        <button
-            type="button"
-            onclick="showPage('notes')"
-        >
-            📄 Notes / PDF
-        </button>
-
-        <button
-            type="button"
-            onclick="showResults(); showPage('results')"
-        >
-            🏆 Results
-        </button>
-
-        <button
-            type="button"
-            onclick="showPage('notifications')"
-        >
-            🔔 Notifications
-        </button>
-
-        <button
-            type="button"
-            onclick="youtube()"
-        >
-            ▶️ YouTube
-        </button>
-
-        <button
-            type="button"
-            onclick="showPage('profile')"
-        >
-            👤 Profile
-        </button>
-
-        <button
-            type="button"
-            onclick="showPage('contact')"
-        >
-            📞 Contact
-        </button>
-
-        <button
-            type="button"
-            onclick="showPage('about')"
-        >
-            ℹ️ About
-        </button>
-
-        <button
-            type="button"
-            class="logout-btn"
-            onclick="logout()"
-        >
-            🚪 Logout
-        </button>
-
-    </nav>
-
-</header>
-
-
-<!-- =========================================================
-     MAIN APPLICATION
-========================================================= -->
-
-<main id="app">
-
-
-<!-- =========================================================
-     LOGIN PAGE
-========================================================= -->
-
-<section
-    id="loginPage"
-    class="page"
->
-
-    <div class="login-wrapper">
-
-        <div class="login-card">
-
-            <div class="login-logo">
-                🎓
-            </div>
-
-            <h2>
-                GS JUNCTION PRAYAGRAJ
-            </h2>
-
-            <p class="login-tagline">
-                सभी प्रतियोगी परीक्षाओं हेतु
-                गुणवत्तापूर्ण अध्ययन एवं टेस्ट प्लेटफॉर्म
-            </p>
-
-
-            <div class="login-buttons">
-
-                <button
-                    type="button"
-                    class="primary-btn"
-                    onclick="loginStudent()"
-                >
-                    👨‍🎓 Student Login
+            <div class="auth-controls">
+                <span id="userRoleBadge" class="role-badge">Student</span>
+                <button id="toggleAuthBtn" class="btn btn-outline" onclick="toggleAuthRole()">
+                    <i class="fa-solid fa-user-gear"></i> Admin Login
                 </button>
+            </div>
+        </div>
+    </header>
 
+    <!-- MAIN APP CONTAINER -->
+    <main class="main-container" id="mainContainer">
 
-                <button
-                    type="button"
-                    class="secondary-btn"
-                    onclick="loginAdmin()"
-                >
-                    ⚙️ Admin Login
-                </button>
+        <!-- ================= STUDENT INTERFACE ================= -->
+        <div id="studentInterface" class="interface-section active">
+            <!-- Student Navigation Tabs -->
+            <nav class="nav-tabs">
+                <button class="tab-btn active" onclick="switchStudentTab('home')"><i class="fa-solid fa-house"></i> Home</button>
+                <button class="tab-btn" onclick="switchStudentTab('tests')"><i class="fa-solid fa-pen-to-square"></i> Tests</button>
+                <button class="tab-btn" onclick="switchStudentTab('courses')"><i class="fa-solid fa-book-open"></i> Courses</button>
+                <button class="tab-btn" onclick="switchStudentTab('live')"><i class="fa-solid fa-video"></i> Live Classes</button>
+                <button class="tab-btn" onclick="switchStudentTab('notes')"><i class="fa-solid fa-file-pdf"></i> Notes / PDF</button>
+                <button class="tab-btn" onclick="switchStudentTab('results')"><i class="fa-solid fa-trophy"></i> Results</button>
+                <button class="tab-btn" onclick="switchStudentTab('profile')"><i class="fa-solid fa-user"></i> Profile</button>
+            </nav>
 
+            <!-- Home Tab -->
+            <div id="tab-home" class="tab-content active">
+                <div class="welcome-banner">
+                    <h2>स्वागत है, GS JUNCTION PRAYAGRAJ में!</h2>
+                    <p id="brandTaglineText">सभी प्रतियोगी परीक्षाओं हेतु गुणवत्तापूर्ण अध्ययन एवं टेस्ट प्लेटफॉर्म</p>
+                </div>
+
+                <div class="grid-dashboard">
+                    <div class="dash-card" onclick="switchStudentTab('live')">
+                        <i class="fa-solid fa-tower-broadcast card-icon text-danger"></i>
+                        <h3>🎥 Live Classes</h3>
+                        <p>लाइव एवं आगामी कक्षाएं</p>
+                    </div>
+                    <div class="dash-card" onclick="switchStudentTab('courses')">
+                        <i class="fa-solid fa-graduation-cap card-icon text-primary"></i>
+                        <h3>📚 Courses</h3>
+                        <p>संपूर्ण कोर्स एवं सामग्री</p>
+                    </div>
+                    <div class="dash-card" onclick="switchStudentTab('tests')">
+                        <i class="fa-solid fa-list-check card-icon text-success"></i>
+                        <h3>📝 MCQ Test</h3>
+                        <p>विषय एवं परीक्षा वार टेस्ट</p>
+                    </div>
+                    <div class="dash-card" onclick="switchStudentTab('notes')">
+                        <i class="fa-solid fa-file-lines card-icon text-warning"></i>
+                        <h3>📄 Notes / PDF</h3>
+                        <p>महत्वपूर्ण नोट्स एवं अध्ययन सामग्री</p>
+                    </div>
+                    <div class="dash-card" onclick="switchStudentTab('results')">
+                        <i class="fa-solid fa-chart-line card-icon text-info"></i>
+                        <h3>🏆 Test Result</h3>
+                        <p>अपना प्रदर्शन एवं विश्लेषण देखें</p>
+                    </div>
+                    <div class="dash-card" onclick="switchStudentTab('youtube')">
+                        <i class="fa-brands fa-youtube card-icon text-danger"></i>
+                        <h3>▶️ YouTube Classes</h3>
+                        <p>निःशुल्क वीडियो कक्षाएं</p>
+                    </div>
+                </div>
             </div>
 
+            <!-- Tests Tab -->
+            <div id="tab-tests" class="tab-content">
+                <div class="section-header">
+                    <h2>📝 Available Test Series</h2>
+                    <p class="text-muted">अपनी परीक्षा चुनें। ध्यान दें: TGT, PGT और LT GRADE के GS Test अलग-अलग हैं।</p>
+                </div>
 
-            <div class="login-exams">
+                <!-- Exam Category Selector -->
+                <div class="category-filter">
+                    <button class="cat-chip active" onclick="filterTests('ALL')">सभी (ALL)</button>
+                    <button class="cat-chip" onclick="filterTests('UPPSC')">UPPSC / PCS</button>
+                    <button class="cat-chip" onclick="filterTests('UPSSSC')">UPSSSC</button>
+                    <button class="cat-chip" onclick="filterTests('TGT')">TGT</button>
+                    <button class="cat-chip" onclick="filterTests('PGT')">PGT</button>
+                    <button class="cat-chip" onclick="filterTests('LT GRADE')">LT GRADE</button>
+                    <button class="cat-chip" onclick="filterTests('UGC NET')">UGC NET</button>
+                    <button class="cat-chip" onclick="filterTests('TET')">TET / CTET</button>
+                </div>
 
-                <span>PCS</span>
-                <span>UPSSSC</span>
-                <span>TGT</span>
-                <span>PGT</span>
-                <span>LT GRADE</span>
-                <span>UGC NET</span>
-                <span>TET</span>
-                <span>CTET</span>
-
+                <!-- Test Cards Grid -->
+                <div id="testCardsContainer" class="cards-grid">
+                    <!-- Dynamic rendering via JS -->
+                </div>
             </div>
 
-        </div>
+            <!-- Active Test Screen (Hidden initially) -->
+            <div id="activeTestEngine" class="test-engine-view hidden">
+                <div class="test-header-bar">
+                    <div>
+                        <h3 id="currentTestTitle">Test Title</h3>
+                        <span id="currentTestMeta" class="badge">Category</span>
+                    </div>
+                    <div class="timer-box">
+                        <i class="fa-regular fa-clock"></i> <span id="timerDisplay">00:00:00</span>
+                    </div>
+                </div>
 
-    </div>
+                <div class="test-body-layout">
+                    <!-- Question Area -->
+                    <div class="question-container">
+                        <div class="q-meta-info">
+                            <span>प्रश्न संख्या: <strong id="qCurrentIndex">1</strong>/<span id="qTotalCount">0</span></span>
+                            <span>अंक: <strong id="qMarks">1</strong> | माइनस मार्किंग: <strong id="qNegative">0</strong></span>
+                        </div>
 
-</section>
+                        <div id="qTextDisplay" class="q-text-box">
+                            <!-- Question Text -->
+                        </div>
 
+                        <div id="optionsContainer" class="options-group">
+                            <!-- Options standard radio choices -->
+                        </div>
 
-<!-- =========================================================
-     STUDENT HOME
-========================================================= -->
+                        <div class="test-navigation-controls">
+                            <button class="btn btn-secondary" onclick="navigateQuestion(-1)"><i class="fa-solid fa-chevron-left"></i> Previous</button>
+                            <button class="btn btn-warning" onclick="clearCurrentAnswer()">Clear Selection</button>
+                            <button class="btn btn-primary" onclick="navigateQuestion(1)">Next <i class="fa-solid fa-chevron-right"></i></button>
+                            <button class="btn btn-success pull-right" onclick="confirmSubmitTest()">Submit Test</button>
+                        </div>
+                    </div>
 
-<section
-    id="home"
-    class="page active"
->
-
-    <div class="hero-section">
-
-        <div class="hero-content">
-
-            <span class="eyebrow">
-                LIVE STUDY ALLAHABAD
-            </span>
-
-            <h2>
-                GS JUNCTION PRAYAGRAJ
-            </h2>
-
-            <h3>
-                सभी प्रतियोगी परीक्षाओं हेतु
-                गुणवत्तापूर्ण अध्ययन एवं टेस्ट प्लेटफॉर्म
-            </h3>
-
-            <p class="exam-line">
-                PCS • UPSSSC • TGT • PGT • LT GRADE •
-                UGC NET • TET • CTET
-            </p>
-
-
-            <div class="hero-actions">
-
-                <button
-                    type="button"
-                    class="primary-btn"
-                    onclick="showPage('tests')"
-                >
-                    📝 Test Series
-                </button>
-
-                <button
-                    type="button"
-                    class="youtube-btn"
-                    onclick="youtube()"
-                >
-                    ▶️ YouTube Classes
-                </button>
-
+                    <!-- Question Palette Sidebar -->
+                    <div class="palette-sidebar">
+                        <h4>Question Palette</h4>
+                        <div class="palette-legend">
+                            <span class="legend-item"><span class="dot current"></span> Current</span>
+                            <span class="legend-item"><span class="dot answered"></span> Answered</span>
+                            <span class="legend-item"><span class="dot skipped"></span> Skipped</span>
+                            <span class="legend-item"><span class="dot unanswered"></span> Unanswered</span>
+                        </div>
+                        <div id="paletteGrid" class="palette-grid">
+                            <!-- Dynamic Palette Numbers -->
+                        </div>
+                    </div>
+                </div>
             </div>
 
-        </div>
+            <!-- Test Result Screen -->
+            <div id="testResultView" class="result-view hidden">
+                <div class="result-card">
+                    <h2>🏆 Test Performance Summary</h2>
+                    <h3 id="resTestName">Test Title</h3>
 
+                    <div class="result-stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-label">Total Score</span>
+                            <span class="stat-value text-primary" id="resScore">0</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Accuracy</span>
+                            <span class="stat-value text-success" id="resAccuracy">0%</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Attempted</span>
+                            <span class="stat-value" id="resAttempted">0</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Correct</span>
+                            <span class="stat-value text-success" id="resCorrect">0</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Wrong</span>
+                            <span class="stat-value text-danger" id="resWrong">0</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Time Taken</span>
+                            <span class="stat-value" id="resTimeTaken">0m 0s</span>
+                        </div>
+                    </div>
 
-        <!-- STUDENT WELCOME -->
+                    <div class="result-actions">
+                        <button class="btn btn-primary" onclick="toggleDetailedExplanations()"><i class="fa-solid fa-eye"></i> View Question Explanations</button>
+                        <button class="btn btn-outline" onclick="switchStudentTab('tests')">Back to Tests</button>
+                    </div>
 
-        <div class="welcome-card">
-
-            <div class="welcome-icon">
-                👨‍🎓
+                    <div id="explanationsSection" class="explanations-list hidden">
+                        <h3>Detailed Solutions & Explanations</h3>
+                        <div id="explanationsContainer"></div>
+                    </div>
+                </div>
             </div>
 
-            <span>
-                स्वागत है
-            </span>
-
-            <strong id="studentName">
-                Student
-            </strong>
-
-            <p>
-                आपकी प्रतियोगी परीक्षा की तैयारी
-                अब एक ही स्थान पर।
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         QUICK FEATURES
-    ====================================================== -->
-
-    <div class="feature-grid">
-
-        <button
-            type="button"
-            class="feature-card"
-            onclick="showPage('liveClasses')"
-        >
-            <span>🎥</span>
-            <strong>Live Classes</strong>
-            <small>Upcoming Classes</small>
-        </button>
-
-
-        <button
-            type="button"
-            class="feature-card"
-            onclick="showPage('courses')"
-        >
-            <span>📚</span>
-            <strong>Courses</strong>
-            <small>Courses देखें</small>
-        </button>
-
-
-        <button
-            type="button"
-            class="feature-card"
-            onclick="showPage('tests')"
-        >
-            <span>📝</span>
-            <strong>MCQ Tests</strong>
-            <small>Online Test दें</small>
-        </button>
-
-
-        <button
-            type="button"
-            class="feature-card"
-            onclick="showPage('notes')"
-        >
-            <span>📄</span>
-            <strong>Notes / PDF</strong>
-            <small>Study Material</small>
-        </button>
-
-
-        <button
-            type="button"
-            class="feature-card"
-            onclick="showResults(); showPage('results')"
-        >
-            <span>🏆</span>
-            <strong>Results</strong>
-            <small>Test History</small>
-        </button>
-
-
-        <button
-            type="button"
-            class="feature-card"
-            onclick="showPage('notifications')"
-        >
-            <span>🔔</span>
-            <strong>Notifications</strong>
-            <small>Latest Updates</small>
-        </button>
-
-    </div>
-
-
-    <!-- =====================================================
-         STUDENT STATISTICS
-    ====================================================== -->
-
-    <div class="section-heading">
-
-        <span>
-            📊
-        </span>
-
-        <div>
-            <h2>
-                आपकी Performance
-            </h2>
-
-            <p>
-                आपके Test Performance का संक्षिप्त विवरण
-            </p>
-        </div>
-
-    </div>
-
-
-    <div class="stats-grid">
-
-        <div class="stat-card">
-
-            <strong id="totalTests">
-                0
-            </strong>
-
-            <span>
-                Total Tests
-            </span>
-
+            <!-- Other Generic Student Tabs -->
+            <div id="tab-courses" class="tab-content"><div class="placeholder-box"><h3>📚 Premium Courses</h3><p>नवीनतम बैचेस (Political Elite Batch, Answer Writing Mastery) यहाँ उपलब्ध हैं।</p></div></div>
+            <div id="tab-live" class="tab-content"><div class="placeholder-box"><h3>🎥 Live Classes Schedule</h3><p>रात 09:15 PM पर नियमित प्रैक्टिस क्लास एवं सुबह 11:00 AM नया बैच।</p></div></div>
+            <div id="tab-notes" class="tab-content"><div class="placeholder-box"><h3>📄 Notes & Study Material</h3><p>PDF नोट्स डाउनलोड करने के लिए उपलब्ध हैं।</p></div></div>
+            <div id="tab-results" class="tab-content"><div class="placeholder-box"><h3>🏆 Previous Test History</h3><p>आपके द्वारा दिए गए सभी टेस्ट का विस्तृत इतिहास यहाँ सुरक्षित रहता है।</p></div></div>
+            <div id="tab-youtube" class="tab-content"><div class="placeholder-box"><h3>▶️ YouTube Channel</h3><p>LIVE STUDY ALLAHABAD चैनल पर मुफ़्त प्रैक्टिस सेशन देखें।</p></div></div>
+            <div id="tab-profile" class="tab-content"><div class="placeholder-box"><h3>👤 Student Profile</h3><p>नाम: उत्पल विद्यार्थी | परीक्षा लक्ष्य: TGT / PGT / PCS</p></div></div>
         </div>
 
 
-        <div class="stat-card">
-
-            <strong id="bestScore">
-                0%
-            </strong>
-
-            <span>
-                Best Score
-            </span>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <strong id="accuracy">
-                0%
-            </strong>
-
-            <span>
-                Accuracy
-            </span>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         EXAM SELECTION
-    ====================================================== -->
-
-    <div class="section-heading">
-
-        <span>
-            📚
-        </span>
-
-        <div>
-
-            <h2>
-                परीक्षा चुनें
-            </h2>
-
-            <p>
-                अपनी परीक्षा के अनुसार Test Series चुनें
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div
-        id="homeExamGrid"
-        class="exam-grid"
-    >
-        <!-- JavaScript द्वारा Exams आएंगे -->
-    </div>
-
-
-    <!-- =====================================================
-         ANNOUNCEMENT
-    ====================================================== -->
-
-    <div class="announcement-card">
-
-        <div class="announcement-icon">
-            📢
-        </div>
-
-        <div>
-
-            <strong>
-                Important Announcement
-            </strong>
-
-            <p>
-                नई Test Series, Classes और Study Material
-                के लिए Notifications देखते रहें।
-            </p>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     LIVE CLASSES
-========================================================= -->
-
-<section
-    id="liveClasses"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>🎥</span>
-
-        <div>
-
-            <h2>
-                Live Classes
-            </h2>
-
-            <p>
-                Upcoming और Live Classes
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="content-grid">
-
-        <div class="content-card">
-
-            <span class="content-icon">
-                🔴
-            </span>
-
-            <h3>
-                Live Study Allahabad
-            </h3>
-
-            <p>
-                प्रतियोगी परीक्षाओं की नियमित
-                Live Classes YouTube और App पर।
-            </p>
-
-            <button
-                type="button"
-                onclick="youtube()"
-            >
-                ▶️ YouTube Classes
-            </button>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <span class="content-icon">
-                📅
-            </span>
-
-            <h3>
-                Upcoming Classes
-            </h3>
-
-            <p>
-                Upcoming Live Classes की जानकारी
-                यहाँ दिखाई जाएगी।
-            </p>
-
-            <span class="coming-soon">
-                जल्द उपलब्ध होगा
-            </span>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     COURSES
-========================================================= -->
-
-<section
-    id="courses"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>📚</span>
-
-        <div>
-
-            <h2>
-                Courses
-            </h2>
-
-            <p>
-                प्रतियोगी परीक्षाओं के लिए Courses
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="content-grid">
-
-        <div class="content-card">
-
-            <span class="content-icon">
-                📘
-            </span>
-
-            <h3>
-                TGT / PGT Courses
-            </h3>
-
-            <p>
-                TGT एवं PGT परीक्षा की Subject-wise
-                तैयारी।
-            </p>
-
-            <span class="coming-soon">
-                Courses जल्द उपलब्ध होंगे
-            </span>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <span class="content-icon">
-                📗
-            </span>
-
-            <h3>
-                LT GRADE Courses
-            </h3>
-
-            <p>
-                LT Grade परीक्षा के लिए
-                व्यवस्थित तैयारी।
-            </p>
-
-            <span class="coming-soon">
-                Courses जल्द उपलब्ध होंगे
-            </span>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <span class="content-icon">
-                📕
-            </span>
-
-            <h3>
-                UGC NET / PCS
-            </h3>
-
-            <p>
-                उच्च स्तरीय प्रतियोगी परीक्षाओं
-                हेतु Courses।
-            </p>
-
-            <span class="coming-soon">
-                Courses जल्द उपलब्ध होंगे
-            </span>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     TESTS
-========================================================= -->
-
-<section
-    id="tests"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>📝</span>
-
-        <div>
-
-            <h2>
-                Online Test Series
-            </h2>
-
-            <p>
-                Exam → Category → Subject → Test
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <!-- TEST FILTER -->
-
-    <div class="test-selector-card">
-
-        <div class="selector-grid">
-
-            <div class="form-group">
-
-                <label for="examSelect">
-                    Exam
-                </label>
-
-                <select
-                    id="examSelect"
-                    onchange="updateCategorySelector()"
-                >
-                    <option value="">
-                        सभी Exams
-                    </option>
-                </select>
-
+        <!-- ================= ADMIN INTERFACE ================= -->
+        <div id="adminInterface" class="interface-section">
+            <div class="admin-wrapper">
+                <aside class="admin-sidebar">
+                    <div class="admin-profile">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <h4>Admin Panel</h4>
+                        <small>GS JUNCTION</small>
+                    </div>
+                    <ul class="admin-menu">
+                        <li class="active" onclick="switchAdminTab('dash')"><i class="fa-solid fa-chart-pie"></i> Dashboard</li>
+                        <li onclick="switchAdminTab('add-test')"><i class="fa-solid fa-plus-circle"></i> Add Test (TXT / Manual)</li>
+                        <li onclick="switchAdminTab('manage-tests')"><i class="fa-solid fa-tasks"></i> Manage Tests</li>
+                        <li onclick="switchAdminTab('branding')"><i class="fa-solid fa-palette"></i> Branding & Theme</li>
+                    </ul>
+                </aside>
+
+                <div class="admin-content">
+                    <!-- Admin Dash -->
+                    <div id="admin-tab-dash" class="admin-tab active">
+                        <h2>📊 Quick Overview</h2>
+                        <div class="grid-dashboard">
+                            <div class="dash-card"><h3>Total Tests</h3><p id="adminTotalTestsCount">0</p></div>
+                            <div class="dash-card"><h3>Published</h3><p id="adminPublishedCount">0</p></div>
+                            <div class="dash-card"><h3>Active Students</h3><p>1,250+</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Add Test Tab -->
+                    <div id="admin-tab-add-test" class="admin-tab">
+                        <h2>➕ Create / Add New Test</h2>
+                        <form id="createTestForm" onsubmit="handleCreateTest(event)">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Test ID (Unique)</label>
+                                    <input type="text" id="adminTestId" placeholder="e.g., tgt-gs-002" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Test Title</label>
+                                    <input type="text" id="adminTestName" placeholder="e.g., TGT GS Special Test 2" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Exam Category</label>
+                                    <select id="adminExamCat" required>
+                                        <option value="UPPSC">UPPSC / PCS</option>
+                                        <option value="UPSSSC">UPSSSC</option>
+                                        <option value="TGT">TGT</option>
+                                        <option value="PGT">PGT</option>
+                                        <option value="LT GRADE">LT GRADE</option>
+                                        <option value="UGC NET">UGC NET</option>
+                                        <option value="TET">TET / CTET</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Subject</label>
+                                    <input type="text" id="adminSubject" placeholder="General Studies / Political Science" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Time Per Question (Seconds)</label>
+                                    <input type="number" id="adminTimePerQ" value="45" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Marks Per Question</label>
+                                    <input type="number" id="adminMarks" value="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>TXT File Path (in /tests folder)</label>
+                                    <input type="text" id="adminFilePath" placeholder="tests/tgt-gs-002.txt" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Publish New Test</button>
+                        </form>
+                    </div>
+
+                    <!-- Manage Tests -->
+                    <div id="admin-tab-manage-tests" class="admin-tab">
+                        <h2>📝 Test Repository</h2>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Exam</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTestTableBody">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Branding Settings -->
+                    <div id="admin-tab-branding" class="admin-tab">
+                        <h2>🎨 Dynamic Branding & Style Settings</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Brand Header Title</label>
+                                <input type="text" id="brandTitleInput" value="GS JUNCTION PRAYAGRAJ">
+                            </div>
+                            <div class="form-group">
+                                <label>Primary Theme Color</label>
+                                <input type="color" id="primaryColorInput" value="#1a365d">
+                            </div>
+                            <div class="form-group">
+                                <label>Accent Color</label>
+                                <input type="color" id="accentColorInput" value="#d69e2e">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveBrandingSettings()" style="margin-top: 15px;">Save Branding Changes</button>
+                    </div>
+                </div>
             </div>
-
-
-            <div class="form-group">
-
-                <label for="categorySelect">
-                    Category
-                </label>
-
-                <select
-                    id="categorySelect"
-                    onchange="updateSubjectSelector()"
-                >
-                    <option value="">
-                        सभी Categories
-                    </option>
-                </select>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="subjectSelect">
-                    Subject
-                </label>
-
-                <select
-                    id="subjectSelect"
-                    onchange="updateTestSelector()"
-                >
-                    <option value="">
-                        सभी Subjects
-                    </option>
-                </select>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="testSelect">
-                    Test
-                </label>
-
-                <select
-                    id="testSelect"
-                    onchange="showSelectedTestInfo()"
-                >
-                    <option value="">
-                        Test चुनें
-                    </option>
-                </select>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="count">
-                    Questions
-                </label>
-
-                <select id="count">
-                    <option value="10">
-                        10 Questions
-                    </option>
-                </select>
-
-            </div>
-
         </div>
 
-
-        <!-- TEST INFORMATION -->
-
-        <div
-            id="selectedTestInfo"
-            class="selected-test-info"
-        >
-            Exam → Category → Subject → Test Select करें।
-        </div>
-
-
-        <div class="test-start-row">
-
-            <button
-                type="button"
-                class="primary-btn large-btn"
-                onclick="startTest()"
-            >
-                🚀 Start Test
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- TEST AREA -->
-
-    <div
-        id="testArea"
-        class="test-area hidden"
-    >
-    </div>
-
-
-    <!-- RESULT AREA -->
-
-    <div
-        id="resultArea"
-        class="result-area hidden"
-    >
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     EXAM AREA
-========================================================= -->
-
-<section
-    id="examArea"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>📚</span>
-
-        <div>
-
-            <h2 id="examTitle">
-                Test Series
-            </h2>
-
-            <p id="examDescription">
-                उपलब्ध सभी Tests
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div
-        id="examTests"
-        class="exam-tests-grid"
-    >
-        <!-- Tests JavaScript से आएंगे -->
-    </div>
-
-
-    <div class="back-action">
-
-        <button
-            type="button"
-            onclick="showPage('home')"
-        >
-            ← Home पर वापस जाएँ
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     NOTES / PDF
-========================================================= -->
-
-<section
-    id="notes"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>📄</span>
-
-        <div>
-
-            <h2>
-                Notes / PDF
-            </h2>
-
-            <p>
-                Study Material एवं PDF Notes
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="content-grid">
-
-        <div class="content-card">
-
-            <span class="content-icon">
-                📄
-            </span>
-
-            <h3>
-                Study Notes
-            </h3>
-
-            <p>
-                Exam, Subject और Topic के अनुसार
-                Notes उपलब्ध होंगे।
-            </p>
-
-            <span class="coming-soon">
-                जल्द उपलब्ध होगा
-            </span>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <span class="content-icon">
-                📥
-            </span>
-
-            <h3>
-                PDF Download
-            </h3>
-
-            <p>
-                महत्वपूर्ण PDF को पढ़ने एवं
-                Download करने की सुविधा।
-            </p>
-
-            <span class="coming-soon">
-                जल्द उपलब्ध होगा
-            </span>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     RESULTS
-========================================================= -->
-
-<section
-    id="results"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>🏆</span>
-
-        <div>
-
-            <h2>
-                Test Results
-            </h2>
-
-            <p>
-                आपके सभी Test Results
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div
-        id="resultArea"
-        class="result-area"
-    >
-        <div class="empty-state">
-
-            <span>🏆</span>
-
-            <h3>
-                अभी कोई Result उपलब्ध नहीं है
-            </h3>
-
-            <p>
-                Test देने के बाद आपका Result यहाँ दिखाई देगा।
-            </p>
-
-        </div>
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     NOTIFICATIONS
-========================================================= -->
-
-<section
-    id="notifications"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>🔔</span>
-
-        <div>
-
-            <h2>
-                Notifications
-            </h2>
-
-            <p>
-                Latest Updates और महत्वपूर्ण सूचनाएँ
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="notification-list">
-
-        <div class="notification-card">
-
-            <span>
-                📢
-            </span>
-
-            <div>
-
-                <strong>
-                    GS JUNCTION PRAYAGRAJ
-                </strong>
-
-                <p>
-                    नई Test Series और Classes की
-                    जानकारी यहाँ उपलब्ध होगी।
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="empty-state small-empty">
-
-            <span>🔔</span>
-
-            <p>
-                अभी कोई नई Notification नहीं है।
-            </p>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     PROFILE
-========================================================= -->
-
-<section
-    id="profile"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>👤</span>
-
-        <div>
-
-            <h2>
-                Student Profile
-            </h2>
-
-            <p>
-                अपनी Profile Information अपडेट करें
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="profile-layout">
-
-        <div class="profile-card">
-
-            <div class="profile-avatar">
-                👨‍🎓
-            </div>
-
-            <h3 id="profileStudentName">
-                Student
-            </h3>
-
-            <p>
-                Student Account
-            </p>
-
-        </div>
-
-
-        <div class="profile-form-card">
-
-            <div class="form-group">
-
-                <label for="name">
-                    Student Name
-                </label>
-
-                <input
-                    type="text"
-                    id="name"
-                    placeholder="अपना नाम लिखें"
-                >
-
-            </div>
-
-
-            <button
-                type="button"
-                class="primary-btn"
-                onclick="saveName()"
-            >
-                💾 नाम सुरक्षित करें
-            </button>
-
-
-            <p
-                id="msg"
-                class="form-message"
-            ></p>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     CONTACT
-========================================================= -->
-
-<section
-    id="contact"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>📞</span>
-
-        <div>
-
-            <h2>
-                Contact Us
-            </h2>
-
-            <p>
-                GS JUNCTION PRAYAGRAJ से संपर्क करें
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="contact-grid">
-
-        <div class="contact-card">
-
-            <span>📞</span>
-
-            <h3>
-                Phone
-            </h3>
-
-            <p>
-                Course एवं Test Series जानकारी के लिए
-            </p>
-
-            <button
-                type="button"
-                onclick="contactAdmin()"
-            >
-                Contact
-            </button>
-
-        </div>
-
-
-        <div class="contact-card">
-
-            <span>💬</span>
-
-            <h3>
-                WhatsApp
-            </h3>
-
-            <p>
-                WhatsApp पर संपर्क करें
-            </p>
-
-            <button
-                type="button"
-                onclick="contactAdmin()"
-            >
-                WhatsApp
-            </button>
-
-        </div>
-
-
-        <div class="contact-card">
-
-            <span>📱</span>
-
-            <h3>
-                Telegram
-            </h3>
-
-            <p>
-                Telegram Updates प्राप्त करें
-            </p>
-
-            <button
-                type="button"
-                onclick="contactAdmin()"
-            >
-                Telegram
-            </button>
-
-        </div>
-
-
-        <div class="contact-card">
-
-            <span>▶️</span>
-
-            <h3>
-                YouTube
-            </h3>
-
-            <p>
-                Live Study Allahabad
-            </p>
-
-            <button
-                type="button"
-                onclick="youtube()"
-            >
-                YouTube
-            </button>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     ABOUT
-========================================================= -->
-
-<section
-    id="about"
-    class="page"
->
-
-    <div class="page-header">
-
-        <span>ℹ️</span>
-
-        <div>
-
-            <h2>
-                About Us
-            </h2>
-
-            <p>
-                GS JUNCTION PRAYAGRAJ
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="about-card">
-
-        <div class="about-logo">
-            🎓
-        </div>
-
-        <h2>
-            GS JUNCTION PRAYAGRAJ
-        </h2>
-
-        <h3>
-            POWERED BY LIVE STUDY ALLAHABAD
-        </h3>
-
-
-        <p>
-            GS JUNCTION PRAYAGRAJ एक
-            Professional Online Education एवं
-            Test Platform है, जिसका उद्देश्य
-            प्रतियोगी परीक्षाओं की तैयारी कर रहे
-            विद्यार्थियों को गुणवत्तापूर्ण अध्ययन,
-            Online Test Series, Notes, Live Classes
-            और अन्य शैक्षणिक सुविधाएँ एक ही स्थान
-            पर उपलब्ध कराना है।
-        </p>
-
-
-        <div class="about-features">
-
-            <span>📚 Courses</span>
-            <span>📝 Test Series</span>
-            <span>🎥 Live Classes</span>
-            <span>📄 Notes / PDF</span>
-            <span>🏆 Results</span>
-            <span>🔔 Notifications</span>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     ADMIN PANEL
-========================================================= -->
-
-<section
-    id="adminPanel"
-    class="page"
->
-
-    <div class="admin-header">
-
-        <div>
-
-            <span class="admin-label">
-                ADMIN PANEL
-            </span>
-
-            <h2>
-                GS JUNCTION PRAYAGRAJ
-            </h2>
-
-            <p>
-                Platform Management Dashboard
-            </p>
-
-        </div>
-
-
-        <button
-            type="button"
-            class="logout-btn"
-            onclick="logout()"
-        >
-            🚪 Logout
-        </button>
-
-    </div>
-
-
-    <!-- ADMIN DASHBOARD CARDS -->
-
-    <div class="admin-grid">
-
-
-        <button
-            type="button"
-            class="admin-card"
-            onclick="adminAction('tests')"
-        >
-
-            <span>
-                📝
-            </span>
-
-            <strong>
-                Test Management
-            </strong>
-
-            <small>
-                Add / Edit / Publish Tests
-            </small>
-
-        </button>
-
-
-        <button
-            type="button"
-            class="admin-card"
-            onclick="adminAction('questions')"
-        >
-
-            <span>
-                ❓
-            </span>
-
-            <strong>
-                Question Bank
-            </strong>
-
-            <small>
-                Questions Manage करें
-            </small>
-
-        </button>
-
-
-        <button
-            type="button"
-            class="admin-card"
-            onclick="adminAction('students')"
-        >
-
-            <span>
-                👥
-            </span>
-
-            <strong>
-                Students
-            </strong>
-
-            <small>
-                Student Management
-            </small>
-
-        </button>
-
-
-        <button
-            type="button"
-            class="admin-card"
-            onclick="adminAction('courses')"
-        >
-
-            <span>
-                📚
-            </span>
-
-            <strong>
-                Courses
-            </strong>
-
-            <small>
-                Course Management
-            </small>
-
-        </button>
-
-
-        <button
-            type="button"
-            class="admin-card"
-            onclick="adminAction('notes')"
-        >
-
-            <span>
-                📄
-            </span>
-
-            <strong>
-                Notes / PDF
-            </strong>
-
-            <small>
-                Study Material
-            </small>
-
-        </button>
-
-
-        <button
-            type="button"
-            class="admin-card"
-            onclick="adminAction('notifications')"
-        >
-
-            <span>
-                🔔
-            </span>
-
-            <strong>
-                Notifications
-            </strong>
-
-            <small>
-                Student Updates
-            </small>
-
-        </button>
-
-
-        <button
-            type="button"
-            class="admin-card"
-            onclick="adminAction('links')"
-        >
-
-            <span>
-                🔗
-            </span>
-
-            <strong>
-                Social Links
-            </strong>
-
-            <small>
-                YouTube / Telegram / etc.
-            </small>
-
-        </button>
-
-
-        <button
-            type="button"
-            class="admin-card"
-            onclick="adminAction('settings')"
-        >
-
-            <span>
-                ⚙️
-            </span>
-
-            <strong>
-                Settings
-            </strong>
-
-            <small>
-                App Settings
-            </small>
-
-        </button>
-
-    </div>
-
-
-    <!-- =====================================================
-         TXT TEST UPLOAD
-    ====================================================== -->
-
-    <div class="admin-section">
-
-        <div class="admin-section-header">
-
-            <div>
-
-                <span>
-                    📤
-                </span>
-
-                <h3>
-                    Bulk TXT Question Upload
-                </h3>
-
-            </div>
-
-        </div>
-
-
-        <p>
-            TXT file upload करके एक साथ Multiple
-            Questions App में Load करें।
-        </p>
-
-
-        <div class="upload-box">
-
-            <label
-                for="txtFile"
-                class="upload-label"
-            >
-                📄 TXT File चुनें
-            </label>
-
-            <input
-                type="file"
-                id="txtFile"
-                accept=".txt,text/plain"
-            >
-
-            <small>
-                Format:
-                Question + (A) (B) (C) (D) + उत्तर
-            </small>
-
-        </div>
-
-    </div>
-
-
-    <!-- ADMIN MESSAGE -->
-
-    <div
-        id="adminMessage"
-        class="admin-message hidden"
-    >
-    </div>
-
-</section>
-
-
-</main>
-
-
-<!-- =========================================================
-     FOOTER
-========================================================= -->
-
-<footer class="site-footer">
-
-    <div class="footer-inner">
-
-        <div class="footer-brand">
-
-            <h3>
-                GS JUNCTION PRAYAGRAJ
-            </h3>
-
-            <p>
-                सभी प्रतियोगी परीक्षाओं हेतु
-                गुणवत्तापूर्ण अध्ययन एवं टेस्ट प्लेटफॉर्म
-            </p>
-
-        </div>
-
-
-        <div class="footer-exams">
-
-            <strong>
-                Exams
-            </strong>
-
-            <p>
-                PCS • UPSSSC • TGT • PGT •
-                LT GRADE • UGC NET • TET • CTET
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="footer-bottom">
-
-        <p>
-            © 2026 GS JUNCTION PRAYAGRAJ
-        </p>
-
-        <strong>
-            POWERED BY LIVE STUDY ALLAHABAD
-        </strong>
-
-    </div>
-
-</footer>
-
-
-<!-- =========================================================
-     APP JAVASCRIPT
-========================================================= -->
-
-<script
-    src="app.js"
-    defer
-></script>
-
-
-<!-- =========================================================
-     SERVICE WORKER
-========================================================= -->
-
-<script>
-
-if ("serviceWorker" in navigator) {
-
-    window.addEventListener(
-        "load",
-        function () {
-
-            navigator.serviceWorker
-                .register("service-worker.js")
-                .then(
-                    function () {
-
-                        console.log(
-                            "Service Worker registered."
-                        );
-
-                    }
-                )
-                .catch(
-                    function (error) {
-
-                        console.warn(
-                            "Service Worker registration failed:",
-                            error
-                        );
-
-                    }
-                );
-
-        }
-    );
-
-}
-
-</script>
-
-
-<!-- =========================================================
-     PROFILE NAME SYNC
-========================================================= -->
-
-<script>
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-        const originalLoadProfile =
-            window.loadProfile;
-
-        /*
-         * Existing app.js loadProfile() के साथ
-         * profile name को भी sync रखा जाएगा।
-         */
-
-        const observer =
-            new MutationObserver(
-                function () {
-
-                    const mainName =
-                        document.getElementById(
-                            "studentName"
-                        );
-
-                    const profileName =
-                        document.getElementById(
-                            "profileStudentName"
-                        );
-
-                    if (
-                        mainName &&
-                        profileName
-                    ) {
-
-                        profileName.textContent =
-                            mainName.textContent ||
-                            "Student";
-                    }
-
-                }
-            );
-
-        const main =
-            document.getElementById("app");
-
-        if (main) {
-
-            observer.observe(
-                main,
-                {
-                    childList: true,
-                    subtree: true,
-                    characterData: true
-                }
-            );
-
-        }
-
-    }
-);
-
-</script>
-
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+        <p>GS JUNCTION PRAYAGRAJ &copy; 2026</p>
+        <p class="powered-by">POWERED BY LIVE STUDY ALLAHABAD</p>
+    </footer>
+
+    <!-- App Logic Scripts -->
+    <script src="app.js"></script>
 </body>
 </html>
